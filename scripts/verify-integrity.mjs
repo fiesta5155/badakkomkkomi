@@ -340,14 +340,25 @@ for (const dir of ['src/services', 'src/hooks']) {
   }
 }
 
+function collectMarkdownFiles(dirPath) {
+  const results = [];
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...collectMarkdownFiles(fullPath));
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
 const markdownDocsToVerify = [
   'README.md',
   'AGENTS.md',
   'DEPLOY_GUIDE.md',
-  'docs/ARCHITECTURE_AND_DESIGN.md',
-  'docs/DATA_AND_TECH_SOURCES.md',
-  'docs/ROUTE_BERTHING_UX_ANALYSIS_REPORT.md',
-  'docs/designs/SITEMAP.md',
+  '_agents/skills/bada-kkomkkomi-elephant/SKILL.md',
+  ...collectMarkdownFiles('docs'),
 ];
 const mdLinkRegex = /\[[^\]]+\]\(([^)]+)\)/g;
 for (const docPath of markdownDocsToVerify) {
@@ -355,12 +366,15 @@ for (const docPath of markdownDocsToVerify) {
   const docDir = path.dirname(docPath);
   for (const match of content.matchAll(mdLinkRegex)) {
     const rawTarget = match[1].trim().split('#')[0];
+    assert(
+      !rawTarget.startsWith('file://') && !/^[a-zA-Z]:[\\/]/.test(rawTarget),
+      `Forbidden local filesystem path link in ${docPath}: (${match[1]}) — use repository-relative paths only`,
+    );
     if (
       !rawTarget ||
       rawTarget.startsWith('http://') ||
       rawTarget.startsWith('https://') ||
       rawTarget.startsWith('mailto:') ||
-      rawTarget.startsWith('file://') ||
       rawTarget.startsWith('conversation://')
     ) {
       continue;
@@ -372,6 +386,29 @@ for (const docPath of markdownDocsToVerify) {
     );
   }
 }
+
+// 8. 이관 준비성(Zero-Config Portability) 및 토큰 번들 노출 차단 정적 가드
+const syncServiceTs = fs.readFileSync('src/services/githubLayerSyncService.ts', 'utf8');
+const mapViewTsx = fs.readFileSync('src/components/MapView.tsx', 'utf8');
+const buildCoastlineMjs = fs.readFileSync('scripts/build-coastline-polygons.mjs', 'utf8');
+assert(
+  syncServiceTs.includes('export function resolveViteBasePath') &&
+    syncServiceTs.includes('export function inferDefaultGitHubRepoCoords') &&
+    !syncServiceTs.includes('VITE_GITHUB_LAYER_SYNC_TOKEN'),
+  'githubLayerSyncService.ts must export resolveViteBasePath and inferDefaultGitHubRepoCoords and must not read VITE_GITHUB_LAYER_SYNC_TOKEN',
+);
+assert(
+  viteConfigTs.includes('resolveViteBasePath'),
+  'vite.config.ts must use resolveViteBasePath(process.env) for zero-config repository portability',
+);
+assert(
+  !mapViewTsx.includes('https://gunnysis.github.io'),
+  'src/components/MapView.tsx must not hardcode https://gunnysis.github.io',
+);
+assert(
+  !buildCoastlineMjs.includes('.gemini/antigravity-cli'),
+  'scripts/build-coastline-polygons.mjs must not hardcode local .gemini/antigravity-cli path',
+);
 
 console.log(
   `[Verify OK] Version ${pkg.version} (${displayMatch[1]}) | Docking: ${dockingFc.features.length} | Ports: ${portsData.ports.length} | Waypoints: ${portsData.waypoints.length} | EGM Contracts: OK | SW Precache: ${swPrecacheCount || 'pre-build'} | Legacy Bloat: 0`,

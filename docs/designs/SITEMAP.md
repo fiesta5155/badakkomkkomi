@@ -10,10 +10,11 @@
 | :--- | :--- | :--- |
 | **루트 블루프린트 (`Hay`)** | [`AGENTS.md`](../../AGENTS.md) | 전역 불변식(`Global Invariants`), 전역 부수효과(`Global Side Effects`), `.dev/docs` 아티팩트 경로 격리 및 통합 검증 명령 정의 |
 | **Elephant 컨텍스트 스킬** | [`_agents/skills/bada-kkomkkomi-elephant/SKILL.md`](../../_agents/skills/bada-kkomkkomi-elephant/SKILL.md) | EGM 설계 세션 시 프로젝트 핵심 맥락 및 Phase Write Boundary 로드 |
-| **마스터 아키텍처 & 구현 설계서** | [`docs/ARCHITECTURE_AND_DESIGN.md`](../ARCHITECTURE_AND_DESIGN.md) | **1장(현상태 분석·팩트체크·근본 원인)** + **2장(아키텍처·데이터 흐름·UI/UX·항구 선택 상태 머신·Target Scope & File Boundary)** + **3장(사용자 Action Items)** 통합 정본 |
-| **정박지·경유지 UX 및 실항로 곡선 구현 명세서** | [`docs/ROUTE_BERTHING_UX_ANALYSIS_REPORT.md`](../ROUTE_BERTHING_UX_ANALYSIS_REPORT.md) | 비항구 해상·해안 정박지 클릭, 마커 드래그 미세 조정, 선박 GPS 즉시 설정, 찍은 순서대로 자동 연결(`1 ➔ 2 ➔ 3`), `[도착 완료]` 자동 잠금, 옵션 A 우회 곡선(`leg.pathPositions`) 통합 구현 정본 |
+| **마스터 아키텍처 & 구현 설계서** | [`docs/ARCHITECTURE_AND_DESIGN.md`](../ARCHITECTURE_AND_DESIGN.md) | **1장(시스템 아키텍처·불변식)** + **2장(정박지 선택 상태 머신·실항로 렌더링)** + **3장(`docs/` 3계층 문서 거버넌스 설계)** 통합 정본 |
+| **정박지·경유지 UX 및 실항로 곡선 구현 명세서** | [`docs/ROUTE_BERTHING_UX_ANALYSIS_REPORT.md`](../ROUTE_BERTHING_UX_ANALYSIS_REPORT.md) | 비항구 해상·해안 정박지 클릭, 마커 드래그 미세 조정, 선박 GPS 즉시 설정, 찍은 순서대로 자동 연결(`1 ➔ 2 ➔ 3`), `[도착 완료]` 자동 잠금, 옵션 A 우회 곡선(`leg.pathPositions`) 서브시스템 상세 명세서 |
 | **데이터·API·기술 출처 명세서** | [`docs/DATA_AND_TECH_SOURCES.md`](../DATA_AND_TECH_SOURCES.md) | 6대 데이터·API·알고리즘 출처 및 해상 음영지역(오프라인) 동작 보장 매트릭스 정본 |
 | **운영자 무상 배포 매뉴얼** | [`DEPLOY_GUIDE.md`](../../DEPLOY_GUIDE.md) | 비개발자 운영자용 정적 데이터(`ports.json`, `docking_points.geojson`, 사진) 관리 및 자동 배포 가이드 |
+| **비개발자 이관·신규 구축 및 문서 거버넌스 기획서** | [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](../HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md) | 개발자 주도 클린룸 이관, 계정·경로 하드코딩 탈종속화, ChatGPT Pro 무상 유지보수 워크플로 및 `docs/` 문서 거버넌스 통합 기획·설계 정본 |
 
 ---
 
@@ -66,7 +67,7 @@ UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 
 - [`src/services/routeLegLabelService.ts`](../../src/services/routeLegLabelService.ts): `getRouteLegLabelParts()`
 - [`src/services/spatialFileParser.ts`](../../src/services/spatialFileParser.ts): `parseSpatialFiles()`, `detectCrsFromMetadata()`
 - [`src/services/layerStorageService.ts`](../../src/services/layerStorageService.ts): `loadOperationalLayerState()`, `saveOperationalLayerState()`, `listOperationalSnapshots()`, `restoreOperationalSnapshot()`, `hasLegacyDummyFeatures()`
-- [`src/services/githubLayerSyncService.ts`](../../src/services/githubLayerSyncService.ts): `pushLayersToGitHubRepo()`, `loadGitHubSyncConfig()`, `saveGitHubSyncConfig()`
+- [`src/services/githubLayerSyncService.ts`](../../src/services/githubLayerSyncService.ts): `resolveViteBasePath()`, `inferDefaultGitHubRepoCoords()`, `loadGitHubSyncConfig()`, `saveGitHubSyncConfig()`, `commitLayersToGitHubRepository()`
 - [`src/services/ecmwfWeatherService.ts`](../../src/services/ecmwfWeatherService.ts): `buildEcmwfWeatherUrls()`, `alignEcmwfWindAndWaveSeries()`, `evaluateHourlyWeatherSeries()`, `evaluateCombinedWeatherGrade()`, `resolveEffectiveThresholds()`
 - [`src/services/emailReportService.ts`](../../src/services/emailReportService.ts): `buildFieldReportEmailSubject()`, `buildFieldReportEmailBody()`, `buildMailtoUri()`
 - [`src/services/kakaoMapLoader.ts`](../../src/services/kakaoMapLoader.ts): `loadKakaoMapSdk()`, `leafletZoomToKakaoLevel()`, `kakaoLevelToLeafletZoom()`, `diagnoseKakaoMapFailure()`

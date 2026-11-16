@@ -5,7 +5,29 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const base = process.env.GITHUB_ACTIONS === 'true' ? '/bada-kkomkkomi/' : '/';
+function resolveViteBasePath(env: NodeJS.ProcessEnv): string {
+  const explicitBase = env.VITE_BASE_PATH?.trim();
+  if (explicitBase) {
+    const stripped = explicitBase.replace(/^\/+|\/+$/g, '');
+    return stripped ? `/${stripped}/` : '/';
+  }
+  if (env.GITHUB_ACTIONS === 'true') {
+    const repoFull = env.GITHUB_REPOSITORY?.trim() ?? '';
+    const [owner = '', repoName = ''] = repoFull.split('/');
+    const cleanOwner = owner.trim();
+    const cleanRepo = repoName.trim();
+    if (cleanRepo) {
+      if (cleanOwner && cleanRepo.toLowerCase() === `${cleanOwner.toLowerCase()}.github.io`) {
+        return '/';
+      }
+      return `/${cleanRepo}/`;
+    }
+    return '/bada-kkomkkomi/';
+  }
+  return '/';
+}
+
+const base = resolveViteBasePath(process.env);
 
 export default defineConfig({
   base,

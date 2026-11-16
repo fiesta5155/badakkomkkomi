@@ -7,42 +7,142 @@ import type {
 
 const LS_KEY_GITHUB_SYNC_CONFIG = 'bada_github_sync_config_v1';
 
-const DEFAULT_SYNC_CONFIG: GitHubSyncConfig = {
+export interface GitHubRepoCoords {
+  owner: string;
+  repo: string;
+}
+
+const FALLBACK_REPO_COORDS: GitHubRepoCoords = {
   owner: 'gunnysis',
   repo: 'bada-kkomkkomi',
-  branch: 'main',
-  token: (import.meta.env.VITE_GITHUB_LAYER_SYNC_TOKEN as string | undefined)?.trim() ?? '',
-  autoCommitOnSave: true,
 };
 
+/**
+ * Vite 빌드 base 경로 결정 순수 함수 (vite.config.ts 및 단위 테스트 공용)
+ * - 1순위: VITE_BASE_PATH 명시값 ('/' 또는 '/custom-path/')
+ * - 2순위: GITHUB_ACTIONS === 'true'일 때 GITHUB_REPOSITORY ('owner/repo') 파싱
+ *          ('<owner>.github.io' 사용자/조직 루트 사이트면 '/', 일반 프로젝트 저장소면 '/<repo>/')
+ * - 3순위: 로컬 개발 기본값 '/'
+ */
+export function resolveViteBasePath(
+  env?: {
+    VITE_BASE_PATH?: string;
+    GITHUB_ACTIONS?: string;
+    GITHUB_REPOSITORY?: string;
+  } | null,
+): string {
+  const explicitBase = env?.VITE_BASE_PATH?.trim();
+  if (explicitBase) {
+    const stripped = explicitBase.replace(/^\/+|\/+$/g, '');
+    return stripped ? `/${stripped}/` : '/';
+  }
+
+  if (env?.GITHUB_ACTIONS === 'true') {
+    const repoFull = env?.GITHUB_REPOSITORY?.trim() ?? '';
+    const [owner = '', repoName = ''] = repoFull.split('/');
+    const cleanOwner = owner.trim();
+    const cleanRepo = repoName.trim();
+    if (cleanRepo) {
+      if (cleanOwner && cleanRepo.toLowerCase() === `${cleanOwner.toLowerCase()}.github.io`) {
+        return '/';
+      }
+      return `/${cleanRepo}/`;
+    }
+    return '/bada-kkomkkomi/';
+  }
+
+  return '/';
+}
+
+/**
+ * 런타임 URL(*.github.io) 또는 환경변수에서 기본 GitHub 저장소(owner/repo) 자동 추론
+ */
+export function inferDefaultGitHubRepoCoords(
+  loc?: { hostname?: string; pathname?: string } | null,
+  env?: { owner?: string; repo?: string } | null,
+): GitHubRepoCoords {
+  const envOwner = env?.owner?.trim();
+  const envRepo = env?.repo?.trim();
+  if (envOwner && envRepo) {
+    return { owner: envOwner, repo: envRepo };
+  }
+
+  const runtimeLoc =
+    loc !== undefined
+      ? loc
+      : typeof window !== 'undefined'
+        ? window.location
+        : null;
+  const hostname = runtimeLoc?.hostname?.trim().toLowerCase() ?? '';
+  const pathname = runtimeLoc?.pathname?.trim() ?? '';
+
+  if (hostname.endsWith('.github.io')) {
+    const inferredOwner = hostname.slice(0, -'.github.io'.length).trim();
+    const firstSegment = pathname
+      .split('/')
+      .map((s) => s.trim())
+      .filter(Boolean)[0];
+    if (inferredOwner) {
+      return {
+        owner: envOwner || inferredOwner,
+        repo: envRepo || firstSegment || `${inferredOwner}.github.io`,
+      };
+    }
+  }
+
+  return {
+    owner: envOwner || FALLBACK_REPO_COORDS.owner,
+    repo: envRepo || FALLBACK_REPO_COORDS.repo,
+  };
+}
+
+function buildDefaultSyncConfig(): GitHubSyncConfig {
+  const inlineMetaEnv = (
+    import.meta as ImportMeta & { env?: Record<string, string | undefined> }
+  ).env;
+  const coords = inferDefaultGitHubRepoCoords(undefined, {
+    owner: inlineMetaEnv?.VITE_GITHUB_REPO_OWNER?.trim(),
+    repo: inlineMetaEnv?.VITE_GITHUB_REPO_NAME?.trim(),
+  });
+  return {
+    owner: coords.owner,
+    repo: coords.repo,
+    branch: 'main',
+    token: '',
+    autoCommitOnSave: false,
+  };
+}
+
 export function loadGitHubSyncConfig(): GitHubSyncConfig {
+  const defaults = buildDefaultSyncConfig();
   try {
     const raw = localStorage.getItem(LS_KEY_GITHUB_SYNC_CONFIG);
-    if (!raw) return DEFAULT_SYNC_CONFIG;
+    if (!raw) return defaults;
     const parsed = JSON.parse(raw);
     return {
-      owner: parsed.owner || DEFAULT_SYNC_CONFIG.owner,
-      repo: parsed.repo || DEFAULT_SYNC_CONFIG.repo,
-      branch: parsed.branch || DEFAULT_SYNC_CONFIG.branch,
-      token: parsed.token ?? DEFAULT_SYNC_CONFIG.token,
+      owner: parsed.owner?.trim() || defaults.owner,
+      repo: parsed.repo?.trim() || defaults.repo,
+      branch: parsed.branch?.trim() || defaults.branch,
+      token: typeof parsed.token === 'string' ? parsed.token.trim() : '',
       autoCommitOnSave:
         typeof parsed.autoCommitOnSave === 'boolean'
           ? parsed.autoCommitOnSave
-          : DEFAULT_SYNC_CONFIG.autoCommitOnSave,
+          : defaults.autoCommitOnSave,
     };
   } catch {
-    return DEFAULT_SYNC_CONFIG;
+    return defaults;
   }
 }
 
 export function saveGitHubSyncConfig(next: GitHubSyncConfig): void {
+  const defaults = buildDefaultSyncConfig();
   try {
     localStorage.setItem(
       LS_KEY_GITHUB_SYNC_CONFIG,
       JSON.stringify({
-        owner: next.owner.trim() || 'gunnysis',
-        repo: next.repo.trim() || 'bada-kkomkkomi',
-        branch: next.branch.trim() || 'main',
+        owner: next.owner.trim() || defaults.owner,
+        repo: next.repo.trim() || defaults.repo,
+        branch: next.branch.trim() || defaults.branch,
         token: next.token.trim(),
         autoCommitOnSave: next.autoCommitOnSave,
       }),
@@ -53,7 +153,7 @@ export function saveGitHubSyncConfig(next: GitHubSyncConfig): void {
 }
 
 /**
- *管理 화면에서 [저장] 버튼 클릭 시 호출:
+ * 관리 화면에서 [저장] 버튼 클릭 시 호출:
  * 원격 GitHub 저장소(main 브랜치)에 변경된 레이어 GeoJSON 파일들(public/data/layers/*.geojson)과
  * 설정 파일(public/config/app_config.json)을 단일 원자적 커밋(Single Atomic Commit)으로 즉시 푸시하여
  * GitHub Pages 자동 배포(deploy-pages.yml)를 트리거합니다.
@@ -74,7 +174,7 @@ export async function commitLayersToGitHubRepository(params: {
       success: true,
       status: 'local_only',
       message:
-        '앱 및 기기 영속 저장소(IndexedDB)에 즉시 운영 반영되었습니다. (원격 GitHub 자동 커밋은 토큰 설정 시 활성화됩니다.)',
+        '현재 기기(브라우저 IndexedDB)에 저장되었습니다. (전 직원 단말기 배포는 GitHub 커밋 또는 관리자 고급 설정의 원격 자동 커밋 활성화 시 수행됩니다.)',
     };
   }
 

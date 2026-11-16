@@ -1024,13 +1024,23 @@ export function MapView({
 
               <div className="rounded-2xl border border-[#d6c6b2] bg-[#f7f4ee] p-3">
                 <p className="font-extrabold text-[#003360]">
-                  [사용자 필수 조치] 카카오 개발자 콘솔 웹 도메인 등록
+                  [사용자 필수 조치] 카카오 개발자 콘솔 3단계 설정 확인
                 </p>
-                <p className="mt-1 text-[11px] text-[#484843]">
-                  카카오맵 JS SDK는 보안 정책상 등록된 도메인에서만 지도를 렌더링합니다.
-                  카카오 개발자 콘솔(developers.kakao.com) ➔ <strong>내 애플리케이션</strong> ➔{' '}
-                  <strong>앱 설정 &gt; 플랫폼 &gt; Web 사이트 도메인</strong>에 아래 주소를 추가해 주세요:
-                </p>
+                <ol className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-[#484843] [word-break:keep-all]">
+                  <li>
+                    <strong className="text-[#003360]">1. 카카오맵 활성화(ON):</strong>{' '}
+                    카카오 개발자 콘솔(developers.kakao.com) ➔ <strong>내 애플리케이션</strong> ➔{' '}
+                    <strong>카카오맵 설정</strong>에서 <strong>사용 설정(활성화)을 ON</strong>으로 변경
+                  </li>
+                  <li>
+                    <strong className="text-[#003360]">2. JavaScript 키 SDK 도메인 등록:</strong>{' '}
+                    <strong>앱 키 &gt; JavaScript 키</strong>(또는 웹 플랫폼 설정)의 도메인 목록에 아래 현재 접속 주소(하위 경로 제외)를 등록
+                  </li>
+                  <li>
+                    <strong className="text-[#003360]">3. 무료 쿼터 대상 확인:</strong>{' '}
+                    계정당 최초 활성화 무료 쿼터(일 300,000회) 적용 앱인지 쿼터 화면에서 확인
+                  </li>
+                </ol>
 
                 <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2">
                   <code className="truncate font-mono text-xs font-bold text-[#003360]">
@@ -1055,11 +1065,17 @@ export function MapView({
                   </button>
                 </div>
 
-                <p className="mt-2 text-[11px] text-[#484843]">
-                  권장 등록 도메인 목록:
+                <p className="mt-2 text-[11px] text-[#484843] [word-break:keep-all]">
+                  권장 등록 도메인 형식 (하위 경로 <code className="font-bold">/bada-kkomkkomi/</code> 제외):
                   <br />• 로컬 개발: <code className="font-bold text-[#003360]">http://localhost:5173</code>,{' '}
                   <code className="font-bold text-[#003360]">http://127.0.0.1:5173</code>
-                  <br />• 운영 배포: <code className="font-bold text-[#003360]">https://gunnysis.github.io</code>
+                  <br />• 운영 배포:{' '}
+                  <code className="font-bold text-[#003360]">
+                    {diagnostics.currentOrigin.includes('localhost') ||
+                    diagnostics.currentOrigin.includes('127.0.0.1')
+                      ? 'https://<운영자GitHub아이디>.github.io'
+                      : diagnostics.currentOrigin}
+                  </code>
                 </p>
               </div>
             </div>

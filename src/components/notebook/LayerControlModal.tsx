@@ -1890,8 +1890,8 @@ export function LayerControlModal({
                   <FolderGit2 className="h-4 w-4 text-[#003360]" />
                   <span>관리자 고급 설정: 원격 GitHub 저장소(GitHub Pages) 자동 운영 배포 연동</span>
                 </summary>
-                <p className="mt-2 text-[11px] leading-relaxed font-semibold text-[#484843]">
-                  관리 화면에서 <strong>[저장 (운영 반영)]</strong> 클릭 시 기기 내 영속 저장소(`IndexedDB`)에는 토큰 없이도 100% 즉시 반영됩니다. 모든 직원 단말기에 배포되도록 원격 GitHub 저장소(`main`)까지 동시에 자동 커밋하려면 저장소 쓰기 토큰(`contents: write` 권한 Fine-grained PAT)을 입력하세요. (토큰은 외부로 노출되지 않고 현재 기기 내부에만 격리 보관됩니다.)
+                <p className="mt-2 text-[11px] leading-relaxed font-semibold text-[#484843] [word-break:keep-all]">
+                  하단 <strong>[저장 (운영 반영)]</strong> 클릭 시 기본적으로 <strong>현재 기기 내부(`IndexedDB`)</strong>에 즉시 저장됩니다. 전 직원 단말기에 배포하려면 변환된 GeoJSON을 GitHub 웹/CLI로 커밋하거나(권장), 개인 전용 관리 PC에 한해 아래에 대상 저장소 전용 최소 권한(<code>Contents: Read and write</code>) Fine-grained PAT를 설정하세요. <strong className="text-[#870b41]">(보안 주의: 공용 PC나 현장 공용 단말기에는 브라우저에 토큰이 남으므로 절대 PAT를 입력하지 마십시오.)</strong>
                 </p>
 
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">

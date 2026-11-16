@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const RAW_PATH =
-  'C:/Users/Administrator/.gemini/antigravity-cli/brain/654e088b-5396-4722-ae87-00a5cb65222b/scratch/osm_coastline_raw.json';
+  process.env.OSM_COASTLINE_RAW_JSON ||
+  path.resolve('data-sources/osm_coastline_raw.json');
 const OUT_TS_PATH = path.resolve('src/data/coastlinePolygons.ts');
 
 // Douglas-Peucker simplification in degrees (1 deg lat ~ 111km, 0.00014 deg ~ 15m)
@@ -95,6 +96,12 @@ function computeSignedAreaLngLat(ring) {
 }
 
 function main() {
+  if (!fs.existsSync(RAW_PATH)) {
+    console.log(
+      `[INFO] 외부 OSM 해안선 원본 파일(${RAW_PATH})이 현재 환경에 없어 기존 컴파일된 ${OUT_TS_PATH}를 유지합니다.`,
+    );
+    return;
+  }
   const data = JSON.parse(fs.readFileSync(RAW_PATH, 'utf8'));
   const nodes = new Map();
   const ways = [];

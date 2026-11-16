@@ -17,6 +17,10 @@ import {
   samplePolylineDirectionArrows,
 } from '../services/routeGeoService.ts';
 import { getRouteLegLabelParts } from '../services/routeLegLabelService.ts';
+import {
+  inferDefaultGitHubRepoCoords,
+  resolveViteBasePath,
+} from '../services/githubLayerSyncService.ts';
 import { detectCrsFromMetadata } from '../services/spatialFileParser.ts';
 import { hasLegacyDummyFeatures } from '../services/layerStorageService.ts';
 import {
@@ -905,6 +909,56 @@ describe('7. Registered Port Candidate Selection, Sibling Port Switcher & Post-E
         );
       }
     }
+  });
+});
+
+describe('8. Handover Readiness: Zero-Config Base Path & GitHub Repo Auto-Inference (githubLayerSyncService.ts)', () => {
+  it('resolves Vite base path across explicit override, GitHub Actions project/user pages, and local dev', () => {
+    assert.equal(resolveViteBasePath({ VITE_BASE_PATH: 'custom-subpath' }), '/custom-subpath/');
+    assert.equal(resolveViteBasePath({ VITE_BASE_PATH: '/' }), '/');
+    assert.equal(
+      resolveViteBasePath({
+        GITHUB_ACTIONS: 'true',
+        GITHUB_REPOSITORY: 'knps-ops/bada-kkomkkomi-east',
+      }),
+      '/bada-kkomkkomi-east/',
+    );
+    assert.equal(
+      resolveViteBasePath({
+        GITHUB_ACTIONS: 'true',
+        GITHUB_REPOSITORY: 'knps-ops/knps-ops.github.io',
+      }),
+      '/',
+    );
+    assert.equal(resolveViteBasePath({ GITHUB_ACTIONS: 'false' }), '/');
+  });
+
+  it('infers GitHub owner and repo from *.github.io runtime URL, env overrides, and localhost fallback', () => {
+    assert.deepEqual(
+      inferDefaultGitHubRepoCoords({
+        hostname: 'knps-ops.github.io',
+        pathname: '/bada-kkomkkomi-east/index.html',
+      }),
+      { owner: 'knps-ops', repo: 'bada-kkomkkomi-east' },
+    );
+    assert.deepEqual(
+      inferDefaultGitHubRepoCoords({
+        hostname: 'knps-ops.github.io',
+        pathname: '/',
+      }),
+      { owner: 'knps-ops', repo: 'knps-ops.github.io' },
+    );
+    assert.deepEqual(
+      inferDefaultGitHubRepoCoords(
+        { hostname: 'localhost', pathname: '/' },
+        { owner: 'custom-owner', repo: 'custom-repo' },
+      ),
+      { owner: 'custom-owner', repo: 'custom-repo' },
+    );
+    assert.deepEqual(
+      inferDefaultGitHubRepoCoords({ hostname: 'localhost', pathname: '/' }),
+      { owner: 'gunnysis', repo: 'bada-kkomkkomi' },
+    );
   });
 });
 

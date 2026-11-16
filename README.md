@@ -10,6 +10,7 @@
 - **비개발자 운영자 매뉴얼**: [`DEPLOY_GUIDE.md`](./DEPLOY_GUIDE.md)
 - **외부 데이터·API·지도·기술 출처 안내서 (일반인·운영자용)**: [`docs/DATA_AND_TECH_SOURCES.md`](./docs/DATA_AND_TECH_SOURCES.md)
 - **아키텍처·구현 설계·트러블슈팅 단일 정본**: [`docs/ARCHITECTURE_AND_DESIGN.md`](./docs/ARCHITECTURE_AND_DESIGN.md)
+- **비개발자 이관·클린룸 신규 구축 및 문서 거버넌스 기획·설계서**: [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](./docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md)
 
 ---
 
@@ -80,6 +81,7 @@ bada-kkomkkomi/
 ├── docs/
 │   ├── ARCHITECTURE_AND_DESIGN.md     # 최종 구현 설계서 · 데이터 사전 · 트러블슈팅 단일 정본
 │   ├── DATA_AND_TECH_SOURCES.md       # 외부 데이터 · API · 지도 · 기술 및 에셋 출처 안내서
+│   ├── HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md # 비개발자 이관 · 클린룸 신규 구축 및 문서 거버넌스 통합 기획·설계서
 │   ├── ROUTE_BERTHING_UX_ANALYSIS_REPORT.md # 정박지(출발·도착·경유지) 지정 UX 분석 및 초단순 리팩토링 명세서
 │   └── designs/
 │       └── SITEMAP.md                 # Google EGM 서브시스템 살아있는 명세서 & 계약 인덱스 (Peanuts)
