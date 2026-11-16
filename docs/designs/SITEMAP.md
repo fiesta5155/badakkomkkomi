@@ -16,6 +16,7 @@
 | **운영자 무상 배포 매뉴얼** | [`DEPLOY_GUIDE.md`](../../DEPLOY_GUIDE.md) | 비개발자 운영자용 정적 데이터(`ports.json`, `docking_points.geojson`, 사진) 관리 및 자동 배포 가이드 |
 | **비개발자 이관·신규 구축 및 문서 거버넌스 기획서** | [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](../HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md) | 개발자 주도 클린룸 이관, 계정·경로 하드코딩 탈종속화, ChatGPT Pro 무상 유지보수 워크플로 및 `docs/` 문서 거버넌스 통합 기획·설계 정본 |
 | **스트레스 테스트 권고안 및 심층 하드닝 구현 설계서** | [`docs/HANDOVER_HARDENING_IMPLEMENTATION_PLAN.md`](../HANDOVER_HARDENING_IMPLEMENTATION_PLAN.md) | Vite 번들 환경변수 직렬화 원천 차단(`HARDEN-01`), 전 스크립트 개인 경로 0건화(`HARDEN-02`), 내만 비항구 앵커 브리지 우회(`HARDEN-03`), 브라우저·Node.js 겸용 KML 파서(`HARDEN-04`), 무결성 검증기 하드닝(`HARDEN-05`) 구현 정본 |
+| **비개발자 이관 작업 마스터 플랜 및 실전 안내서** | [`docs/reports/NON_DEVELOPER_HANDOVER_PLAN_AND_GUIDE.md`](../reports/NON_DEVELOPER_HANDOVER_PLAN_AND_GUIDE.md) | Day-1 클린룸 5단계 세팅, 합동 인수인계 실습·검수표, Day-2+ 일상 데이터 동시 수정 및 ChatGPT Pro 골든 프롬프트 안내서 |
 | **이관 준비 스트레스 테스트 및 종합 검증 결과 보고서** | [`docs/reports/HANDOVER_STRESS_TEST_AND_VERIFICATION_REPORT.md`](../reports/HANDOVER_STRESS_TEST_AND_VERIFICATION_REPORT.md) | 18,360쌍 전수 항로·200개 몬테카를로 좌표·4,002개 공간 피처·1,000시간 기상 카오스·8종 돌연변이·번들 보안 감사 실측 보고서 |
 
 ---
