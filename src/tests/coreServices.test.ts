@@ -21,7 +21,12 @@ import {
   inferDefaultGitHubRepoCoords,
   resolveViteBasePath,
 } from '../services/githubLayerSyncService.ts';
-import { detectCrsFromMetadata } from '../services/spatialFileParser.ts';
+import {
+  createSampleGeoPackageFile,
+  createSampleShapefileZip,
+  detectCrsFromMetadata,
+  parseSpatialFiles,
+} from '../services/spatialFileParser.ts';
 import { hasLegacyDummyFeatures } from '../services/layerStorageService.ts';
 import {
   alignEcmwfWindAndWaveSeries,
@@ -959,6 +964,106 @@ describe('8. Handover Readiness: Zero-Config Base Path & GitHub Repo Auto-Infere
       inferDefaultGitHubRepoCoords({ hostname: 'localhost', pathname: '/' }),
       { owner: 'gunnysis', repo: 'bada-kkomkkomi' },
     );
+  });
+
+  it('detours long-distance routes from deep enclosed non-port coves without crossing land barriers (HARDEN-03)', () => {
+    const coveCases: Array<{ label: string; from: RouteWaypoint; to: RouteWaypoint }> = [
+      {
+        label: '일운 구조라 내항 안쪽 -> 용남 화삼항 인근',
+        from: {
+          id: 'cove_1_from',
+          name: '구조라 내항 인근',
+          lat: 34.80744299115613,
+          lng: 128.68066194131038,
+          type: 'start',
+          isCustomCoord: true,
+        },
+        to: {
+          id: 'cove_1_to',
+          name: '용남 화삼항 인근',
+          lat: 34.859877659548076,
+          lng: 128.4593577644555,
+          type: 'end',
+          isCustomCoord: true,
+        },
+      },
+      {
+        label: '고성만 안쪽 비항구 -> 내도 도선 부잔교',
+        from: {
+          id: 'cove_2_from',
+          name: '고성만 안쪽',
+          lat: 34.93676,
+          lng: 128.19631,
+          type: 'start',
+          isCustomCoord: true,
+        },
+        to: makeWaypointFromPort('KR-GN-GJ-BERTH-0016', 'end'),
+      },
+      {
+        label: '광도 안정 황리 포구 안쪽 -> 연화도 인근',
+        from: {
+          id: 'cove_3_from',
+          name: '광도 안정 황리 인근',
+          lat: 35.01791,
+          lng: 128.3881,
+          type: 'start',
+          isCustomCoord: true,
+        },
+        to: {
+          id: 'cove_3_to',
+          name: '연화도 인근',
+          lat: 34.687884382652115,
+          lng: 128.37207339030226,
+          type: 'end',
+          isCustomCoord: true,
+        },
+      },
+    ];
+
+    for (const tc of coveCases) {
+      const summary = calculateRouteSummary([tc.from, tc.to], 18, ports, marineWaypoints);
+      assert.equal(summary.legs.length, 1, tc.label);
+      const leg = summary.legs[0];
+      assert.ok(leg.pathPositions.length >= 4, `${tc.label}: expected multi-vertex detour`);
+      for (let i = 0; i < leg.pathPositions.length - 1; i++) {
+        const [lat1, lng1] = leg.pathPositions[i];
+        const [lat2, lng2] = leg.pathPositions[i + 1];
+        assert.equal(
+          doesSegmentCrossLand(lat1, lng1, lat2, lng2),
+          false,
+          `${tc.label}: segment [${i} -> ${i + 1}] crossed land barrier`,
+        );
+      }
+    }
+  });
+
+  it('parses KML, GeoPackage (.gpkg), and Shapefile (.zip) natively in Node.js without DOMParser (HARDEN-04)', async () => {
+    const kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+      <kml xmlns="http://www.opengis.net/kml/2.2">
+        <Document>
+          <name>한려해상 현장 점검 KML</name>
+          <Placemark>
+            <name>테스트 순찰 지점</name>
+            <ExtendedData><SimpleData name="코드명">KML-PT-01</SimpleData></ExtendedData>
+            <Point><coordinates>128.4512,34.7825,0</coordinates></Point>
+          </Placemark>
+        </Document>
+      </kml>`;
+    const kmlFile = new File([kmlContent], 'patrol_points.kml', {
+      type: 'application/vnd.google-earth.kml+xml',
+    });
+    const gpkgFile = createSampleGeoPackageFile();
+    const shpZipFile = createSampleShapefileZip();
+
+    const res = await parseSpatialFiles([kmlFile, gpkgFile, shpZipFile], {
+      crsOverride: 'AUTO',
+    });
+    assert.equal(res.errors.length, 0);
+    assert.equal(res.candidates.length, 3);
+    assert.equal(res.candidates[0].sourceFormat, 'kml');
+    assert.equal(res.candidates[0].featureCollection.features.length, 1);
+    assert.equal(res.candidates[1].detectedCrs, 'EPSG:5179');
+    assert.equal(res.candidates[2].detectedCrs, 'EPSG:5179');
   });
 });
 

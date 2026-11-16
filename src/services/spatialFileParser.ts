@@ -1519,52 +1519,144 @@ function parseKmlGeometryElement(container: Element): SpatialGeometry | null {
   return null;
 }
 
+function extractKmlFeaturesWithoutDom(kmlText: string): {
+  docName: string;
+  features: SpatialFeature[];
+} {
+  const stripCdata = (s: string) =>
+    s
+      .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+      .replace(/<[^>]+>/g, '')
+      .trim();
+  const docNameMatch = kmlText.match(/<Document[^>]*>[\s\S]*?<name[^>]*>([\s\S]*?)<\/name>/i);
+  const docName = docNameMatch ? stripCdata(docNameMatch[1]) : '';
+  const features: SpatialFeature[] = [];
+  const placemarkRegex = /<Placemark\b[^>]*>([\s\S]*?)<\/Placemark>/gi;
+  let pmIdx = 0;
+
+  for (const match of kmlText.matchAll(placemarkRegex)) {
+    const block = match[1];
+    let geom: SpatialGeometry | null = null;
+
+    const pointCoordMatch = block.match(
+      /<Point\b[^>]*>[\s\S]*?<coordinates[^>]*>([\s\S]*?)<\/coordinates>[\s\S]*?<\/Point>/i,
+    );
+    const lineCoordMatch = block.match(
+      /<LineString\b[^>]*>[\s\S]*?<coordinates[^>]*>([\s\S]*?)<\/coordinates>[\s\S]*?<\/LineString>/i,
+    );
+    const polyMatch = block.match(/<Polygon\b[^>]*>([\s\S]*?)<\/Polygon>/i);
+
+    if (pointCoordMatch) {
+      const pts = parseKmlCoordString(pointCoordMatch[1]);
+      if (pts.length > 0) geom = { type: 'Point', coordinates: pts[0] };
+    } else if (lineCoordMatch) {
+      const pts = parseKmlCoordString(lineCoordMatch[1]);
+      if (pts.length >= 2) geom = { type: 'LineString', coordinates: pts };
+    } else if (polyMatch) {
+      const polyBlock = polyMatch[1];
+      const rings: [number, number][][] = [];
+      const outerMatch = polyBlock.match(
+        /<outerBoundaryIs\b[^>]*>[\s\S]*?<coordinates[^>]*>([\s\S]*?)<\/coordinates>[\s\S]*?<\/outerBoundaryIs>/i,
+      );
+      if (outerMatch) {
+        const pts = parseKmlCoordString(outerMatch[1]);
+        if (pts.length >= 3) rings.push(pts);
+      }
+      const innerRegex =
+        /<innerBoundaryIs\b[^>]*>[\s\S]*?<coordinates[^>]*>([\s\S]*?)<\/coordinates>[\s\S]*?<\/innerBoundaryIs>/gi;
+      for (const inMatch of polyBlock.matchAll(innerRegex)) {
+        const pts = parseKmlCoordString(inMatch[1]);
+        if (pts.length >= 3) rings.push(pts);
+      }
+      if (rings.length > 0) geom = { type: 'Polygon', coordinates: rings };
+    }
+
+    if (!geom) continue;
+
+    const props: Record<string, any> = {};
+    const nameM = block.match(/<name[^>]*>([\s\S]*?)<\/name>/i);
+    const descM = block.match(/<description[^>]*>([\s\S]*?)<\/description>/i);
+    if (nameM) props.name = stripCdata(nameM[1]);
+    if (descM) props.description = stripCdata(descM[1]);
+
+    for (const sd of block.matchAll(
+      /<SimpleData\b[^>]*name=(?:"([^"]+)"|'([^']+)')[^>]*>([\s\S]*?)<\/SimpleData>/gi,
+    )) {
+      const key = sd[1] || sd[2];
+      if (key) props[key] = stripCdata(sd[3]);
+    }
+
+    for (const de of block.matchAll(
+      /<Data\b[^>]*name=(?:"([^"]+)"|'([^']+)')[^>]*>[\s\S]*?<value[^>]*>([\s\S]*?)<\/value>[\s\S]*?<\/Data>/gi,
+    )) {
+      const key = de[1] || de[2];
+      if (key) props[key] = stripCdata(de[3]);
+    }
+
+    features.push({
+      type: 'Feature',
+      id: props.id ?? `KML-${pmIdx + 1}`,
+      properties: sanitizeProperties(props, pmIdx),
+      geometry: geom,
+    });
+    pmIdx++;
+  }
+
+  return { docName, features };
+}
+
 async function parseKmlText(
   kmlText: string,
   sourceFileName: string,
   crsOverride: SupportedCrsCode,
 ): Promise<ParsedLayerCandidate> {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(kmlText, 'text/xml');
-  const docNameEl = doc.getElementsByTagName('name')[0];
-  const baseLayerName =
-    docNameEl?.textContent?.trim() || sourceFileName.replace(/\.(kml|kmz)$/i, '');
+  let baseLayerName = sourceFileName.replace(/\.(kml|kmz)$/i, '');
+  let rawFeatures: SpatialFeature[] = [];
 
-  const placemarks = doc.getElementsByTagName('Placemark');
-  const rawFeatures: SpatialFeature[] = [];
+  if (typeof DOMParser !== 'undefined') {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(kmlText, 'text/xml');
+    const docNameEl = doc.getElementsByTagName('name')[0];
+    baseLayerName = docNameEl?.textContent?.trim() || baseLayerName;
 
-  for (let i = 0; i < placemarks.length; i++) {
-    const pm = placemarks[i];
-    const geom = parseKmlGeometryElement(pm);
-    if (!geom) continue;
+    const placemarks = doc.getElementsByTagName('Placemark');
+    for (let i = 0; i < placemarks.length; i++) {
+      const pm = placemarks[i];
+      const geom = parseKmlGeometryElement(pm);
+      if (!geom) continue;
 
-    const props: Record<string, any> = {};
-    const nameEl = pm.getElementsByTagName('name')[0];
-    const descEl = pm.getElementsByTagName('description')[0];
-    if (nameEl?.textContent) props.name = nameEl.textContent.trim();
-    if (descEl?.textContent) props.description = descEl.textContent.trim();
+      const props: Record<string, any> = {};
+      const nameEl = pm.getElementsByTagName('name')[0];
+      const descEl = pm.getElementsByTagName('description')[0];
+      if (nameEl?.textContent) props.name = nameEl.textContent.trim();
+      if (descEl?.textContent) props.description = descEl.textContent.trim();
 
-    const simpleDataEls = pm.getElementsByTagName('SimpleData');
-    for (let s = 0; s < simpleDataEls.length; s++) {
-      const sd = simpleDataEls[s];
-      const key = sd.getAttribute('name');
-      if (key) props[key] = sd.textContent?.trim() ?? '';
+      const simpleDataEls = pm.getElementsByTagName('SimpleData');
+      for (let s = 0; s < simpleDataEls.length; s++) {
+        const sd = simpleDataEls[s];
+        const key = sd.getAttribute('name');
+        if (key) props[key] = sd.textContent?.trim() ?? '';
+      }
+
+      const dataEls = pm.getElementsByTagName('Data');
+      for (let d = 0; d < dataEls.length; d++) {
+        const de = dataEls[d];
+        const key = de.getAttribute('name');
+        const valEl = de.getElementsByTagName('value')[0];
+        if (key && valEl) props[key] = valEl.textContent?.trim() ?? '';
+      }
+
+      rawFeatures.push({
+        type: 'Feature',
+        id: props.id ?? `KML-${i + 1}`,
+        properties: sanitizeProperties(props, i),
+        geometry: geom,
+      });
     }
-
-    const dataEls = pm.getElementsByTagName('Data');
-    for (let d = 0; d < dataEls.length; d++) {
-      const de = dataEls[d];
-      const key = de.getAttribute('name');
-      const valEl = de.getElementsByTagName('value')[0];
-      if (key && valEl) props[key] = valEl.textContent?.trim() ?? '';
-    }
-
-    rawFeatures.push({
-      type: 'Feature',
-      id: props.id ?? `KML-${i + 1}`,
-      properties: sanitizeProperties(props, i),
-      geometry: geom,
-    });
+  } else {
+    const fallback = extractKmlFeaturesWithoutDom(kmlText);
+    if (fallback.docName) baseLayerName = fallback.docName;
+    rawFeatures = fallback.features;
   }
 
   if (rawFeatures.length === 0) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 국립공원공단 QGIS 특별보호구역 원본 Shapefile → 앱 정적 GeoJSON(EPSG:4326) 동기화 스크립트
- * - 원본(Read-Only): C:\Users\Administrator\Desktop\국립공원공단\바다꼼꼬미\21_특별보호구역_구획_201224\20_특별보호구역_신규_최종_201109.shp
+ * - 원본(Read-Only): process.env.QGIS_PROTECTED_AREA_SHP 또는 data-sources/20_특별보호구역_신규_최종_201109.shp
  * - 대상: public/data/layers/protected_area.geojson
  * - 필터: 관리 === '한동' (한려해상동부사무소 9개소) || 관리 === '한려' (한려해상국립공원사무소 11개소) → 총 20개소
  * - 좌표계 변환: EPSG:5181 (Korea 2000 / Central Belt, False_Northing=500,000m) → EPSG:4326 (WGS84 경위도)
@@ -16,7 +16,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 const DEFAULT_QGIS_SHP_PATH =
   process.env.QGIS_PROTECTED_AREA_SHP ||
-  'C:\\Users\\Administrator\\Desktop\\국립공원공단\\바다꼼꼬미\\21_특별보호구역_구획_201224\\20_특별보호구역_신규_최종_201109.shp';
+  path.resolve(ROOT, 'data-sources', '20_특별보호구역_신규_최종_201109.shp');
 
 const OUTPUT_GEOJSON_PATH = path.join(ROOT, 'public', 'data', 'layers', 'protected_area.geojson');
 

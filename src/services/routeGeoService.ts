@@ -934,6 +934,7 @@ function findShortestWaypointPath(
   endLat: number,
   endLng: number,
   waypointMap: Map<string, MarineWaypointNode>,
+  allowTerminalCapeDetour = false,
 ): MarineWaypointNode[] {
   const validStarts = startWpIds.filter((id) => waypointMap.has(id));
   const validEnds = new Set(endWpIds.filter((id) => waypointMap.has(id)));
@@ -947,10 +948,15 @@ function findShortestWaypointPath(
 
   for (const sId of validStarts) {
     const node = waypointMap.get(sId)!;
-    if (doesSegmentCrossLand(startLat, startLng, node.lat, node.lng)) {
+    const startCrosses = doesSegmentCrossLand(startLat, startLng, node.lat, node.lng);
+    if (startCrosses && !allowTerminalCapeDetour) {
       continue;
     }
-    const initialG = calculateHaversineKm(startLat, startLng, node.lat, node.lng);
+    const rawStartDist = calculateHaversineKm(startLat, startLng, node.lat, node.lng);
+    if (startCrosses && rawStartDist > 15.0) {
+      continue;
+    }
+    const initialG = startCrosses ? rawStartDist * 1.45 + 1.5 : rawStartDist;
     if (initialG < (gScore.get(sId) ?? Infinity)) {
       gScore.set(sId, initialG);
       fScore.set(sId, initialG + calculateHaversineKm(node.lat, node.lng, endLat, endLng));
@@ -988,17 +994,18 @@ function findShortestWaypointPath(
 
     const currentG = gScore.get(currentId) ?? Infinity;
 
-    if (
-      validEnds.has(currentId) &&
-      !doesSegmentCrossLand(currentNode.lat, currentNode.lng, endLat, endLng)
-    ) {
-      const exitDistKm = calculateHaversineKm(currentNode.lat, currentNode.lng, endLat, endLng);
-      const totalGoalCost = currentG + exitDistKm;
-      if (totalGoalCost < (gScore.get(GOAL_ID) ?? Infinity)) {
-        cameFrom.set(GOAL_ID, currentId);
-        gScore.set(GOAL_ID, totalGoalCost);
-        fScore.set(GOAL_ID, totalGoalCost);
-        openSet.add(GOAL_ID);
+    if (validEnds.has(currentId)) {
+      const endCrosses = doesSegmentCrossLand(currentNode.lat, currentNode.lng, endLat, endLng);
+      const rawExitDistKm = calculateHaversineKm(currentNode.lat, currentNode.lng, endLat, endLng);
+      if (!endCrosses || (allowTerminalCapeDetour && rawExitDistKm <= 15.0)) {
+        const exitDistKm = endCrosses ? rawExitDistKm * 1.45 + 1.5 : rawExitDistKm;
+        const totalGoalCost = currentG + exitDistKm;
+        if (totalGoalCost < (gScore.get(GOAL_ID) ?? Infinity)) {
+          cameFrom.set(GOAL_ID, currentId);
+          gScore.set(GOAL_ID, totalGoalCost);
+          fScore.set(GOAL_ID, totalGoalCost);
+          openSet.add(GOAL_ID);
+        }
       }
     }
 
@@ -1456,16 +1463,32 @@ function computeSeaRouteSegment(
     );
   }
 
-  // Tier-1 경로를 찾지 못한 경우(예: 좁은 만 내부 임의 클릭): Tier-2 국지 C-Space 가시성 그래프 탐색기 직접 호출
+  // [HARDEN-03] 깊숙한 내만(Enclosed Cove) 비항구 정박지에서 만 입구 곶(Cape)에 가려 직선 가시선 변침점이 없을 때:
+  // 양단 최근접 변침점까지 국지 C-Space 곶 우회(solveCoastalVisibilityDetour)를 허용하는 앵커 브리지 탐색 수행
   if (rawWpPath.length === 0) {
-    const localDetour = solveCoastalVisibilityDetour(
+    const coveFromWpIds = Array.from(
+      new Set([...fromWpIds, ...findNearestWaypointIds(fromSeaLat, fromSeaLng, waypoints, 6)]),
+    );
+    const coveToWpIds = Array.from(
+      new Set([...toWpIds, ...findNearestWaypointIds(toSeaLat, toSeaLng, waypoints, 6)]),
+    );
+    rawWpPath = findShortestWaypointPath(
+      coveFromWpIds,
+      coveToWpIds,
       fromSeaLat,
       fromSeaLng,
       toSeaLat,
       toSeaLng,
-      0.06,
-      110,
+      waypointMap,
+      true,
     );
+  }
+
+  // Tier-1 경로를 찾지 못한 경우(예: 좁은 만 내부 단거리 임의 클릭): Tier-2 국지 C-Space 가시성 그래프 탐색기 직접 호출
+  if (rawWpPath.length === 0) {
+    const localDetour =
+      solveCoastalVisibilityDetour(fromSeaLat, fromSeaLng, toSeaLat, toSeaLng, 0.06, 110) ??
+      solveCoastalVisibilityDetour(fromSeaLat, fromSeaLng, toSeaLat, toSeaLng, 0.08, 65);
     const fallbackCoords: [number, number][] = [[safeFrom.lat, safeFrom.lng]];
     if (localDetour && localDetour.length >= 2) {
       for (const pt of localDetour) {
@@ -1514,13 +1537,16 @@ function computeSeaRouteSegment(
   }
   rawCoords.push([safeTo.lat, safeTo.lng]);
 
-  // 최종 안전망(Tier-2 Guard): 만약 양단 진입/이탈 선분 중 해안선과 교차하는 구간이 있으면 C-Space 가시성 우회선으로 자동 보정
+  // 최종 안전망(Tier-2 Guard): 만약 양단 진입/이탈 선분 중 해안선과 교차하는 구간이 있으면 다중 스케일 C-Space 가시성 우회선으로 자동 보정
   const coords: [number, number][] = [rawCoords[0]];
   for (let i = 0; i < rawCoords.length - 1; i++) {
     const [aLat, aLng] = rawCoords[i];
     const [bLat, bLng] = rawCoords[i + 1];
     if (doesSegmentCrossLand(aLat, aLng, bLat, bLng)) {
-      const subDetour = solveCoastalVisibilityDetour(aLat, aLng, bLat, bLng, 0.035, 95);
+      const subDetour =
+        solveCoastalVisibilityDetour(aLat, aLng, bLat, bLng, 0.035, 95) ??
+        solveCoastalVisibilityDetour(aLat, aLng, bLat, bLng, 0.06, 95) ??
+        solveCoastalVisibilityDetour(aLat, aLng, bLat, bLng, 0.08, 55);
       if (subDetour && subDetour.length > 2) {
         for (let k = 1; k < subDetour.length - 1; k++) {
           coords.push(subDetour[k]);

@@ -11,6 +11,8 @@
 - **외부 데이터·API·지도·기술 출처 안내서 (일반인·운영자용)**: [`docs/DATA_AND_TECH_SOURCES.md`](./docs/DATA_AND_TECH_SOURCES.md)
 - **아키텍처·구현 설계·트러블슈팅 단일 정본**: [`docs/ARCHITECTURE_AND_DESIGN.md`](./docs/ARCHITECTURE_AND_DESIGN.md)
 - **비개발자 이관·클린룸 신규 구축 및 문서 거버넌스 기획·설계서**: [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](./docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md)
+- **스트레스 테스트 권고안 및 심층 하드닝 통합 구현 설계서**: [`docs/HANDOVER_HARDENING_IMPLEMENTATION_PLAN.md`](./docs/HANDOVER_HARDENING_IMPLEMENTATION_PLAN.md)
+- **이관 준비 전사 스트레스 테스트 및 검증 결과 보고서**: [`docs/reports/HANDOVER_STRESS_TEST_AND_VERIFICATION_REPORT.md`](./docs/reports/HANDOVER_STRESS_TEST_AND_VERIFICATION_REPORT.md)
 
 ---
 
@@ -82,9 +84,12 @@ bada-kkomkkomi/
 │   ├── ARCHITECTURE_AND_DESIGN.md     # 최종 구현 설계서 · 데이터 사전 · 트러블슈팅 단일 정본
 │   ├── DATA_AND_TECH_SOURCES.md       # 외부 데이터 · API · 지도 · 기술 및 에셋 출처 안내서
 │   ├── HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md # 비개발자 이관 · 클린룸 신규 구축 및 문서 거버넌스 통합 기획·설계서
+│   ├── HANDOVER_HARDENING_IMPLEMENTATION_PLAN.md # 스트레스 테스트 권고안 및 심층 하드닝 통합 구현 설계서
 │   ├── ROUTE_BERTHING_UX_ANALYSIS_REPORT.md # 정박지(출발·도착·경유지) 지정 UX 분석 및 초단순 리팩토링 명세서
-│   └── designs/
-│       └── SITEMAP.md                 # Google EGM 서브시스템 살아있는 명세서 & 계약 인덱스 (Peanuts)
+│   ├── designs/
+│   │   └── SITEMAP.md                 # Google EGM 서브시스템 살아있는 명세서 & 계약 인덱스 (Peanuts)
+│   └── reports/
+│       └── HANDOVER_STRESS_TEST_AND_VERIFICATION_REPORT.md # 전사 스트레스 테스트 및 검증 결과 보고서
 ├── scripts/
 │   ├── build-coastline-polygons.mjs   # OSM 실측 해안선 폴리곤 추출·단순화 빌드 스크립트
 │   ├── sync-qgis-protected-areas.mjs  # 국립공원공단 공식 QGIS 특별보호구역(20개소) EPSG:5181→4326 동기화 스크립트

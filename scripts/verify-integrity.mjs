@@ -391,15 +391,19 @@ for (const docPath of markdownDocsToVerify) {
   }
 }
 
-// 8. 이관 준비성(Zero-Config Portability) 및 토큰 번들 노출 차단 정적 가드
+// 8. 이관 준비성(Zero-Config Portability) · 전 코드 개인 경로 0건 · Vite 전체 환경변수 객체 번들 직렬화 차단 가드
 const syncServiceTs = fs.readFileSync('src/services/githubLayerSyncService.ts', 'utf8');
 const mapViewTsx = fs.readFileSync('src/components/MapView.tsx', 'utf8');
 const buildCoastlineMjs = fs.readFileSync('scripts/build-coastline-polygons.mjs', 'utf8');
+const syncQgisMjs = fs.readFileSync('scripts/sync-qgis-protected-areas.mjs', 'utf8');
+
 assert(
   syncServiceTs.includes('export function resolveViteBasePath') &&
     syncServiceTs.includes('export function inferDefaultGitHubRepoCoords') &&
-    !syncServiceTs.includes('VITE_GITHUB_LAYER_SYNC_TOKEN'),
-  'githubLayerSyncService.ts must export resolveViteBasePath and inferDefaultGitHubRepoCoords and must not read VITE_GITHUB_LAYER_SYNC_TOKEN',
+    !syncServiceTs.includes('VITE_GITHUB_LAYER_SYNC_TOKEN') &&
+    !syncServiceTs.includes('inlineMetaEnv') &&
+    !syncServiceTs.includes('import.meta as'),
+  'githubLayerSyncService.ts must export resolveViteBasePath and inferDefaultGitHubRepoCoords and must not read VITE_GITHUB_LAYER_SYNC_TOKEN or serialize bare import.meta.env object',
 );
 assert(
   viteConfigTs.includes('resolveViteBasePath'),
@@ -410,9 +414,49 @@ assert(
   'src/components/MapView.tsx must not hardcode https://gunnysis.github.io',
 );
 assert(
-  !buildCoastlineMjs.includes('.gemini/antigravity-cli'),
-  'scripts/build-coastline-polygons.mjs must not hardcode local .gemini/antigravity-cli path',
+  !buildCoastlineMjs.includes('.gemini/antigravity-cli') &&
+    syncQgisMjs.includes('data-sources'),
+  'scripts/build-coastline-polygons.mjs and scripts/sync-qgis-protected-areas.mjs must use portable data-sources fallback paths',
 );
+
+const forbiddenLocalPathRegex = new RegExp('C:[\\\\/]' + 'Users[\\\\/]' + 'Administrator', 'i');
+function collectCodeFiles(dirPath) {
+  const results = [];
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...collectCodeFiles(fullPath));
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx') || entry.name.endsWith('.mjs'))
+    ) {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
+for (const codePath of [...collectCodeFiles('src'), ...collectCodeFiles('scripts')]) {
+  const codeText = fs.readFileSync(codePath, 'utf8');
+  assert(
+    !forbiddenLocalPathRegex.test(codeText),
+    `Personal workstation path detected in ${codePath} — all src/ and scripts/ files must be 100% clean-room portable`,
+  );
+}
+
+if (fs.existsSync('dist/assets')) {
+  for (const assetFile of fs.readdirSync('dist/assets')) {
+    if (assetFile.endsWith('.js')) {
+      const bundleText = fs.readFileSync(path.join('dist/assets', assetFile), 'utf8');
+      assert(
+        !bundleText.includes('VITE_GITHUB_LAYER_SYNC_TOKEN') &&
+          !bundleText.includes('SSR:!1') &&
+          !forbiddenLocalPathRegex.test(bundleText),
+        `Bundle security check failed in dist/assets/${assetFile}: full import.meta.env dictionary or forbidden token/path detected`,
+      );
+    }
+  }
+}
 
 console.log(
   `[Verify OK] Version ${pkg.version} (${displayMatch[1]}) | Docking: ${dockingFc.features.length} | Ports: ${portsData.ports.length} | Waypoints: ${portsData.waypoints.length} | EGM Contracts: OK | SW Precache: ${swPrecacheCount || 'pre-build'} | Legacy Bloat: 0`,

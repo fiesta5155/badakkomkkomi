@@ -97,12 +97,17 @@ export function inferDefaultGitHubRepoCoords(
 }
 
 function buildDefaultSyncConfig(): GitHubSyncConfig {
-  const inlineMetaEnv = (
-    import.meta as ImportMeta & { env?: Record<string, string | undefined> }
-  ).env;
+  let envOwner: string | undefined;
+  let envRepo: string | undefined;
+  try {
+    envOwner = (import.meta.env.VITE_GITHUB_REPO_OWNER as string | undefined)?.trim();
+    envRepo = (import.meta.env.VITE_GITHUB_REPO_NAME as string | undefined)?.trim();
+  } catch {
+    // Node.js native test runner (node --test) where import.meta.env is undefined
+  }
   const coords = inferDefaultGitHubRepoCoords(undefined, {
-    owner: inlineMetaEnv?.VITE_GITHUB_REPO_OWNER?.trim(),
-    repo: inlineMetaEnv?.VITE_GITHUB_REPO_NAME?.trim(),
+    owner: envOwner,
+    repo: envRepo,
   });
   return {
     owner: coords.owner,
