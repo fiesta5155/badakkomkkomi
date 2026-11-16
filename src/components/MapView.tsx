@@ -118,6 +118,7 @@ export interface MapViewProps {
   showDirectionArrows?: boolean;
   showLegDurationOnMap?: boolean;
   showLegDistanceOnMap?: boolean;
+  routeDistanceUnit?: 'NM' | 'km';
   fitRouteBoundsTrigger?: number;
   candidatePortId?: string | null;
   onSelectRoutePort?: (portId: string) => void;
@@ -166,6 +167,7 @@ export function MapView({
   showDirectionArrows = true,
   showLegDurationOnMap = true,
   showLegDistanceOnMap = true,
+  routeDistanceUnit = 'NM',
   fitRouteBoundsTrigger = 0,
   candidatePortId = null,
   onSelectRoutePort,
@@ -450,6 +452,7 @@ export function MapView({
           showDirectionArrows={showDirectionArrows}
           showLegDurationOnMap={showLegDurationOnMap}
           showLegDistanceOnMap={showLegDistanceOnMap}
+          routeDistanceUnit={routeDistanceUnit}
           fitRouteBoundsTrigger={fitRouteBoundsTrigger}
           candidatePortId={candidatePortId}
           onSelectRoutePort={onSelectRoutePort}
@@ -499,6 +502,7 @@ export function MapView({
             showDirectionArrows={showDirectionArrows}
             showLegDurationOnMap={showLegDurationOnMap}
             showLegDistanceOnMap={showLegDistanceOnMap}
+            routeDistanceUnit={routeDistanceUnit}
             fitRouteBoundsTrigger={fitRouteBoundsTrigger}
             candidatePortId={candidatePortId}
             onSelectRoutePort={onSelectRoutePort}

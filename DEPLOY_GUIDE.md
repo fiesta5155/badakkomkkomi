@@ -115,7 +115,7 @@ Python, Docker, Android SDK 등 불필요한 도구 없이 Windows 11 PC에 아�
 | :--- | :--- | :--- |
 | **1. 접안 포인트 & 소규모 선착장 데이터 (55개소)** | [`public/data/docking_points.geojson`](./public/data/docking_points.geojson) | 갯바위 접안 포인트 및 소규모 선착장 좌표(`[경도, 위도]`), 물때, 위험요소, 5색 표식, 사진 경로 |
 | **2. 현장 접안 사진** | `public/images/docking/` | 접안 포인트 상세창에 표시할 현장 사진 파일 |
-| **3. 통합 항구·소규모 선착장 사전 (136개소 + 변침점 300개소)** | [`public/data/ports.json`](./public/data/ports.json) | 바닷길 시간계산기에서 지도 직접 항구 선택, 초성/별칭/섬 검색, A* 해상 실항로 우회 연산에 사용되는 항포구·선착장 목록 |
+| **3. 통합 항구·소규모 선착장 사전 (136개소 + 변침점 300개소)** | [`public/data/ports.json`](./public/data/ports.json) | 정적 항구·변침점 목록. 시간계산 지도 클릭에서는 항구 자동 선택 및 변침점 자동 사용 없이 원좌표 간 직선거리로 계산함 |
 | **4. 운영자 설정 & 레이어** | [`public/config/app_config.json`](./public/config/app_config.json) | 현장 제보 수신 이메일 주소, 공간정보 레이어 목록, 기상 판정 기본 기준값 |
 
 ---

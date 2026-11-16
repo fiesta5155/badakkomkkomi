@@ -1594,11 +1594,33 @@ function computeSeaRouteSegment(
 /**
  * 경로 포인트 목록과 선박 속력, 항포구/해상 변침점 그래프를 이용해 전체 및 구간별 항해 연산 수행
  */
+function computeDirectRouteSegment(from: RouteWaypoint, to: RouteWaypoint, legIndex: number) {
+  const pathPositions: [number, number][] = [
+    [from.lat, from.lng],
+    [to.lat, to.lng],
+  ];
+  const distanceKm = calculateHaversineKm(from.lat, from.lng, to.lat, to.lng);
+  const midpoint = getPolylineArcMidpoint(pathPositions);
+
+  return {
+    distanceKm,
+    directDistanceKm: distanceKm,
+    detourFactor: 1,
+    pathPositions,
+    waypointNames: [],
+    activeWaypoints: [],
+    directionArrows: samplePolylineDirectionArrows(pathPositions, legIndex),
+    midLat: midpoint.midLat,
+    midLng: midpoint.midLng,
+  };
+}
+
 export function calculateRouteSummary(
   waypoints: RouteWaypoint[],
   speedKnots: number,
   ports: MarinePort[] = [],
   marineWaypoints: MarineWaypointNode[] = [],
+  routeMode: 'sea' | 'direct' = 'sea',
 ): RouteCalculationResult {
   if (waypoints.length < 2) {
     return {
@@ -1629,7 +1651,9 @@ export function calculateRouteSummary(
     const from = waypoints[i];
     const to = waypoints[i + 1];
 
-    const seg = computeSeaRouteSegment(from, to, i, portMap, marineWaypoints, waypointMap);
+    const seg = routeMode === 'direct'
+      ? computeDirectRouteSegment(from, to, i)
+      : computeSeaRouteSegment(from, to, i, portMap, marineWaypoints, waypointMap);
     const distanceKm = seg.distanceKm;
     const distanceNm = kmToNauticalMiles(distanceKm);
     const directDistanceNm = kmToNauticalMiles(seg.directDistanceKm);
@@ -1687,13 +1711,15 @@ export function calculateRouteSummary(
       safetyNote = hazards[0] ?? `최저수심 ${minDepth ?? 2.0}m 확인 권장`;
     }
 
-    // [GAP-09 안전 가드] 만일 우회 탐색 실패로 폴리라인에 육지 교차 선분이 남아 있으면 절대 'safe'로 반환하지 않고 즉시 'danger' 경고 표시
+    // 직선은 그대로 표시하되, 육지 교차 구간은 실제 항해 가능 경로로 오인하지 않도록 경고한다.
     for (let pIdx = 0; pIdx < seg.pathPositions.length - 1; pIdx++) {
       const [pA0, pA1] = seg.pathPositions[pIdx];
       const [pB0, pB1] = seg.pathPositions[pIdx + 1];
       if (doesSegmentCrossLand(pA0, pA1, pB0, pB1)) {
         safetyLevel = 'danger';
-        safetyNote = '해안선 우회 경로 탐색 제한 구간 — 현장 수로 확인 필수';
+        safetyNote = routeMode === 'direct'
+          ? '직선 경로가 육지를 가로지릅니다 — 실제 항해 경로 확인 필수'
+          : '해안선 우회 경로 탐색 제한 구간 — 현장 수로 확인 필수';
         break;
       }
     }

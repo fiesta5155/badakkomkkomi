@@ -67,6 +67,108 @@ import {
 } from '../services/routePortSelectionService.ts';
 import type { MarinePort, MarineWaypointNode, PortsDataset } from '../types/port.ts';
 import type { RouteWaypoint } from '../types/route.ts';
+import {
+  appendStraightRoutePoint,
+  moveStraightRoutePoint,
+  removeStraightRoutePoint,
+} from '../services/straightRouteService.ts';
+import {
+  getRouteIslandNames,
+  loadRouteIslands,
+  parseRouteIslandGeoJson,
+} from '../services/routeIslandLabels.ts';
+
+describe('자유 직선 그리기', () => {
+  it('클릭 좌표를 보정 없이 순서대로 연결하고 마지막 점 취소 후 구간을 다시 계산한다', () => {
+    const coordinates: [number, number][] = [
+      [34.8669, 128.5146], // 육지 위도 그대로 유지
+      [34.81, 128.43],
+      [34.78, 128.5],
+      [34.8669, 128.5146], // 첫 지점 재클릭도 별도 마지막 점
+    ];
+    const points = coordinates.reduce<RouteWaypoint[]>(
+      (current, [lat, lng], index) => appendStraightRoutePoint(current, lat, lng, `point-${index}`),
+      [],
+    );
+    assert.deepEqual(points.map(({ lat, lng }) => [lat, lng]), coordinates);
+    assert.deepEqual(points.map(({ name }) => name), ['지점 1', '지점 2', '지점 3', '지점 4']);
+    const result = calculateRouteSummary(points, 10, [], [], 'direct');
+    assert.equal(result.legs.length, 3);
+    result.legs.forEach((leg, index) => {
+      assert.deepEqual(leg.pathPositions, [coordinates[index], coordinates[index + 1]]);
+      assert.equal(leg.activeWaypoints?.length, 0);
+    });
+    assert.ok(Math.abs(result.totalDurationMinutes - result.totalDistanceNm * 6) < 1e-8);
+
+    const moved = moveStraightRoutePoint(points, 'point-1', 34.9, 128.4);
+    assert.deepEqual([moved[1].lat, moved[1].lng], [34.9, 128.4]);
+    const undone = removeStraightRoutePoint(moved, 'point-3');
+    assert.deepEqual(undone.map(({ name }) => name), ['지점 1', '지점 2', '지점 3']);
+    assert.equal(calculateRouteSummary(undone, 10, [], [], 'direct').legs.length, 2);
+  });
+});
+
+describe('이동경로 섬 이름', () => {
+  const rawIslands = JSON.parse(fs.readFileSync(
+    new URL('../../public/data/islands_tongyeong_geoje.geojson', import.meta.url), 'utf8',
+  )) as unknown;
+  const islands = parseRouteIslandGeoJson(rawIslands);
+  const yongcho = islands.find((island) => island.id === '48220:0041');
+  const bijin = islands.find((island) => island.name === '비진도');
+  assert.ok(yongcho && bijin);
+  const waypoint = ([lng, lat]: readonly [number, number], index: number): RouteWaypoint => ({
+    id: `island-${index}`, name: `지점 ${index + 1}`, lat, lng, type: 'waypoint',
+  });
+
+  it('용초도 남쪽을 지날 때 선착장 없이 WFS MultiPolygon 경계로 인식한다', () => {
+    const points = [waypoint([128.495779, 34.732034], 0), waypoint([128.496779, 34.732034], 1)];
+    assert.deepEqual(getRouteIslandNames(points, islands), ['용초도']);
+    assert.equal(yongcho.polygons.length, 2);
+  });
+
+  it('실제 섬 경계에서 0.6NM 안팎을 구분한다', () => {
+    const southernmost = yongcho.polygons.flatMap((polygon) => polygon[0])
+      .reduce((south, current) => current[1] < south[1] ? current : south);
+    const routeAt = (distanceNm: number) => {
+      const lat = southernmost[1] - distanceNm * 1.852 / 111.195;
+      return [waypoint([southernmost[0] - 0.00001, lat], 0),
+        waypoint([southernmost[0] + 0.00001, lat], 1)];
+    };
+    assert.deepEqual(getRouteIslandNames(routeAt(0.59), [yongcho]), ['용초도']);
+    assert.deepEqual(getRouteIslandNames(routeAt(0.61), [yongcho]), []);
+  });
+
+  it('경로 진행 순서를 지키고 같은 이름은 한 번만 표시한다', () => {
+    const yongCoast = yongcho.polygons[0][0];
+    const bijinCoast = bijin.polygons[0][0];
+    const points = [yongCoast[0], yongCoast[1], yongCoast[2],
+      bijinCoast[0], bijinCoast[1], yongCoast[0], yongCoast[1]].map(waypoint);
+    assert.deepEqual(getRouteIslandNames(points, [yongcho, bijin]), ['용초도', '비진도']);
+    assert.deepEqual(getRouteIslandNames(points.slice(0, 1), [yongcho, bijin]), []);
+  });
+
+  it('무명섬을 제외하고 islnds_nm이 없으면 로딩 오류를 낸다', () => {
+    const feature = (rawIslands as { features: unknown[] }).features[0] as Record<string, unknown>;
+    const unnamed = { ...feature, id: 'unnamed', properties: { islnds_nm: '무명섬' } };
+    assert.equal(parseRouteIslandGeoJson({ type: 'FeatureCollection', features: [feature, unnamed] }).length, 1);
+    assert.throws(() => parseRouteIslandGeoJson({ type: 'FeatureCollection', features: [
+      { ...feature, properties: { name: '잘못된 이름' } },
+    ] }), /islnds_nm/);
+  });
+
+  it('주변에 섬이 없는 구간은 이름을 추가하지 않는다', () => {
+    const points = [waypoint([129.1, 36.1], 0), waypoint([129.2, 36.2], 1)];
+    assert.deepEqual(getRouteIslandNames(points, islands), []);
+  });
+
+  it('GeoJSON HTTP 오류와 잘못된 응답을 이름 없이 실패 처리한다', async () => {
+    await assert.rejects(loadRouteIslands('/missing.geojson', undefined,
+      (async () => new Response('', { status: 404 })) as typeof fetch), /HTTP 404/);
+    await assert.rejects(loadRouteIslands('/broken.geojson', undefined,
+      (async () => new Response('{"type":"FeatureCollection","features":[]}')) as typeof fetch),
+    /비어 있거나/);
+  });
+});
 
 const portsDataset = JSON.parse(
   fs.readFileSync(new URL('../../public/data/ports.json', import.meta.url), 'utf8'),
@@ -116,6 +218,35 @@ describe('1. Route Geo Engine & 8 Benchmark Sea Routes (routeGeoService.ts)', ()
 
     const mins = calculateDurationMinutes(15, 15);
     assert.equal(mins, 60);
+  });
+
+  it('connects selected points in order with straight legs and warns without rerouting across land', () => {
+    const selected = [
+      makeWaypointFromPort('TY-001', 'start'),
+      makeWaypointFromPort('TY-002', 'waypoint'),
+      makeWaypointFromPort('GJ-001', 'end'),
+    ];
+    const result = calculateRouteSummary(selected, 15, ports, marineWaypoints, 'direct');
+    assert.equal(result.legs.length, 2);
+
+    let expectedDistanceNm = 0;
+    for (const [index, leg] of result.legs.entries()) {
+      const from = selected[index];
+      const to = selected[index + 1];
+      assert.deepEqual(leg.pathPositions, [[from.lat, from.lng], [to.lat, to.lng]]);
+      assert.deepEqual(leg.activeWaypoints, []);
+      assert.deepEqual(leg.waypointNames, []);
+      const directNm = kmToNauticalMiles(calculateHaversineKm(from.lat, from.lng, to.lat, to.lng));
+      assert.ok(Math.abs(leg.distanceNm - directNm) < 1e-9);
+      assert.ok(Math.abs(leg.durationMinutes - directNm / 15 * 60) < 1e-9);
+      expectedDistanceNm += directNm;
+    }
+
+    assert.ok(doesSegmentCrossLand(selected[0].lat, selected[0].lng, selected[1].lat, selected[1].lng));
+    assert.equal(result.legs[0].safetyLevel, 'danger');
+    assert.match(result.legs[0].safetyNote ?? '', /육지를 가로지릅니다/);
+    assert.ok(Math.abs(result.totalDistanceNm - expectedDistanceNm) < 1e-9);
+    assert.ok(Math.abs(result.totalDurationMinutes - expectedDistanceNm / 15 * 60) < 1e-9);
   });
 
   it('snaps coordinates within 500m to the nearest MarinePort and preserves offshore custom coords', () => {
@@ -570,6 +701,12 @@ describe('6. v2.4 Spatial CRS Detection, Route Leg Label Toggle & Nearby Marine 
       combinedText: '',
       isHidden: true,
     });
+
+    const kilometers = getRouteLegLabelParts(24.4, 6.234, true, true, 'km');
+    assert.equal(kilometers.durationText, bothOn.durationText);
+    assert.equal(kilometers.distanceText, '11.5km');
+    assert.equal(getRouteLegLabelParts(24.4, 6.234, false, true, 'km').combinedText, '11.5km');
+    assert.equal(getRouteLegLabelParts(24.4, 6.234, false, false, 'km').isHidden, true);
   });
 
   it('appends ( 인근: ... ) only for custom sea coordinates within 5 NM and preserves official port names', () => {

@@ -309,6 +309,7 @@ export function buildRouteLegBadgeSpec(
     isSelected?: boolean;
     showDuration?: boolean;
     showDistance?: boolean;
+    distanceUnit?: 'NM' | 'km';
   },
 ): MarkerTemplateSpec {
   const showDuration = options?.showDuration ?? true;
@@ -318,6 +319,7 @@ export function buildRouteLegBadgeSpec(
     distanceNm,
     showDuration,
     showDistance,
+    options?.distanceUnit,
   );
   if (labelParts.isHidden) {
     return {
@@ -331,8 +333,6 @@ export function buildRouteLegBadgeSpec(
     };
   }
 
-  const mins = Math.round(durationMinutes);
-  const nmStr = distanceNm.toFixed(1);
   const isSelected = Boolean(options?.isSelected);
   const safetyLevel = options?.safetyLevel ?? 'safe';
   const legIndexAttr =
@@ -372,7 +372,7 @@ export function buildRouteLegBadgeSpec(
       <button
         type="button"
         ${legIndexAttr}
-        title="구간 소요시간 · 거리 (${nmStr}NM · 약 ${mins}분)"
+        title="${escapeHtml(labelParts.combinedText)}"
         style="
           display: inline-flex;
           align-items: center;

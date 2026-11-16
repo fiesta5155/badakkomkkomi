@@ -10,8 +10,8 @@
 | :--- | :--- | :--- |
 | **루트 블루프린트 (`Hay`)** | [`AGENTS.md`](../../AGENTS.md) | 전역 불변식(`Global Invariants`), 전역 부수효과(`Global Side Effects`), `.dev/docs` 아티팩트 경로 격리 및 통합 검증 명령 정의 |
 | **Elephant 컨텍스트 스킬** | [`_agents/skills/bada-kkomkkomi-elephant/SKILL.md`](../../_agents/skills/bada-kkomkkomi-elephant/SKILL.md) | EGM 설계 세션 시 프로젝트 핵심 맥락 및 Phase Write Boundary 로드 |
-| **마스터 아키텍처 & 구현 설계서** | [`docs/ARCHITECTURE_AND_DESIGN.md`](../ARCHITECTURE_AND_DESIGN.md) | **1장(시스템 아키텍처·불변식)** + **2장(정박지 선택 상태 머신·실항로 렌더링)** + **3장(`docs/` 3계층 문서 거버넌스 설계)** 통합 정본 |
-| **정박지·경유지 UX 및 실항로 곡선 구현 명세서** | [`docs/ROUTE_BERTHING_UX_ANALYSIS_REPORT.md`](../ROUTE_BERTHING_UX_ANALYSIS_REPORT.md) | 비항구 해상·해안 정박지 클릭, 마커 드래그 미세 조정, 선박 GPS 즉시 설정, 찍은 순서대로 자동 연결(`1 ➔ 2 ➔ 3`), `[도착 완료]` 자동 잠금, 옵션 A 우회 곡선(`leg.pathPositions`) 서브시스템 상세 명세서 |
+| **마스터 아키텍처 & 구현 설계서** | [`docs/ARCHITECTURE_AND_DESIGN.md`](../ARCHITECTURE_AND_DESIGN.md) | **1장(시스템 아키텍처·불변식)** + **2장(정박지 선택 상태 머신·직선 경로 렌더링)** + **3장(`docs/` 3계층 문서 거버넌스 설계)** 통합 정본 |
+| **정박지·경유지 UX 구현 기록** | [`docs/ROUTE_BERTHING_UX_ANALYSIS_REPORT.md`](../ROUTE_BERTHING_UX_ANALYSIS_REPORT.md) | 비항구 해상·해안 정박지 클릭, 마커 드래그, 선박 GPS, 순차 연결(`1 ➔ 2 ➔ 3`) 및 `[도착 완료]` 잠금 기록. 현재 앱은 직선 경로를 표시함 |
 | **데이터·API·기술 출처 명세서** | [`docs/DATA_AND_TECH_SOURCES.md`](../DATA_AND_TECH_SOURCES.md) | 6대 데이터·API·알고리즘 출처 및 해상 음영지역(오프라인) 동작 보장 매트릭스 정본 |
 | **운영자 무상 배포 매뉴얼** | [`DEPLOY_GUIDE.md`](../../DEPLOY_GUIDE.md) | 비개발자 운영자용 정적 데이터(`ports.json`, `docking_points.geojson`, 사진) 관리 및 자동 배포 가이드 |
 | **비개발자 이관·신규 구축 및 문서 거버넌스 기획서** | [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](../HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md) | 개발자 주도 클린룸 이관, 계정·경로 하드코딩 탈종속화, ChatGPT Pro 무상 유지보수 워크플로 및 `docs/` 문서 거버넌스 통합 기획·설계 정본 |
@@ -39,6 +39,7 @@
 - [`src/components/notebook/LayerControlModal.tsx`](../../src/components/notebook/LayerControlModal.tsx): `LayerControlModal(props)`
 - [`src/components/notebook/FieldReportModal.tsx`](../../src/components/notebook/FieldReportModal.tsx): `FieldReportModal(props)`
 - [`src/components/notebook/PorpoiseObservationModal.tsx`](../../src/components/notebook/PorpoiseObservationModal.tsx): `PorpoiseObservationModal(props)`
+- [`src/components/calendar/CalendarScreen.tsx`](../../src/components/calendar/CalendarScreen.tsx): `CalendarScreen(props)` — 선박별 월간 달력, 날짜 상세, 일정 작성
 - [`src/components/navigation/RouteTimeCalculator.tsx`](../../src/components/navigation/RouteTimeCalculator.tsx): `RouteTimeCalculator(props)`
 - [`src/components/navigation/PortSelectModal.tsx`](../../src/components/navigation/PortSelectModal.tsx): `PortSelectModal(props)`
 - [`src/components/navigation/MarineWeatherPanel.tsx`](../../src/components/navigation/MarineWeatherPanel.tsx): `MarineWeatherPanel(props)`
@@ -48,8 +49,8 @@
 - `HomeScreen.tsx`의 4대 포스터 카드는 동일한 아이콘 슬롯 높이를 유지하며, 카드 내부 다중 단축 버튼 바를 두지 않습니다(Memo 2).
 - `MapView.tsx`는 자체적으로 GeoJSON을 중복 fetch하지 않고 `useAppConfig.ts`가 공급하는 `layers` 및 `geoJsonLayersData` 단일 SSOT만 렌더링합니다.
 - `buildNavPortPinSpec()`의 136개 항구 마커와 `buildDockingMarkerSpec()`의 55개 접안지 마커는 모두 `.bada-marker-hit-target`(`52×52px`) 터치 영역을 보장합니다.
-- `KakaoMapCanvas.tsx`와 `LegacyLeafletCanvas.tsx`는 항로 작성(`isRouteDrawing`) 중 지도(바다·해안·항구 마커) 클릭 시 찍은 순서대로 순차 연결(`출발 ➔ 도착 ➔ 경유+도착 연장`)하고, 모든 정박지 마커(`routeWaypoints`)의 60fps 드래그 미세 조정(`onUpdateWaypointPos`)을 지원하며, 지도 위에는 378개 해안선 폴리곤을 우회하는 **실제 바닷길 곡선(`leg.pathPositions`, 옵션 A)**과 **실항로 50% 누적 거리 중점 배지(`leg.midLat`, `leg.midLng`)**를 렌더링합니다.
-- `RouteTimeCalculator.tsx`는 `[항로 그리기 / 이동만]` 모드 스위치와 `[✅ 도착 완료 / 🔄 새 항로]` 원터치 잠금 제어를 제공하며, `PortSelectModal.tsx`는 `[📍 내 선박 현재 GPS 위치로 설정 — 즉시 적용]` 버튼과 `[거리순 / 항로주변 정렬]`을 함께 제공합니다. `App.tsx`는 페이지 신규 접속 시 `localStorage`의 이전 경로를 자동 복원하지 않고 항상 빈 경로(`routeWaypoints = []`)로 초기화합니다.
+- `KakaoMapCanvas.tsx`와 `LegacyLeafletCanvas.tsx`는 시간계산에서 지도 클릭의 원좌표를 `App.tsx`로 전달합니다. `straightRouteService.ts`는 클릭 순서대로 점을 추가하고, 지도는 **인접 지점 간 직선(`leg.pathPositions`)**과 **구간 중점 배지(`leg.midLat`, `leg.midLng`)**를 렌더링합니다. 마커 드래그 좌표도 보정하지 않습니다.
+- `RouteTimeCalculator.tsx`의 자유 그리기 화면은 예상시간을 크게 표시하고, `routeIslandLabels.ts`가 실제 항구·해안선 데이터에서 찾은 섬 이름을 요약 카드의 이동경로 두 줄 또는 전체 보기로 표시합니다. `[직선 그리기 / 이동만]`, `[되돌리기]`, `[초기화]`, 속력 입력, 구간별 거리·시간을 제공합니다. `App.tsx`는 페이지 신규 접속 시 경로를 빈 배열(`routeWaypoints = []`)로 초기화합니다.
 
 ### Side Effects
 - 브라우저 History API(`window.history.pushState` / `back`), 클립보드 복사(`navigator.clipboard.writeText`), 이메일 클라이언트 호출(`mailto:`), Geolocation API(`navigator.geolocation`), Kakao Maps SDK DOM 마운트 및 Leaflet Canvas 렌더링을 수행합니다.
@@ -61,8 +62,10 @@
 
 ## 2. Core Domain Services (`src/services`)
 
+- [`src/services/calendarRepository.ts`](../../src/services/calendarRepository.ts): `createCalendarRepository()`, `monthCells()`, `setVoyageStatus()`, `setCalendarMemo()` — 선박별 일정 로컬 저장
+
 ### Overview
-UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 어댑터 계층입니다. 해상 실항로 탐색, 등록 항구 선택 상태 머신, QGIS 바이너리 파일 파싱 및 측지계 변환, ECMWF 기상 시계열 정합, 로컬/원격 레이어 영속화를 담당합니다.
+UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 어댑터 계층입니다. 직선거리 기반 예상시간 계산, 등록 항구 선택 상태 머신, QGIS 바이너리 파일 파싱 및 측지계 변환, ECMWF 기상 시계열 정합, 로컬/원격 레이어 영속화를 담당합니다.
 
 ### Interface
 - [`src/services/routeGeoService.ts`](../../src/services/routeGeoService.ts): `calculateRouteSummary()`, `resolveSmartWaypoint()`, `doesSegmentCrossLand()`, `isPointInAnyLandBarrier()`, `getNearbyMarinePlaceLabel()`, `extractChosung()`, `matchesKoreanSearch()`
@@ -77,8 +80,8 @@ UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 
 - [`src/services/workspaceDraftRepository.ts`](../../src/services/workspaceDraftRepository.ts): `loadWorkspaceDraft()`, `saveWorkspaceDraft()`, `sanitizeWorkspaceDraft()`, `isValidRouteWaypointsDraft()`, `classifyGpsError()`
 
 ### Invariants
-- `routeGeoService.ts`: 136개 항구 전 조합(18,360쌍) 계산 시 378개 해안선 폴리곤 교차(`doesSegmentCrossLand`)가 0건이어야 하며, 우회 경로 탐색이 실패해 육지 관통이 남는 경우 직선 구간을 정상 경로처럼 반환하지 않고 `safetyLevel: 'danger'` 및 경로 경고를 명시합니다.
-- `routePortSelectionService.ts`: 반경 150m 이내 동일·초근접 항구(0m 동좌표 2쌍 포함)를 `siblingPorts`로 누락 없이 반환하여 136개 전수 선택을 보장합니다. 연속 중복(`A → A` 인접)과 경유지 없는 0거리 직항(`waypoints.length <= 2`에서 `start === end`)을 거부하고, 경유지 삭제·비우기 후 `A → A`가 남으면 도착지를 해제해 `select_end` 대기 상태로 안전 복귀시킵니다.
+- `routeGeoService.ts`: 앱에서 선택 지점 간 Haversine 직선거리와 입력 속력 기반 예상시간을 계산합니다. 직선이 해안선 폴리곤과 교차해도 선을 유지하고 `safetyLevel: 'danger'`와 육지 교차 경고를 명시합니다. 기존 해상 우회 계산은 호환용 코드로 남아 있지만 앱에서 호출하지 않습니다.
+- `routePortSelectionService.ts`: 이전 정박지 지정 로직을 보관합니다. 현재 시간계산 지도 클릭은 이 서비스의 항구 스냅·중복 거부·최적 삽입을 호출하지 않습니다.
 - `spatialFileParser.ts`: `.prj` WKT의 `False_Northing` 파라미터(`500000` vs `600000`)를 구분하여 `EPSG:5181`(구 중부원점)을 `EPSG:5186`으로 오판하지 않습니다.
 - `ecmwfWeatherService.ts`: `ecmwf_ifs`와 `ecmwf_wam` 외 타 기상 모델로 폴백하지 않으며, 결측 시 `unknown`을 반환합니다.
 

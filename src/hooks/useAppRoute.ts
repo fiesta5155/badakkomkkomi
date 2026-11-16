@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type ScreenType = 'home' | 'notebook' | 'navigation';
+export type ScreenType = 'home' | 'notebook' | 'navigation' | 'calendar';
 export type NavPanelType = 'route' | 'weather';
 
 export interface AppRouteState {
@@ -21,6 +21,10 @@ export function parseRouteFromUrl(search: string): AppRouteState {
     return { screen: 'notebook', panel: 'route' };
   }
 
+  if (screenParam === 'calendar') {
+    return { screen: 'calendar', panel: 'route' };
+  }
+
   if (screenParam === 'navigation') {
     const panel: NavPanelType = panelParam === 'weather' ? 'weather' : 'route';
     return { screen: 'navigation', panel };
@@ -39,6 +43,9 @@ export function buildUrlForRoute(route: AppRouteState): string {
   }
   if (route.screen === 'notebook') {
     return `${basePath}?screen=notebook`;
+  }
+  if (route.screen === 'calendar') {
+    return `${basePath}?screen=calendar`;
   }
   return `${basePath}?screen=navigation&panel=${route.panel}`;
 }

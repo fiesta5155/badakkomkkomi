@@ -204,7 +204,7 @@ assert(
   'WeatherThresholdSettings.tsx: source accordion titles and offline matrix labels must wrap cleanly ([word-break:keep-all]) instead of truncating with ellipsis',
 );
 
-// 바닷길 시간계산기 초기 빈 경로([]) 불변식, 순차·비항구·항구 정박지 선택(appendSequentialRouteWaypoint / applyResolvedWaypointSelection / applyDirectPortSelection), 실항로 곡선(leg.pathPositions) 렌더링 및 300변침점·378실측해안선 표기 정합 확인
+// 바닷길 시간계산기 초기 빈 경로([]), 원좌표 자유 그리기, 직선 경로 렌더링 확인
 const appTsx = fs.readFileSync('src/App.tsx', 'utf8');
 const routeCalcTsx = fs.readFileSync('src/components/navigation/RouteTimeCalculator.tsx', 'utf8');
 const kakaoCanvasTsx = fs.readFileSync('src/components/map/KakaoMapCanvas.tsx', 'utf8');
@@ -216,24 +216,28 @@ assert(
   'src/App.tsx: routeWaypoints must always initialize as an empty array ([]) and never restore a pre-selected route from localStorage or static constants on page load',
 );
 assert(
-  appTsx.includes('applyDirectPortSelection') &&
-    appTsx.includes('appendSequentialRouteWaypoint') &&
-    appTsx.includes('applyResolvedWaypointSelection'),
-  'src/App.tsx: route selection must wire applyDirectPortSelection, appendSequentialRouteWaypoint, and applyResolvedWaypointSelection',
+  appTsx.includes('appendStraightRoutePoint(prev, lat, lng, id)') &&
+    appTsx.includes('removeStraightRoutePoint(prev, id)') &&
+    appTsx.includes('moveStraightRoutePoint(prev, id, lat, lng)') &&
+    routeCalcTsx.includes('freeDrawMode') &&
+    routeCalcTsx.includes('되돌리기'),
+  'Route calculator must append raw click coordinates, permit last-point undo, and keep direct marker movement',
 );
 assert(
   kakaoCanvasTsx.includes('leg.pathPositions') &&
     leafletCanvasTsx.includes('leg.pathPositions'),
-  'KakaoMapCanvas.tsx and LegacyLeafletCanvas.tsx must render multi-vertex sea-route detour curves (leg.pathPositions, Option A)',
+  'KakaoMapCanvas.tsx and LegacyLeafletCanvas.tsx must render route segments from leg.pathPositions',
 );
 assert(
-  routeCalcTsx.includes('300변침점·378실측해안선 우회') &&
-    !routeCalcTsx.includes('35변침점·20섬 우회') &&
-    !routeCalcTsx.includes('56변침점·67해안장벽 우회'),
-  'RouteTimeCalculator.tsx: provenance badge must display 300변침점·378실측해안선 우회',
+  appTsx.includes("calculateRouteSummary(routeWaypoints, speedKnots, portsList, marineWaypoints, 'direct')") &&
+    routeCalcTsx.includes('getRouteIslandNames') &&
+    routeCalcTsx.includes('이동경로') &&
+    routeCalcTsx.includes('>예상시간</strong>') &&
+    !routeCalcTsx.includes('해상 실항로 정밀 계산'),
+  'RouteTimeCalculator.tsx and App.tsx must use and describe straight-line distance calculation',
 );
 assert(
-  routeCalcTsx.includes('if (isCollapsed)') &&
+  routeCalcTsx.includes('if (freeDrawMode)') &&
     routeCalcTsx.includes('전체 예상 소요시간') &&
     !routeCalcTsx.includes('RotateCcw'),
   'RouteTimeCalculator.tsx: must render compact summary card when isCollapsed and prevent Row 1 toolbar overflow (UI-BUG-01..04)',

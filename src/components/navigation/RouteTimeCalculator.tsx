@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   ArrowDown,
@@ -30,11 +30,19 @@ import type {
   RouteWaypoint,
 } from '../../types/route';
 import type { SourceCategoryKey } from '../../config/dataSources';
+import type { MarinePort } from '../../types/port';
+import {
+  getRouteIslandNames,
+  loadRouteIslands,
+  type RouteIsland,
+} from '../../services/routeIslandLabels';
 
 export type { RouteMapTapMode } from '../../types/route';
 export type RouteSheetStage = 'summary' | 'compact' | 'full';
 
 interface RouteTimeCalculatorProps {
+  freeDrawMode?: boolean;
+  portsList?: MarinePort[];
   waypoints: RouteWaypoint[];
   speedKnots: number;
   calculation: RouteCalculationResult;
@@ -64,6 +72,8 @@ interface RouteTimeCalculatorProps {
   onToggleLegDurationOnMap?: () => void;
   showLegDistanceOnMap?: boolean;
   onToggleLegDistanceOnMap?: () => void;
+  distanceUnit?: 'NM' | 'km';
+  onChangeDistanceUnit?: (unit: 'NM' | 'km') => void;
   onFitRouteBounds?: () => void;
   onOpenSourcesInfo?: (sourceId: SourceCategoryKey) => void;
 }
@@ -75,7 +85,59 @@ const SPEED_PRESETS = [
   { knots: 28, label: '28kn' },
 ];
 
+type IslandLoadState = {
+  status: 'loading' | 'ready' | 'error';
+  islands: RouteIsland[];
+  error?: string;
+};
+
+function RouteIslandPreview({ names }: { names: string[] }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const probeRef = useRef<HTMLDivElement | null>(null);
+  const [visibleCount, setVisibleCount] = useState(names.length);
+  const [showAll, setShowAll] = useState(false);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const probe = probeRef.current;
+    if (!container || !probe) return;
+    const measure = () => {
+      const lineHeight = parseFloat(window.getComputedStyle(probe).lineHeight) || 16;
+      for (let count = names.length; count >= 0; count--) {
+        probe.textContent = names.slice(0, count).join(' → ') +
+          (count < names.length ? ` … (총 ${names.length}곳)` : '');
+        if (probe.scrollHeight <= lineHeight * 2 + 1) {
+          setVisibleCount(count);
+          return;
+        }
+      }
+      setVisibleCount(0);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [names]);
+
+  const shown = names.slice(0, visibleCount).join(' → ');
+  const summary = visibleCount < names.length ? ` … (총 ${names.length}곳)` : '';
+  return (
+    <div ref={containerRef} className="relative min-w-0 flex-1 text-[11px] font-bold leading-4 wrap-anywhere text-[#003360]">
+      <div className={showAll ? '' : 'max-h-8 overflow-hidden'} aria-label={`이동경로: ${names.join(' → ') || '표시할 섬 없음'}`}>
+        {names.length === 0 ? '—' : showAll ? names.join(' → ') : shown + summary}
+      </div>
+      {visibleCount < names.length && (
+        <button type="button" onClick={() => setShowAll((value) => !value)} className="mt-0.5 text-[10px] font-bold text-sky-700 underline">
+          {showAll ? '접기' : '전체 보기'}
+        </button>
+      )}
+      <div ref={probeRef} aria-hidden="true" className="pointer-events-none invisible absolute inset-x-0 top-0 text-[11px] font-bold leading-4 wrap-anywhere" />
+    </div>
+  );
+}
+
 export function RouteTimeCalculator({
+  freeDrawMode = false,
   waypoints,
   speedKnots,
   calculation,
@@ -105,6 +167,8 @@ export function RouteTimeCalculator({
   onToggleLegDurationOnMap,
   showLegDistanceOnMap = true,
   onToggleLegDistanceOnMap,
+  distanceUnit = 'NM',
+  onChangeDistanceUnit,
   onFitRouteBounds,
   onOpenSourcesInfo,
 }: RouteTimeCalculatorProps) {
@@ -116,6 +180,32 @@ export function RouteTimeCalculator({
   const copyTimerRef = useRef<number | null>(null);
   const prevWaypointCountRef = useRef<number>(waypoints.length);
   const pointsListRef = useRef<HTMLDivElement | null>(null);
+  const [islandLoadState, setIslandLoadState] = useState<IslandLoadState>({
+    status: 'loading', islands: [],
+  });
+  const [islandReloadCount, setIslandReloadCount] = useState(0);
+  const routeIslandNames = useMemo(
+    () => freeDrawMode && islandLoadState.status === 'ready'
+      ? getRouteIslandNames(waypoints, islandLoadState.islands) : [],
+    [freeDrawMode, waypoints, islandLoadState],
+  );
+
+  useEffect(() => {
+    if (!freeDrawMode) return;
+    const controller = new AbortController();
+    const url = `${import.meta.env.BASE_URL}data/islands_tongyeong_geoje.geojson`;
+    void loadRouteIslands(url, controller.signal).then((islands) => {
+      if (!controller.signal.aborted) setIslandLoadState({ status: 'ready', islands });
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) {
+        setIslandLoadState({
+          status: 'error', islands: [],
+          error: error instanceof Error ? error.message : '알 수 없는 오류',
+        });
+      }
+    });
+    return () => controller.abort();
+  }, [freeDrawMode, islandReloadCount]);
 
   const intermediateCount = Math.max(0, waypoints.length - 2);
 
@@ -210,6 +300,138 @@ export function RouteTimeCalculator({
       setCopiedBriefing(false);
     }
   }, [waypoints, calculation, speedKnots, timeFormatted, etaTimeKst, formatKstEtaFromOffsetMins]);
+
+  if (freeDrawMode) {
+    const freeDrawStage: RouteSheetStage = waypoints.length === 0
+      ? 'summary' : sheetStage === 'full' ? 'full' : 'compact';
+    const isExpanded = freeDrawStage === 'full';
+    const distanceSummary = distanceUnit === 'NM'
+      ? `${calculation.totalDistanceNm.toFixed(1)} NM`
+      : `${calculation.totalDistanceKm.toFixed(1)} km`;
+    const speedPosition = Math.max(0, Math.min(100, ((speedKnots - 5) / 30) * 100));
+    return (
+      <section
+        className={`knps-hud-surface bada-hud-panel pointer-events-auto relative mx-auto flex max-h-[min(70dvh,calc(100dvh-10.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#00a79d]/60 bg-white/96 text-[#003360] shadow-2xl backdrop-blur-md ${freeDrawStage === 'summary' ? 'max-w-xl p-3' : 'max-w-[720px] p-3 sm:p-4'}`}
+        aria-label="바닷길 직선거리 시간계산"
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div aria-hidden="true" className="knps-tricolor-bar pointer-events-none absolute inset-x-0 top-0 h-1" />
+        <div className="flex items-center justify-between gap-2">
+          <strong className={`text-sky-700 ${freeDrawStage === 'summary' ? 'text-xs font-bold' : 'text-base font-black'}`}>예상시간</strong>
+          {freeDrawStage !== 'summary' && <button
+            type="button"
+            onClick={() => setSheetStage(isExpanded ? 'compact' : 'full')}
+            aria-expanded={isExpanded}
+            className={`flex min-h-9 min-w-16 items-center justify-center rounded-lg border border-sky-300 bg-sky-50 px-2 text-xs font-bold text-[#003360] active:scale-95 ${isExpanded ? 'sm:min-h-10 sm:min-w-24 sm:border-sky-400 sm:text-sm' : ''}`}
+          >
+            {isExpanded ? '접기 ▲' : '열기 ▼'}
+          </button>}
+        </div>
+        {freeDrawStage !== 'summary' && <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-1.5 gap-y-1 rounded-xl border border-sky-200 bg-[#f0f9ff] px-2 py-1.5 sm:mt-2 sm:px-3 sm:py-2">
+          <div className="flex min-w-0 items-center gap-1 whitespace-nowrap">
+            <Clock className="h-4 w-4 shrink-0 text-[#003360] sm:h-6 sm:w-6" aria-hidden="true" />
+            <strong className="text-[23px] leading-none font-black tabular-nums text-[#003360] sm:text-3xl">{timeFormatted}</strong>
+          </div>
+          <span className="hidden h-7 border-l border-slate-300 sm:block" aria-hidden="true" />
+          <div className="flex items-center gap-1 whitespace-nowrap text-[10px] font-black tabular-nums sm:text-xs">
+            <MapPin className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true" />
+            {distanceSummary}
+          </div>
+          <div className="flex items-center gap-1 whitespace-nowrap text-[10px] font-black tabular-nums sm:text-xs">
+            <Gauge className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true" />
+            {speedKnots} kn
+          </div>
+          <div className="flex items-center gap-1">
+            <button type="button" onClick={() => onRemoveWaypoint(waypoints[waypoints.length - 1].id)} className="flex min-h-9 items-center gap-0.5 rounded-lg border border-amber-500 bg-amber-50 px-1.5 text-[10px] font-bold whitespace-nowrap text-amber-900 sm:px-2 sm:text-xs">
+              <Undo2 className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />되돌리기
+            </button>
+            <button type="button" onClick={onResetRoute} className="flex min-h-9 items-center gap-0.5 rounded-lg border border-rose-400 bg-rose-50 px-1.5 text-[10px] font-bold whitespace-nowrap text-rose-900 sm:px-2 sm:text-xs">
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />초기화
+            </button>
+          </div>
+        </div>}
+        {freeDrawStage === 'summary' && <p className="mt-1 text-[11px] font-bold text-slate-600">지도를 눌러 첫 번째 지점을 선택하세요.</p>}
+        {freeDrawStage === 'compact' && <div className="mt-1.5 flex min-w-0 items-start gap-2 rounded-xl border border-sky-200 bg-[#f0f9ff] px-2 py-1.5 sm:mt-2">
+          <strong className="shrink-0 text-[11px] leading-4 text-sky-700">이동경로</strong>
+          {islandLoadState.status === 'error' ? (
+            <div className="min-w-0 flex-1 text-[11px] font-bold leading-4 text-rose-700" role="alert">
+              섬 데이터 로딩 실패: {islandLoadState.error}
+              <button type="button" onClick={() => {
+                setIslandLoadState({ status: 'loading', islands: [] });
+                setIslandReloadCount((count) => count + 1);
+              }}
+                className="ml-2 underline">다시 시도</button>
+            </div>
+          ) : islandLoadState.status === 'loading' ? (
+            <span className="min-w-0 flex-1 text-[11px] leading-4 text-slate-500">섬 데이터 불러오는 중…</span>
+          ) : (
+            <RouteIslandPreview names={routeIslandNames} />
+          )}
+        </div>}
+        {isExpanded && (
+          <div className="bada-contained-scroll-region mt-2 min-h-0 space-y-2 overflow-y-auto overscroll-contain" onTouchMove={(event) => event.stopPropagation()}>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-sky-200 bg-[#f0f9ff] px-3 py-2 text-xs font-bold sm:px-4">
+              <strong className="shrink-0 text-[#003360]">선박 속력</strong>
+              <div className="min-w-28 flex-1 px-6 pt-7">
+                <div className="relative">
+                  <span className="absolute -top-7 -translate-x-1/2 rounded-md bg-[#003360] px-2 py-0.5 font-mono text-[11px] font-black whitespace-nowrap text-white" style={{ left: `calc(${speedPosition}% + ${(0.5 - speedPosition / 100) * 16}px)` }} aria-hidden="true">
+                    {speedKnots} kn
+                  </span>
+                  <input type="range" min={5} max={35} step={1} value={speedKnots} onChange={(event) => onChangeSpeed(Number(event.target.value))} aria-label="선박 예상 속력 슬라이더" className="h-7 w-full cursor-pointer accent-[#00846c]" />
+                </div>
+              </div>
+              <span className="hidden h-8 border-l border-slate-400 sm:block" aria-hidden="true" />
+              <div className="flex flex-wrap items-center gap-1" role="group" aria-label="속력 프리셋">
+                {SPEED_PRESETS.map((preset) => (
+                  <button key={preset.knots} type="button" onClick={() => onChangeSpeed(preset.knots)} aria-pressed={speedKnots === preset.knots} className={`min-h-8 rounded-lg px-2 font-mono text-[11px] font-black whitespace-nowrap ${speedKnots === preset.knots ? 'bg-[#003360] text-white' : 'border border-sky-300 bg-white text-[#003360]'}`}>
+                    {preset.knots} kn
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-2 rounded-xl border border-sky-200 bg-[#f0f9ff] px-3 py-2 text-[11px] font-bold sm:px-4 sm:text-xs" aria-label="지도 표시와 경로 설정">
+              <div className="flex items-center gap-1.5">
+                <strong className="mr-1 text-[#003360]">표시</strong>
+                {([['시간', showLegDurationOnMap, onToggleLegDurationOnMap], ['거리', showLegDistanceOnMap, onToggleLegDistanceOnMap]] as const).map(([label, enabled, toggle]) => (
+                  <div key={label} className="flex items-center gap-1">
+                    <span>{label}</span>
+                    <button type="button" role="switch" aria-checked={enabled} aria-label={`지도 구간 ${label} 표시`} onClick={toggle} className={`relative h-5 w-9 rounded-full border transition-colors ${enabled ? 'border-[#00846c] bg-[#00846c]' : 'border-slate-300 bg-slate-300'}`}>
+                      <span className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${enabled ? 'left-[18px]' : 'left-0.5'}`} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <span className="hidden h-7 border-l border-slate-400 sm:block" aria-hidden="true" />
+              <div className="flex items-center gap-1" role="group" aria-label="거리 단위">
+                <strong className="mr-1 text-[#003360]">단위</strong>
+                {(['NM', 'km'] as const).map((unit) => (
+                  <button key={unit} type="button" onClick={() => onChangeDistanceUnit?.(unit)} aria-pressed={distanceUnit === unit} className={`min-h-8 rounded-lg px-2 font-black ${distanceUnit === unit ? 'bg-[#003360] text-white' : 'border border-sky-300 bg-white text-[#003360]'}`}>{unit}</button>
+                ))}
+              </div>
+              <span className="hidden h-7 border-l border-slate-400 sm:block" aria-hidden="true" />
+              <div className="flex items-center gap-1" role="group" aria-label="지도 사용 모드">
+                <strong className="mr-1 text-[#003360]">경로</strong>
+                {(['draw', 'pan_only'] as const).map((mode) => (
+                  <button key={mode} type="button" aria-pressed={routeMapTapMode === mode} onClick={() => onChangeRouteMapTapMode?.(mode)} className={`min-h-8 rounded-lg px-2 font-bold whitespace-nowrap ${routeMapTapMode === mode ? 'bg-[#003360] text-white' : 'border border-sky-300 bg-white text-[#003360]'}`}>
+                    {mode === 'draw' ? '직선 그리기' : '이동만'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <button type="button" onClick={onStartNewRoute ?? onResetRoute} className="flex min-h-9 items-center gap-1 rounded-lg border border-sky-500 bg-sky-50 px-3 text-xs font-bold text-[#003360]">
+                <Plus className="h-4 w-4" aria-hidden="true" />새 항로
+              </button>
+              {onFitRouteBounds && <button type="button" onClick={onFitRouteBounds} disabled={waypoints.length < 2} className="flex min-h-9 items-center gap-1 rounded-lg border border-sky-500 bg-sky-50 px-3 text-xs font-bold text-[#003360] disabled:opacity-40">
+                <Maximize2 className="h-4 w-4" aria-hidden="true" />지도 전체
+              </button>}
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  }
 
   if (isCollapsed) {
     return (
@@ -456,12 +678,12 @@ export function RouteTimeCalculator({
             {hasCautionOrDanger && (
               <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-amber-500 bg-amber-100 px-1.5 py-0.5 text-[10px] font-extrabold whitespace-nowrap text-amber-900">
                 <AlertTriangle className="h-2.5 w-2.5 shrink-0 text-amber-700" />
-                <span>수심·암초주의</span>
+                <span>항로·수심주의</span>
               </span>
             )}
             <span
               className="inline-flex shrink-0 items-center rounded-md border border-slate-300 bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-slate-700"
-              title="해상 실항로·입력 속력 기반 추정치이며 실제 항로와 다를 수 있습니다."
+              title="직선거리·입력 속력 기반 추정치이며 실제 항로와 다를 수 있습니다."
             >
               추정치·참고용
             </span>
@@ -977,7 +1199,7 @@ export function RouteTimeCalculator({
           <div className="space-y-1 px-1">
             <div className="flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-bold text-slate-600">
               <span>
-                🧭 <strong className="font-extrabold text-[#003360]">해상 실항로 정밀 계산</strong> (136항포구 · 300변침점·378실측해안선 우회 연산)
+                🧭 <strong className="font-extrabold text-[#003360]">직선거리 기반 예상시간</strong> (사용자 지정 지점 순서대로 연결)
               </span>
               {onOpenSourcesInfo && (
                 <button
@@ -991,7 +1213,7 @@ export function RouteTimeCalculator({
               )}
             </div>
             <p className="text-[10px] leading-snug font-semibold text-slate-600">
-              ※ 선속·수로 변침 기반 단순 추정치이며 조류·기상·선박 특성에 따라 달라질 수 있으므로 공식 항해 계획(해도·ECDIS·선장 판단)을 대체하지 않습니다.
+              ※ 직선거리와 입력 속력 기반 단순 추정치입니다. 직선이 육지를 가로지를 수 있으며 실제 항로·조류·기상·선박 특성에 따라 달라지므로 공식 항해 계획(해도·ECDIS·선장 판단)을 대체하지 않습니다.
             </p>
           </div>
         </div>

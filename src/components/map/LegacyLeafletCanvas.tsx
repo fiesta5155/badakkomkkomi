@@ -57,6 +57,7 @@ export interface LegacyLeafletCanvasProps {
   showDirectionArrows?: boolean;
   showLegDurationOnMap?: boolean;
   showLegDistanceOnMap?: boolean;
+  routeDistanceUnit?: 'NM' | 'km';
   fitRouteBoundsTrigger?: number;
   candidatePortId?: string | null;
   onSelectRoutePort?: (portId: string) => void;
@@ -175,10 +176,11 @@ function getRouteLegBadgeIcon(
   isSelected = false,
   showDuration = true,
   showDistance = true,
+  distanceUnit: 'NM' | 'km' = 'NM',
 ): L.DivIcon {
   const mins = Math.round(durationMinutes);
   const nmStr = distanceNm.toFixed(1);
-  const cacheKey = `legbadge:${mins}:${nmStr}:${bearingDeg}:${legIndex}:${safetyLevel}:${isSelected ? 1 : 0}:${showDuration ? 1 : 0}:${showDistance ? 1 : 0}`;
+  const cacheKey = `legbadge:${mins}:${nmStr}:${bearingDeg}:${legIndex}:${safetyLevel}:${isSelected ? 1 : 0}:${showDuration ? 1 : 0}:${showDistance ? 1 : 0}:${distanceUnit}`;
   return getCachedDivIcon(cacheKey, () => {
     const spec = buildRouteLegBadgeSpec(durationMinutes, distanceNm, bearingDeg, cardinal, {
       legIndex,
@@ -186,6 +188,7 @@ function getRouteLegBadgeIcon(
       isSelected,
       showDuration,
       showDistance,
+      distanceUnit,
     });
     return L.divIcon({
       className: 'bada-custom-marker',
@@ -371,6 +374,7 @@ export function LegacyLeafletCanvas({
   showDirectionArrows: _showDirectionArrows = true,
   showLegDurationOnMap = true,
   showLegDistanceOnMap = true,
+  routeDistanceUnit = 'NM',
   fitRouteBoundsTrigger = 0,
   candidatePortId = null,
   onSelectRoutePort,
@@ -680,6 +684,7 @@ export function LegacyLeafletCanvas({
                     isSelected,
                     showLegDurationOnMap,
                     showLegDistanceOnMap,
+                    routeDistanceUnit,
                   )}
                   interactive={Boolean(onSelectLeg)}
                   zIndexOffset={isSelected ? 460 : 420}
@@ -717,6 +722,8 @@ export function LegacyLeafletCanvas({
                   }
                   if (wp.matchedPortId && onSelectRoutePort) {
                     onSelectRoutePort(wp.matchedPortId);
+                  } else {
+                    onMapClickForRoute(wp.lat, wp.lng);
                   }
                 },
                 dragend: (e) => {

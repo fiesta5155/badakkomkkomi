@@ -66,6 +66,7 @@ export interface KakaoMapCanvasProps {
   showDirectionArrows?: boolean;
   showLegDurationOnMap?: boolean;
   showLegDistanceOnMap?: boolean;
+  routeDistanceUnit?: 'NM' | 'km';
   fitRouteBoundsTrigger?: number;
   candidatePortId?: string | null;
   onSelectRoutePort?: (portId: string) => void;
@@ -429,6 +430,7 @@ export function KakaoMapCanvas({
   showDirectionArrows: _showDirectionArrows = true,
   showLegDurationOnMap = true,
   showLegDistanceOnMap = true,
+  routeDistanceUnit = 'NM',
   fitRouteBoundsTrigger = 0,
   candidatePortId = null,
   onSelectRoutePort,
@@ -1126,6 +1128,7 @@ export function KakaoMapCanvas({
             isSelected,
             showDuration: showLegDurationOnMap,
             showDistance: showLegDistanceOnMap,
+            distanceUnit: routeDistanceUnit,
           },
         );
         const el = createOverlayElement(
@@ -1176,6 +1179,8 @@ export function KakaoMapCanvas({
         () => {
           if (wp.matchedPortId && onSelectRoutePort) {
             onSelectRoutePort(wp.matchedPortId);
+          } else {
+            onMapClickForRoute(wp.lat, wp.lng);
           }
         },
       );
@@ -1202,7 +1207,9 @@ export function KakaoMapCanvas({
     onSelectLeg,
     showLegDurationOnMap,
     showLegDistanceOnMap,
+    routeDistanceUnit,
     onSelectRoutePort,
+    onMapClickForRoute,
     onUpdateWaypointPos,
     onRemoveWaypoint,
   ]);

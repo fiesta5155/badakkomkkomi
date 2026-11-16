@@ -13,6 +13,7 @@ export interface HomeScreenProps {
   onSelectFeatureCard: (target: 'notebook' | 'navigation') => void;
   onSelectNotebookPreset?: (preset: NotebookLaunchPreset) => void;
   onSelectNavigationPanel?: (panel: NavPanelType) => void;
+  onSelectCalendar?: () => void;
   onOpenSettings?: (section?: 'thresholds' | 'guide' | 'sources') => void;
   isCustomThresholds?: boolean;
   hasActiveWorkspace?: boolean;
@@ -37,6 +38,7 @@ export function HomeScreen({
   onSelectFeatureCard,
   onSelectNotebookPreset,
   onSelectNavigationPanel,
+  onSelectCalendar,
   onOpenSettings,
   hasActiveWorkspace = false,
   activeWorkspaceSummary,
@@ -188,12 +190,11 @@ export function HomeScreen({
               </button>
             </article>
 
-            {/* 카드 3 (출시 예정): 꼬미의 달력 */}
+            {/* 카드 3: 꼬미의 달력 */}
             <button
               type="button"
-              disabled
-              aria-disabled="true"
-              className="[container-type:inline-size] flex min-h-36 h-full cursor-not-allowed flex-col items-center justify-center rounded-3xl border-2 border-[#93c5fd] bg-gradient-to-b from-[#e8f2fe] via-[#dbeafe] to-[#b9d6fc] px-2 py-4 text-center shadow-sm sm:min-h-44 sm:py-5"
+              onClick={onSelectCalendar}
+              className="[container-type:inline-size] flex min-h-36 h-full flex-col items-center justify-center rounded-3xl border-2 border-[#93c5fd] bg-gradient-to-b from-[#e8f2fe] via-[#dbeafe] to-[#b9d6fc] px-2 py-4 text-center shadow-sm transition hover:border-[#0066b3] hover:shadow-lg active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0066b3] sm:min-h-44 sm:py-5"
             >
               <div className="mb-2.5 flex h-20 w-full items-center justify-center sm:h-24">
                 <img

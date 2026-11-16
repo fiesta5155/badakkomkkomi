@@ -15,6 +15,7 @@ export function getRouteLegLabelParts(
   distanceNm: number,
   showDuration = true,
   showDistance = true,
+  distanceUnit: 'NM' | 'km' = 'NM',
 ): RouteLegLabelParts {
   const safeMins = Number.isFinite(durationMinutes)
     ? Math.max(0, Math.round(durationMinutes))
@@ -22,7 +23,8 @@ export function getRouteLegLabelParts(
   const safeNm = Number.isFinite(distanceNm) ? Math.max(0, distanceNm) : 0;
 
   const durationText = showDuration ? `${safeMins}분` : null;
-  const distanceText = showDistance ? `${safeNm.toFixed(1)}NM` : null;
+  const distanceText = showDistance ? distanceUnit === 'NM'
+    ? `${safeNm.toFixed(1)}NM` : `${(safeNm * 1.852).toFixed(1)}km` : null;
 
   const parts = [durationText, distanceText].filter(
     (item): item is string => item !== null,

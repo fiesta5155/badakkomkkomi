@@ -59,7 +59,7 @@ export const OFFLINE_CAPABILITY_MATRIX: readonly OfflineCapabilityRow[] = [
     detail: '앱 설치 시 정적 데이터·모식도가 기기에 내장되어 통신 없이 즉시 열람',
   },
   {
-    featureName: '바닷길(A*) 계산 · 초성 검색 · 상괭이 기록',
+    featureName: '바닷길 직선거리 계산 · 초성 검색 · 상괭이 기록',
     isOfflineGuaranteed: true,
     statusBadge: '🟢 100% 오프라인',
     detail: '스마트폰 자체 연산 및 기기 내부 저장소(IndexedDB/localStorage) 직접 처리',
@@ -167,31 +167,31 @@ export const DATA_SOURCE_REGISTRY: readonly DataSourceItem[] = [
   },
   {
     id: 'route_algorithm',
-    badgeLabel: '바닷길 항로 · 초성 검색',
+    badgeLabel: '직선거리 계산 · 초성 검색',
     governanceLabel: '자체 개발 수학·기하 알고리즘',
     governanceType: 'inhouse_algorithm',
-    title: '육지·섬 우회 바닷길 계산 및 한글 초성 검색 엔진',
-    providerSummary: '외부 유료 API 없이 앱에 자체 구현한 2계층 하이브리드 A*·가시성 그래프(Visibility Graph·Theta*) 해상 탐색 엔진',
+    title: '직선거리 기반 예상시간 및 한글 초성 검색',
+    providerSummary: '외부 유료 API 없이 앱에서 Haversine 거리와 입력 선속으로 계산',
     operationMode: 'offline_embedded',
     operationModeLabel: '🟢 기기 자체 연산 (100% 오프라인)',
     keyPoints: [
-      '🧭 300개 변침점 · 378개 실측해안선 우회 A*',
-      '✅ 18,360개 전 항로 육지 비관통 검증',
+      '🧭 지도 클릭 원좌표를 순서대로 직선 연결',
+      '⚠️ 육지 교차 시 경고 표시 (직선은 유지)',
       '🔤 무서버 한글 초성 즉시 검색',
     ],
     plainExplanation:
-      '바다 길을 못 찾는 자동차 내비 API나 섬을 관통하는 직선 계산 대신, OpenStreetMap 실측 해안선 폴리곤 378개(12,794정점)를 피해 300개 해상 변침점과 C-Space 가시성 그래프로 우회하는 2계층 하이브리드 A* 엔진을 자체 개발했습니다.',
-    faqQuestion: '바닷길 시간계산기는 어떤 원리로 섬을 피해 거리·도착시간을 계산하나요?',
+      '사용자가 지정한 각 지점 사이를 직선으로 연결하고 Haversine 거리와 입력 선속으로 예상시간을 계산합니다. 섬을 자동 우회하지 않으며 육지 교차 시 경고를 표시합니다.',
+    faqQuestion: '바닷길 시간계산기는 거리·도착시간을 어떻게 계산하나요?',
     faqAnswer:
-      '378개 본토·유무인도 실측 해안선 폴리곤(12,794정점)과 이중 공간 인덱스(Spatial Grid + Latitude Slab)를 코드에 내장하고, 출항지 외측 진입점부터 300개 변침점 그래프와 C-Space 가시성 그래프(Theta*)를 결합해 육지를 관통하지 않는 최단 항로를 1ms 미만에 계산합니다.',
+      '출발·경유·도착 지점을 선택한 순서대로 직선 연결하고, 각 구간의 Haversine 거리를 해리(NM)로 환산한 뒤 입력 속력(knots)으로 나누어 예상시간을 계산합니다. 육지를 가로지르는 직선은 그대로 표시하되 경고합니다.',
     technicalSpecs: [
-      '2계층 하이브리드 A* 탐색: 378개 실측 해안선 폴리곤(12,794정점) 대비 136개 항포구 전체 쌍(18,360쌍) 전수 시뮬레이션 및 육지 비관통(0건) 검증 통과',
-      'Theta* String-Pulling & C-Space 가시성 우회: 외향 법선(Outward Normal) 오프셋 정점 가시성 탐색 및 양단 역주행(U턴) 자동 제거',
+      '지점 순서: 사용자가 지정한 출발·경유·도착 좌표를 순서대로 연결하며 자동 변침점을 추가하지 않음',
+      '육지 교차: 378개 실측 해안선 폴리곤과 교차 여부만 검사하고 직선 경로는 변경하지 않음',
       '거리·침로·중점: 지구 곡면 Haversine 대권거리(1NM=1.852km), 구면 삼각법 침로(0~359°), 호장 50% 진중점',
       '한글 초성 검색: 유니코드 음절 분해 수식 자체 구현 (예: ㅅㄷㅎ → 삼덕항 즉시 검색)',
     ],
     cautionNote:
-      '선속·수로 변침점 기반 참고용 추정치이며, 조류·풍랑·흘수에 따른 공식 전자해도(ECDIS) 및 선장의 현장 판단을 대체하지 않습니다.',
+      '직선거리·입력 선속 기반 참고용 추정치이며 육지를 가로지를 수 있습니다. 공식 전자해도(ECDIS) 및 선장의 현장 판단을 대체하지 않습니다.',
   },
   {
     id: 'qgis_parser',
@@ -369,7 +369,7 @@ export function buildSourceCitationCopyText(appVersionDisplay: string): string {
     `1. 항포구·접안지(136개소/55개소): 해양수산부 국립해양조사원(KHOA) 수로·해안선 기준 + 지자체 어항고시 + 국립공원공단 현장 점검 데이터 (100% 오프라인 내장)`,
     `2. 실시간 해상기상(풍속·파고): 유럽중기예보센터(ECMWF IFS 9km / WAM 9km) 수치예보 모델 + Open-Meteo 무료 오픈 API (결측·오프라인 시 미확인 '?' 안전 처리)`,
     `3. 배경 지도·위성·3D 로드뷰: 카카오맵 Web SDK v3 (국토교통부 국토지리정보원 항공·수치지도 기반) + OpenStreetMap/Leaflet 비상 자동 폴백`,
-    `4. 바닷길 실항로 계산·초성 검색: 통영·거제 300개 해상 변침점 및 378개 실측 해안선 폴리곤(12,794정점) 우회 2계층 하이브리드 A*·가시성 그래프 알고리즘 (외부 유료 API 미사용 · 오프라인 기기 연산)`,
+    `4. 바닷길 직선거리 기반 예상시간·초성 검색: 사용자 지정 지점을 순서대로 직선 연결하고 Haversine 거리와 입력 선속으로 계산 (육지 교차 경고 · 외부 유료 API 미사용 · 오프라인 기기 연산)`,
     `5. QGIS 공간파일 변환: OGC GeoPackage(.gpkg)/Shapefile(.shp) 자체 파서 + 국토지리정보원 국가좌표계(proj4 EPSG:5179/5186) + CP949 한글 복원 (외부 서버 전송 0건)`,
     `6. 브랜드·UI 표준: 국립공원공단 공식 CI·캐릭터(반달이·꼬미) + 한려해상 깃대종 팔색조(NPIP AS 920) + 행정안전부 디지털정부 UI/UX 가이드라인(KRDS)`,
   ].join('\n');
