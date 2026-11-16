@@ -379,6 +379,10 @@ for (const docPath of markdownDocsToVerify) {
     ) {
       continue;
     }
+    assert(
+      !/(^|[\\/])\.dev([\\/]|$)/.test(rawTarget),
+      `Forbidden gitignored .dev/ path link in ${docPath}: (${match[1]}) — use tracked repository-relative paths only`,
+    );
     const resolvedPath = path.resolve(docDir, rawTarget);
     assert(
       fs.existsSync(resolvedPath),

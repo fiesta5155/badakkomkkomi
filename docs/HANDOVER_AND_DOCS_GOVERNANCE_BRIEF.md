@@ -2,7 +2,7 @@
 
 > **문서 등급**: 최종 구현 완료 및 검증 통합 설계 기획서 (Implemented & Verified Architectural & Governance Specification)
 > **문서 상태**: `IMPLEMENTED & VERIFIED` (코드·매뉴얼 리팩토링 및 검증 완료 · 3장 1~5번 사용자 권한 작업은 초기 이관 세팅 시 수행 예정)
-> **문서 경로**: [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](./HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md) (EGM 연구 브리프: [`.dev/docs/concepts_brief.md`](../.dev/docs/concepts_brief.md))
+> **문서 경로**: [`docs/HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md`](./HANDOVER_AND_DOCS_GOVERNANCE_BRIEF.md) (로컬 EGM 연구 브리프 경로: `.dev/docs/concepts_brief.md`)
 > **기준 시점 및 버전**: `2026-11-16` (`Asia/Seoul`) · 앱 버전 기준 `v2.4` (`2.4.0`)
 > **총괄 및 참여 에이전트**: 수석 테크니컬 아키텍트 (Senior Technical Architect) & 6대 전문 에이전트 컨트롤러 (**PWA 앱 · 디자인 · 아키텍처 · QA · UI/UX · 리팩토링 전문 에이전트**)
 > **핵심 설계 목표**:
