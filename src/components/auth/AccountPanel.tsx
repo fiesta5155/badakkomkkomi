@@ -17,6 +17,12 @@ export function AccountPanel() {
         </div>
       </div>
       {auth.error && <p role="alert" className="mt-1 text-xs leading-relaxed text-rose-700">{auth.error}</p>}
+      {auth.user && <details className="mt-1 text-xs">
+        <summary className="cursor-pointer py-1">내 Firebase UID 확인</summary>
+        <p className="mt-1">현재 로그인 계정의 UID입니다. 관리자 지정은 이 값으로 확인합니다.</p>
+        <input aria-label="내 Firebase Auth UID" readOnly value={auth.user.uid} onFocus={(event) => event.target.select()}
+          className="mt-1 min-h-9 w-full rounded-lg border border-sky-200 bg-sky-50 px-2 font-mono text-xs select-text" />
+      </details>}
     </section>
   );
 }

@@ -96,6 +96,45 @@ service cloud.firestore {
       allow list, create, update, delete: if false;
     }
 
+    // 공지 관리자 설정은 단일 문서·단일 UID로만 관리한다. 클라이언트 변경은 금지한다.
+    function announcementAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/appSettings/announcements)
+        && get(/databases/$(database)/documents/appSettings/announcements).data.adminUid is string
+        && get(/databases/$(database)/documents/appSettings/announcements).data.adminUid == request.auth.uid;
+    }
+
+    function validAnnouncement() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['schemaVersion', 'title', 'body', 'published', 'sortOrder', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'revision'])
+        && d.keys().hasOnly(['schemaVersion', 'title', 'body', 'published', 'sortOrder', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'revision'])
+        && d.schemaVersion is int && d.schemaVersion == 1
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+        && d.title.matches('[\\s\\S]*[^\\s\\p{Z}\\x{000B}\\x{FEFF}][\\s\\S]*')
+        && d.body is string && d.body.size() > 0 && d.body.size() <= 10000
+        && d.body.matches('[\\s\\S]*[^\\s\\p{Z}\\x{000B}\\x{FEFF}][\\s\\S]*')
+        && d.published is bool && d.sortOrder is int && d.sortOrder >= 0 && d.sortOrder <= 9999
+        && d.createdBy is string && d.updatedBy == request.auth.uid
+        && d.createdAt is timestamp && d.updatedAt == request.time
+        && d.revision is int && d.revision >= 1;
+    }
+
+    match /appSettings/announcements {
+      allow get: if calendarUser();
+      allow list, create, update, delete: if false;
+    }
+
+    match /announcements/{noticeId} {
+      allow read: if calendarUser() && (resource.data.published == true || announcementAdmin());
+      allow create: if calendarUser() && announcementAdmin() && validAnnouncement()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt == request.time && request.resource.data.revision == 1;
+      allow update: if calendarUser() && announcementAdmin() && validAnnouncement()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'body', 'published', 'sortOrder', 'updatedBy', 'updatedAt', 'revision'])
+        && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if calendarUser() && announcementAdmin();
+    }
+
     // 명시적으로 허용하지 않은 경로는 기본 거부한다.
     match /{document=**} {
       allow read, write: if false;

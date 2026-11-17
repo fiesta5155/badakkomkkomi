@@ -115,6 +115,74 @@ test:rules에는 Java 21 이상이 필요합니다. 127.0.0.1:8085의 demo-bada-
 - [실시간 업데이트와 구독 정리](https://firebase.google.com/docs/firestore/query-data/listen)
 - [보안 규칙 필드 검증](https://firebase.google.com/docs/firestore/security/rules-fields)
 
+## 메인 공지사항 — 로컬 구현, 관리자 미지정 (2026-11-17)
+
+운영 관리자 UID는 아직 확인되지 않았으며 어떤 실제 계정에도 공지 관리 권한을 부여하지 않았습니다. 아래 설정과 규칙 적용은 사용자 검토·승인 후 별도로 진행합니다. 이번 작업에서 운영 Firestore 데이터·규칙, Firebase 환경변수·인증 설정, Git 커밋·Push·Pages 배포는 변경하지 않습니다.
+
+### 기능과 화면
+
+HomeScreen의 메뉴 카드 아래에 HomeNotices.tsx를 배치했습니다. Google 로그인과 기존 한글 두 글자 실명 등록이 완료된 직원만 공지를 조회합니다. 비로그인 상태에는 공지 조회를 요청하지 않습니다. 게시된 공지가 없으면 공지 바를 숨깁니다. 관리자에게는 첫 공지 등록을 위한 별도 ‘공지사항 관리’ 버튼을 제공합니다. 공지 바가 있으면 오른쪽 설정 아이콘으로 같은 관리 창을 엽니다. 이 기능은 홈 화면에만 있습니다.
+
+왼쪽 📢는 고정이고 제목만 오른쪽에서 왼쪽으로 순서대로 반복 이동합니다. 정렬 순서 숫자가 작은 공지가 먼저이며, 같은 숫자는 작성 시각과 ID로 순서를 고정합니다. 일시정지/재생 버튼과 hover·키보드 포커스 중 일시정지를 지원합니다. OS/브라우저 prefers-reduced-motion이 켜지면 이동 애니메이션 없이 제목을 표시하고 여러 제목은 10초마다 교체합니다. 이 교체도 일시정지할 수 있습니다. 클릭하면 전체 본문 팝업과 다른 게시 공지 선택 버튼을 표시합니다. 본문은 일반 텍스트이며 HTML로 실행하지 않습니다.
+
+관리 창에서 제목(1~120자), 본문(1~10,000자), 게시 여부, 정렬 순서(0~9999 정수)를 입력합니다. 기본은 미게시입니다. 서버 저장 성공 후에만 완료를 알리고, 처리 중 중복 클릭을 막습니다. 편집 시작 후 원본이 변경·삭제되었다면 자동 덮어쓰기·재생성을 거부하고 입력을 유지합니다. 입력을 복사해 보관한 뒤 최신 공지를 다시 여세요. 팝업을 닫거나 계정을 바꾸면 미저장 입력은 남지 않습니다.
+
+### 데이터와 권한
+
+```text
+appSettings/announcements
+  adminUid: "확인 후 지정할 Firebase Auth UID 한 개"
+
+announcements/{documentId}
+  schemaVersion: 1
+  title: string
+  body: string
+  published: boolean
+  sortOrder: integer
+  createdBy: 작성한 관리자 UID
+  updatedBy: 수정한 관리자 UID
+  createdAt: server timestamp
+  updatedAt: server timestamp
+  revision: 최초 1, 수정 시 1 증가
+```
+
+appSettings/announcements는 정상 직원에게 문서 get만 허용하며, 모든 클라이언트의 생성·수정·삭제·목록 조회를 금지합니다. 이 단일 문서의 adminUid 문자열과 인증 UID가 같은 한 사람만 공지 생성·수정·삭제를 할 수 있습니다. 설정이 없거나 잘못되면 아무도 관리자 권한을 얻지 않습니다. GitHub 이름·이메일·users.role·calendarAdmins는 공지 관리 권한의 근거로 사용하지 않습니다. 기존 달력 관리자 설정과 별개입니다.
+
+일반 직원은 published=true인 문서만 읽을 수 있습니다. 클라이언트도 반드시 where('published', '==', true)를 사용하므로 Rules가 결과를 사후 필터링한다고 가정하지 않습니다. 관리자는 미게시 공지도 조회합니다. 정렬은 수신 후 수행하므로 기본 published 단일 필드 인덱스만 필요하고 복합 인덱스는 추가하지 않습니다. 운영에서 published 인덱스를 제외했다면 활성화가 필요합니다.
+
+허용 필드 목록·길이·공백 전용 내용·자료형·작성 UID·서버 시각·수정 번호·불변 메타데이터를 Rules에서도 검사합니다. 관리자의 화면만 숨기는 방식에 의존하지 않습니다. 관리자 판정은 서버 확인된 설정만 사용하고, 권한·계정 변경 시 이전 자료·관리 창과 구독을 정리합니다. 공지 및 관리자 설정은 localStorage에 저장하지 않습니다.
+
+### 본인 관리자 UID를 안전하게 확인하는 방법
+
+1. 평소 사용하는 본인의 Google 계정으로 앱에 로그인하고 실명 표시를 확인합니다. 다른 사람 계정·공용 계정으로 진행하지 않습니다.
+2. 홈 계정 영역의 ‘내 Firebase UID 확인’을 펼칩니다. 읽기 전용 입력란은 현재 Firebase Authentication user.uid를 그대로 보여 주며 포커스하면 전체 선택됩니다. 이메일을 UID로 대체하거나 이름으로 추정하지 않습니다.
+3. Firebase 콘솔에서 badakkomkkomi-firebase → Authentication → Users로 이동해 본인의 Google 계정 사용자를 찾습니다. User UID가 앱에서 확인한 값과 정확히 같은지 대조합니다. 이메일은 계정을 찾는 데만 사용하며 권한 판정에는 사용하지 않습니다.
+4. 지정할 UID가 확정되면 그 값만 따로 검토합니다. Firebase ID 토큰·비밀번호·서비스 계정 비공개 키는 수집하거나 전달할 필요가 없습니다. 이 단계까지는 공지 관리자 지정이나 운영 데이터 변경이 없습니다.
+
+### 규칙 백업과 적용 절차 — 승인 전 실행 금지
+
+로컬 규칙 수정 전 원본을 [firestore.before-announcements.rules](docs/backups/firestore.before-announcements.rules)에 보관했습니다. 원본 SHA-256은 90574c50367b0df0c8725e93fd65a3d9b5c158554a7e2b9d00859377cd9adff3입니다. 이 파일은 개발 저장소의 이전 규칙이며 실제 콘솔의 게시본을 자동 백업한 것은 아닙니다.
+
+1. 먼저 관리자 UID 확인과 공지 권한 설계를 검토·승인합니다. 운영 Firestore 규칙 변경 및 설정 문서 생성도 별도 승인 범위입니다.
+2. Firebase 콘솔의 현재 게시 규칙 전체를 별도로 복사하여 날짜와 함께 안전하게 보관합니다. 게시 시각도 기록합니다. 로컬 백업과 운영 게시본이 같다고 가정하지 않습니다.
+3. 현재 게시본과 로컬 firestore.rules를 비교합니다. 변경은 announcementAdmin(), validAnnouncement(), appSettings/announcements와 announcements/{noticeId} 블록뿐입니다. 기존 users·calendarVessels·calendarAdmins와 나머지 기본 거부는 그대로입니다. 자동 검사에서 새 블록을 제외한 파일이 백업과 동일한지 확인합니다.
+4. 충돌 없이 기존 운영 규칙을 보존하는 것을 확인한 뒤, 승인된 로컬 규칙을 사용자가 콘솔에서 게시합니다. 이번 작업에서는 firebase deploy를 실행하지 않습니다.
+5. 별도 승인 후 Firestore 콘솔에서 컬렉션 appSettings, 문서 ID announcements, 필드 adminUid(문자열)에 확인한 본인 UID 한 개만 저장합니다. 이 문서는 앱이 만들지 않습니다. 운영 공지나 기존 사용자·달력 자료를 초기화하지 않습니다.
+6. 규칙 적용 전 앱은 접근 거부 안내를 표시할 수 있습니다. 임시 allow read/write:true나 이메일 예외를 넣어 우회하지 않습니다. 설정 문서가 없어도 정상 직원은 게시 공지 조회가 가능하지만 관리 기능은 활성화되지 않습니다.
+7. 이후 앱을 승인된 방식으로 배포합니다. 지정 관리자 Google 계정으로 로그인해 공지 관리 창에서 먼저 미게시 공지를 작성·검토하고, 게시로 전환합니다. 같은 단계에서 일반 직원 계정으로 게시 공지만 보이는지 확인합니다.
+8. 권한 철회·교체가 필요하면 신뢰할 수 있는 콘솔에서 이 단일 adminUid 값만 변경하거나 문서를 제거합니다. 즉시 새 UID 한 명만 관리할 수 있으며 기존 공지는 유지됩니다. calendarAdmins는 변경하지 않습니다.
+9. 문제가 있으면 공지 바·관리 기능을 사용 중지하고 원인을 확인합니다. 규칙 복원이 필요하면 2번의 실제 운영 백업을 기준으로 승인 후 복원하며, 달력 규칙까지 옛 버전으로 되돌리지 않습니다.
+
+### 검증 및 남은 브라우저 확인
+
+자동 검사는 UID 단일 관리자 판정, 게시 필터·정렬·순환·빈 목록, 기존 규칙 보존을 다룹니다. Rules 에뮬레이터는 관리자 CRUD, 일반 직원·달력 관리자 직접 쓰기 거부, 미게시 조회·무필터 목록 거부, 비로그인·비Google·프로필 없음 거부, 관리자 설정 자가 변경 차단, 누락/잘못된 설정의 기본 거부, 관리자 교체, 위조 필드·시각·수정 번호, 실시간 게시·수정·미게시·삭제 반영 및 구독 정리를 검사합니다. 실제 운영 관리자 대신 로컬 demo-bada-profile의 가상 UID만 사용합니다.
+
+최종 자동 검사: npm test 70/70, npm run test:rules 25/25(기존 17 + 공지 8) 통과, lint·build·verify 및 git diff --check 통과입니다. 운영 관리자 UID는 미지정입니다. 브라우저에서는 모바일 360/390px의 고정 이모지와 이동 제목, 제목 전체 표시, 줄바꿈 본문·팝업 닫기/Escape·키보드 초점, 일시정지와 움직임 줄이기, 빈 공지에서의 관리자 최초 진입, 일반 직원에게 설정 버튼이 없는지, 홈 이탈·계정 전환 시 구독 정리, 두 로그인 계정의 실시간 게시 반영을 확인해야 합니다. 운영 쓰기 테스트는 별도 승인 후 진행합니다.
+
+관련 파일: src/components/home/HomeNotices.tsx, noticeTicker.css, src/hooks/useAnnouncements.ts, src/services/announcementModel.ts, announcementService.ts, src/tests/announcements.test.ts, firebaseAnnouncements.rules.mjs. HomeScreen.tsx에는 컴포넌트 진입만 추가했고 AccountPanel.tsx에는 본인 UID 읽기 전용 표시만 추가했습니다. 기존 인증·달력·지도 서비스는 변경하지 않았습니다.
+
+공식 참고: [Firestore 쿼리와 권한](https://firebase.google.com/docs/firestore/security/rules-query), [Firebase 사용자 UID](https://firebase.google.com/docs/auth/web/manage-users).
+
 ## 달력 날씨 아이콘 보존 개선 (2026-11-17)
 
 기존에는 달력 재진입 시 날씨가 빈 객체로 초기화되고, API 실패 때도 빈 객체로 교체되었습니다. 지역 변경 시 진행 중 요청을 취소했으며 로그인·화면 진입 이후의 주기적 갱신이나 영속 캐시는 없었습니다. API 호출은 ECMWF IFS 단일 모델, daily=weather_code, forecast_days=16, timezone=Asia/Seoul, cache=no-store입니다. 날짜 배열과 코드 배열을 같은 인덱스로 연결합니다. 읽기 전용 확인 당시 응답은 HTTP 200이었으나 16일 중 유효 코드가 14일에만 있어, 먼 날짜의 빈 아이콘은 실제 예보 결측일 수도 있습니다.

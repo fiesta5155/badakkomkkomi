@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import type { NavPanelType } from '../../hooks/useAppRoute';
 import { AccountPanel } from '../auth/AccountPanel';
+import { HomeNotices } from './HomeNotices';
 
 export type NotebookLaunchPreset = 'hazard' | 'all' | 'layers';
 
@@ -248,6 +249,8 @@ export function HomeScreen({
             </article>
           </div>
         </nav>
+
+        <HomeNotices />
 
         {/* 이전 작업 세션이 열려 있을 때 원터치 복귀 배너 */}
         {hasActiveWorkspace && onResumeWorkspace && (

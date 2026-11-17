@@ -141,6 +141,7 @@ bada-kkomkkomi/
 │   │   ├── useFirebaseAuth.ts         # Google 로그인·본인 실명 프로필 상태 및 계정 동작
 │   │   ├── useSharedCalendar.ts       # 선박·월·계정별 Firestore 구독 및 정리
 │   │   ├── useCalendarWeather.ts      # 캐시 우선 날씨 표시·한국 날짜/3시간 갱신·재진입 구독
+│   │   ├── useAnnouncements.ts        # UID별 공지 관리자 확인·게시 공지 실시간 수신
 │   │   ├── useAppRoute.ts             # URL Query 딥링크, Depth-Aware 히스토리 라우터(navigateHome), 프리셋 관리
 │   │   ├── useAppConfig.ts            # app_config.json + IndexedDB 레이어 통합 로더 및 즉시 운영 반영
 │   │   ├── useMarineWeather.ts        # ECMWF API 병렬 조회, KST 타임스탬프 매칭 및 3단계 등급 연산
@@ -153,6 +154,8 @@ bada-kkomkkomi/
 │   │   ├── calendarRepository.ts      # 기존 로컬 일정 호환 및 선박 선택 저장
 │   │   ├── calendarFirestoreService.ts # 공유 일정 실시간 조회·트랜잭션 저장
 │   │   ├── calendarWeatherCache.ts    # 지역·날짜별 날씨 캐시·요청 병합·실패 시 보존
+│   │   ├── announcementModel.ts       # 공지 형식·정렬·순환·단일 관리자 UID 판별
+│   │   ├── announcementService.ts     # 게시 조건 쿼리·공지 실시간 조회·관리자 쓰기 트랜잭션
 │   │   ├── sharedCalendarModel.ts     # 공유 형식·한국 날짜·충돌 검사·로컬 백업 읽기
 │   │   ├── routeIslandLabels.ts       # 실제 항구·해안선 데이터의 섬 이름을 경로 순서대로 표시
 │   │   ├── straightRouteService.ts     # 클릭 좌표 보존·순서 번호·마지막 점 제거
