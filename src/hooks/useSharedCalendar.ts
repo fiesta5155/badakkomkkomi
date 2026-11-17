@@ -16,7 +16,7 @@ export function useSharedCalendar(uid: string, vessel: CalendarVessel, month: st
     return guardedSubscription<{ entries: SharedEntry[]; fromCache: boolean }>(
       (next, error) => subscribeCalendar(db, vessel, month, (entries, fromCache) => next({ entries, fromCache }), error),
       ({ entries, fromCache }) => setState({ scope, entries, phase: fromCache ? 'cache' : 'ready', error: '' }),
-      (cause) => setState({ scope, entries: [], phase: 'error', error: calendarErrorMessage(cause) }));
+      (cause) => setState((current) => ({ scope, entries: current.scope === scope ? current.entries : [], phase: 'error', error: calendarErrorMessage(cause) })));
   }, [uid, vessel, month, scope, retry]);
   useEffect(() => {
     const db = getFirebaseClient()?.db;
@@ -27,5 +27,5 @@ export function useSharedCalendar(uid: string, vessel: CalendarVessel, month: st
   }, [uid, retry]);
   const current = state.scope === scope ? state : { entries: [], phase: 'loading' as const, error: '' };
   return { ...current, isAdmin: admin.uid === uid && admin.enabled, adminError: admin.uid === uid ? admin.error : '',
-    retry: () => { setState({ scope: '', entries: [], phase: 'loading', error: '' }); setRetry((value) => value + 1); } };
+    retry: () => { setState((current) => ({ ...current, phase: 'loading', error: '' })); setRetry((value) => value + 1); } };
 }
