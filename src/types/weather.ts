@@ -29,6 +29,8 @@ export interface MarineWeatherStatusResult {
   hourly: HourlyMarineWeather[];
   selectedIndex: number;
   setSelectedIndex: (index: number) => void;
+  selectedTime: string;
+  selectForecastTime: (time: string) => void;
   current: HourlyMarineWeather | null;
   isLoading: boolean;
   error: string | null;

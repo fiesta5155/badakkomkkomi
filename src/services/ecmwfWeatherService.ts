@@ -90,8 +90,8 @@ export function buildEcmwfWeatherUrls(lat: number, lng: number): {
   const latStr = lat.toFixed(4);
   const lngStr = lng.toFixed(4);
 
-  const windForecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latStr}&longitude=${lngStr}&hourly=wind_speed_10m&wind_speed_unit=kn&models=${ECMWF_WEATHER_MODELS.wind}&timezone=Asia%2FSeoul`;
-  const waveMarineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${latStr}&longitude=${lngStr}&hourly=wave_height&models=${ECMWF_WEATHER_MODELS.wave}&timezone=Asia%2FSeoul`;
+  const windForecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latStr}&longitude=${lngStr}&hourly=wind_speed_10m&wind_speed_unit=kn&models=${ECMWF_WEATHER_MODELS.wind}&timezone=Asia%2FSeoul&forecast_days=10`;
+  const waveMarineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${latStr}&longitude=${lngStr}&hourly=wave_height&models=${ECMWF_WEATHER_MODELS.wave}&timezone=Asia%2FSeoul&forecast_days=10`;
 
   return { windForecastUrl, waveMarineUrl };
 }
@@ -105,6 +105,22 @@ export function getKstCurrentHourPrefix(nowDate = new Date()): string {
   const dd = String(kstTime.getDate()).padStart(2, '0');
   const hh = String(kstTime.getHours()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}T${hh}`;
+}
+
+export function getKstForecastDates(nowDate = new Date()): string[] {
+  const today = getKstCurrentHourPrefix(nowDate).slice(0, 10);
+  const start = Date.parse(`${today}T00:00:00Z`);
+  return Array.from({ length: 10 }, (_, day) =>
+    new Date(start + day * 86_400_000).toISOString().slice(0, 10));
+}
+
+export function getKstThreeHourTime(nowDate = new Date()): string {
+  const hour = getKstCurrentHourPrefix(nowDate);
+  return `${hour.slice(0, 11)}${String(Math.floor(Number(hour.slice(11, 13)) / 3) * 3).padStart(2, '0')}:00`;
+}
+
+export function isThreeHourForecastTime(time: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}T(?:00|03|06|09|12|15|18|21):00$/.test(time);
 }
 
 function normalizeFiniteOrNull(val: unknown): number | null {
@@ -286,5 +302,7 @@ export async function fetchEcmwfMarineWeatherSeries(
     windValues: windJson?.hourly?.wind_speed_10m,
     waveTimes: waveJson?.hourly?.time,
     waveValues: waveJson?.hourly?.wave_height,
+    nowHourPrefix: `${getKstForecastDates()[0]}T00`,
+    maxHours: 240,
   });
 }

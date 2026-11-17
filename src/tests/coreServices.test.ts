@@ -34,7 +34,10 @@ import {
   ECMWF_WEATHER_MODELS,
   evaluateCombinedWeatherGrade,
   evaluateHourlyWeatherSeries,
+  getKstForecastDates,
+  getKstThreeHourTime,
   isValidWeatherThresholds,
+  isThreeHourForecastTime,
   judgeSingleWeatherMetric,
   resolveEffectiveThresholds,
   SAFE_DEFAULT_THRESHOLDS,
@@ -515,6 +518,18 @@ describe('2. ECMWF Marine Weather Service & Threshold Validation (ecmwfWeatherSe
     assert.ok(urls.windForecastUrl.includes('wind_speed_unit=kn'));
     assert.ok(urls.waveMarineUrl.includes(`models=${ECMWF_WEATHER_MODELS.wave}`));
     assert.ok(urls.waveMarineUrl.includes('timezone=Asia%2FSeoul'));
+    assert.ok(urls.windForecastUrl.includes('forecast_days=10'));
+    assert.ok(urls.waveMarineUrl.includes('forecast_days=10'));
+  });
+
+  it('keeps ten KST dates across year end and selects only three-hour cards', () => {
+    const dates = getKstForecastDates(new Date('2026-12-31T14:30:00Z'));
+    assert.equal(dates.length, 10);
+    assert.deepEqual(dates.slice(0, 2), ['2026-12-31', '2027-01-01']);
+    assert.equal(dates.at(-1), '2027-01-09');
+    assert.equal(getKstThreeHourTime(new Date('2026-12-31T14:30:00Z')), '2026-12-31T21:00');
+    assert.equal(isThreeHourForecastTime('2027-01-01T00:00'), true);
+    assert.equal(isThreeHourForecastTime('2027-01-01T01:00'), false);
   });
 
   it('aligns wind and wave series by timestamp Map and evaluates missing data as unknown', () => {

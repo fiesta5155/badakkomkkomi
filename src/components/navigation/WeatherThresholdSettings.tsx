@@ -228,7 +228,7 @@ export function WeatherThresholdSettings({
     windGoodNum <= 0
       ? '풍속 기준치는 0보다 큰 숫자를 입력해야 합니다.'
       : windGoodNum >= windModNum
-        ? `풍속 '좋음 상한선(${windGoodNum}kn)'은 '보통 상한선(${windModNum}kn)'보다 작아야 합니다.`
+        ? `풍속 '양호 상한선(${windGoodNum}kn)'은 '보통 상한선(${windModNum}kn)'보다 작아야 합니다.`
         : windModNum > 60
           ? '풍속 상한선은 60kn 이하로 설정하세요.'
           : null;
@@ -241,7 +241,7 @@ export function WeatherThresholdSettings({
     waveGoodNum <= 0
       ? '파고 기준치는 0보다 큰 숫자를 입력해야 합니다.'
       : waveGoodNum >= waveModNum
-        ? `파고 '좋음 상한선(${waveGoodNum}m)'은 '보통 상한선(${waveModNum}m)'보다 작아야 합니다.`
+        ? `파고 '양호 상한선(${waveGoodNum}m)'은 '보통 상한선(${waveModNum}m)'보다 작아야 합니다.`
         : waveModNum > 15
           ? '파고 상한선은 15m 이하로 설정하세요.'
           : null;
@@ -460,7 +460,7 @@ export function WeatherThresholdSettings({
                     htmlFor="wind-good-input"
                     className="mb-1 block text-xs font-extrabold text-[#003360]"
                   >
-                    좋음 상한선 (&lt;)
+                    양호 상한선 (&lt;)
                   </label>
                   <div
                     className={`flex min-h-12 items-center rounded-xl border-2 bg-white px-3 py-2 shadow-2xs ${
@@ -541,7 +541,7 @@ export function WeatherThresholdSettings({
               ) : (
                 <div className="grid grid-cols-3 gap-1.5 text-center text-[11px] font-extrabold tabular-nums">
                   <div className="rounded-lg border border-emerald-300 bg-emerald-50 px-1.5 py-1 text-[#00846c]">
-                    좋음: &lt;{windGoodNum || 0}kn
+                    양호: &lt;{windGoodNum || 0}kn
                   </div>
                   <div className="rounded-lg border border-amber-300 bg-amber-50 px-1.5 py-1 text-amber-900">
                     보통: {windGoodNum || 0}~{windModNum || 0}kn
@@ -566,7 +566,7 @@ export function WeatherThresholdSettings({
                     htmlFor="wave-good-input"
                     className="mb-1 block text-xs font-extrabold text-[#003360]"
                   >
-                    좋음 상한선 (&lt;)
+                    양호 상한선 (&lt;)
                   </label>
                   <div
                     className={`flex min-h-12 items-center rounded-xl border-2 bg-white px-3 py-2 shadow-2xs ${
@@ -641,7 +641,7 @@ export function WeatherThresholdSettings({
               ) : (
                 <div className="grid grid-cols-3 gap-1.5 text-center text-[11px] font-extrabold tabular-nums">
                   <div className="rounded-lg border border-emerald-300 bg-emerald-50 px-1.5 py-1 text-[#00846c]">
-                    좋음: &lt;{waveGoodNum || 0}m
+                    양호: &lt;{waveGoodNum || 0}m
                   </div>
                   <div className="rounded-lg border border-amber-300 bg-amber-50 px-1.5 py-1 text-amber-900">
                     보통: {waveGoodNum || 0}~{waveModNum || 0}m
@@ -707,7 +707,7 @@ export function WeatherThresholdSettings({
                 </span>
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-slate-700">
-                사용자가 지정한 지점을 순서대로 직선 연결하고, 직선거리와 입력 선속으로 예상 소요시간을 계산합니다. 직선이 육지·항해 위험구역을 통과할 수 있으며 실제 항해 가능 경로를 보장하지 않습니다. 육지 통과 및 항해 위험구역 경고를 확인하고, 설정한 풍속·파고 기준치로 48시간 기상 신호등(좋음·보통·나쁨)을 판정합니다.
+                사용자가 지정한 지점을 순서대로 직선 연결하고, 직선거리와 입력 선속으로 예상 소요시간을 계산합니다. 직선이 육지·항해 위험구역을 통과할 수 있으며 실제 항해 가능 경로를 보장하지 않습니다. 육지 통과 및 항해 위험구역 경고를 확인하고, 설정한 풍속·파고 기준치로 48시간 기상 신호등(양호·보통·나쁨)을 판정합니다.
               </p>
             </div>
 

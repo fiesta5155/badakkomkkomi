@@ -1,83 +1,118 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   SlidersHorizontal,
   RefreshCw,
-  HelpCircle,
   ChevronDown,
   ChevronUp,
-  Info,
   MapPin,
   Plus,
   WifiOff,
   Wind,
   Waves,
 } from 'lucide-react';
-import type { MarineWeatherStatusResult, WeatherThresholds } from '../../types/weather';
+import type { MarineWeatherStatusResult } from '../../types/weather';
 import type { RouteWaypoint } from '../../types/route';
-import type { SourceCategoryKey } from '../../config/dataSources';
+import { getKstForecastDates, isThreeHourForecastTime } from '../../services/ecmwfWeatherService';
 
 interface MarineWeatherPanelProps {
   weather: MarineWeatherStatusResult;
-  thresholds?: WeatherThresholds;
   waypoints?: RouteWaypoint[];
-  nearestAreaLabel?: string;
   onSelectWaypointWeather?: (lat: number, lng: number, name: string) => void;
   onAddCurrentWeatherAsWaypoint?: () => void;
   onOpenSettings: () => void;
-  onOpenSourcesInfo?: (sourceId: SourceCategoryKey) => void;
   onRefresh: () => void;
 }
 
 export function MarineWeatherPanel({
   weather,
-  thresholds,
   waypoints = [],
-  nearestAreaLabel,
   onSelectWaypointWeather,
   onAddCurrentWeatherAsWaypoint,
   onOpenSettings,
-  onOpenSourcesInfo,
   onRefresh,
 }: MarineWeatherPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const [forecastDates, setForecastDates] = useState(getKstForecastDates);
+  const dateMenuRef = useRef<HTMLElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const mouseDragRef = useRef<{ startX: number; scrollLeft: number; moved: boolean; active: boolean } | null>(null);
   const current = weather.current;
+  const selectedDate = weather.selectedTime.slice(0, 10);
+  const selectedDay = '일월화수목금토'[new Date(`${selectedDate}T00:00:00Z`).getUTCDay()];
+  const cards = useMemo(() => weather.hourly.filter((item) =>
+    forecastDates.includes(item.time.slice(0, 10)) && isThreeHourForecastTime(item.time)),
+  [weather.hourly, forecastDates]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setForecastDates(getKstForecastDates()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!isDateOpen) return;
+    const close = (event: MouseEvent) => {
+      if (!dateMenuRef.current?.contains(event.target as Node)) setIsDateOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsDateOpen(false);
+    };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [isDateOpen]);
+
+  useEffect(() => {
+    const timeline = timelineRef.current;
+    const selected = Array.from(timeline?.children ?? []).find((child) =>
+      (child as HTMLElement).dataset.forecastTime === weather.selectedTime) as HTMLElement | undefined;
+    if (!timeline || !selected) return;
+    const left = timeline.scrollLeft + selected.getBoundingClientRect().left
+      - timeline.getBoundingClientRect().left - (timeline.clientWidth - selected.clientWidth) / 2;
+    timeline.scrollTo({ left, behavior: 'smooth' });
+  }, [weather.selectedTime, cards]);
+
+  const scrollTimeline = (direction: -1 | 1) => {
+    const timeline = timelineRef.current;
+    if (timeline) timeline.scrollBy({ left: direction * timeline.clientWidth * 0.8, behavior: 'smooth' });
+  };
   const isCurrentMatchingWaypoint = waypoints.some(
     (wp) =>
       Math.abs(weather.lat - wp.lat) < 0.002 &&
       Math.abs(weather.lng - wp.lng) < 0.002,
   );
 
-  // 신호등 색상 및 텍스트 매핑 (3단계: 좋음-초록, 보통-앰버/슬레이트, 나쁨-빨강, 실패/미확인-'?')
+  // 신호등 색상 및 텍스트 매핑 (3단계: 양호-초록, 보통-황색, 나쁨-빨강, 실패/미확인-회색)
   const gradeMeta = {
     good: {
-      label: '좋음',
-      color: '#00846c',
-      pillClass: 'bg-emerald-600 text-white',
-      desc: '풍속(IFS)·파고(WAM) 모두 설정 기준 양호 구간',
+      label: '양호',
+      color: '#16A34A',
+      pillClass: 'bg-[#16A34A] text-white',
     },
     moderate: {
       label: '보통',
-      color: '#d97706',
-      pillClass: 'bg-amber-400 text-slate-950',
-      desc: '풍속(IFS)·파고(WAM) 중 하나 이상 보통 주의 구간',
+      color: '#D97706',
+      pillClass: 'bg-[#D97706] text-slate-950',
     },
     bad: {
       label: '나쁨',
-      color: '#dc2626',
-      pillClass: 'bg-red-600 text-white',
-      desc: '풍속(IFS)·파고(WAM) 중 하나 이상 나쁨(위험) 구간',
+      color: '#DC2626',
+      pillClass: 'bg-[#DC2626] text-white',
     },
     unknown: {
       label: '미확인 (?)',
       color: '#64748b',
       pillClass: 'bg-slate-600 text-white',
-      desc: '예보 자료가 없거나 조회 실패 (좋음/보통으로 판정하지 않음)',
     },
   }[current?.grade || 'unknown'];
 
   return (
     <section
-      className="knps-hud-surface bada-hud-panel pointer-events-auto relative flex max-h-[calc(100dvh-10.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] w-full flex-col overflow-hidden rounded-3xl border-2 border-[#00a79d]/55 bg-white/96 p-2.5 text-[#003360] shadow-2xl backdrop-blur-md sm:p-3.5"
+      ref={dateMenuRef}
+      className="knps-hud-surface bada-hud-panel pointer-events-auto relative flex max-h-[calc(100dvh-10.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] w-full min-w-0 flex-col overflow-visible rounded-2xl border border-[#00a79d]/55 bg-white/96 p-2 text-[#003360] shadow-2xl backdrop-blur-md sm:p-3"
       aria-label="해상기상 상태판정 패널"
     >
       <div
@@ -87,25 +122,28 @@ export function MarineWeatherPanel({
       {/* 상단 2단 계층형 기상 판정 헤더 (Row 1: 타이틀·해역배지·유틸 툴바 / Row 2: 전폭 100% 기상 신호등·수치·기준치 브리핑 박스) */}
       <div className="shrink-0">
         {/* Row 1: 좌측 타이틀·해역 배지 + 우측 유틸리티 컨트롤 툴바 */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center justify-between gap-1.5">
           <div className="flex min-w-0 items-center gap-1.5">
-            <span className="shrink-0 text-[11px] font-black tracking-wider whitespace-nowrap text-[#0066b3] uppercase">
-              ECMWF 해상기상 판정
+            <span className="truncate text-[10px] font-black tracking-tight text-[#0066b3] min-[390px]:text-[11px]">
+              선택 지점 해상 기상예보
             </span>
-            {nearestAreaLabel && (
-              <span className="min-w-0 truncate rounded-md border border-sky-300 bg-sky-50 px-1.5 py-0.5 text-[10px] font-extrabold text-[#003360]">
-                {nearestAreaLabel}
-              </span>
-            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-1">
+            <div>
+              <button type="button" onClick={() => setIsDateOpen((open) => !open)} aria-expanded={isDateOpen}
+                aria-label="예보 날짜 선택" className="flex h-7 items-center gap-0.5 rounded-lg border border-sky-300 bg-sky-50 px-1.5 text-[10px] font-black text-[#0066b3] shadow-2xs sm:h-8">
+                {`${Number(selectedDate.slice(5, 7))}/${Number(selectedDate.slice(8, 10))}`}
+                <span className="hidden min-[390px]:inline">({selectedDay})</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            </div>
             <button
               type="button"
               onClick={onRefresh}
               aria-label="기상 정보 새로고침"
               title="기상 예보 다시 불러오기"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#003360] shadow-2xs active:scale-95 sm:h-8.5 sm:w-8.5"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-[#003360] shadow-2xs active:scale-95 sm:h-8 sm:w-8"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${weather.isLoading ? 'animate-spin' : ''}`} />
             </button>
@@ -114,7 +152,7 @@ export function MarineWeatherPanel({
               onClick={onOpenSettings}
               aria-label="기준값 설정"
               title="풍속·파고 판정 기준치 설정"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#0066b3] shadow-2xs active:scale-95 sm:h-8.5 sm:w-8.5"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-[#0066b3] shadow-2xs active:scale-95 sm:h-8 sm:w-8"
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
             </button>
@@ -122,9 +160,8 @@ export function MarineWeatherPanel({
               type="button"
               onClick={() => setIsCollapsed((v) => !v)}
               aria-label={isCollapsed ? '기상 패널 펼치기' : '기상 패널 접기'}
-              className="flex h-8 shrink-0 items-center gap-0.5 rounded-xl border border-sky-300 bg-sky-50 px-2.5 text-xs font-black whitespace-nowrap text-[#0066b3] active:scale-95 sm:h-8.5"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-sky-300 bg-sky-50 text-xs font-black text-[#0066b3] active:scale-95 sm:h-8 sm:w-8"
             >
-              <span>{isCollapsed ? '펼치기' : '접기'}</span>
               {isCollapsed ? (
                 <ChevronUp className="h-3.5 w-3.5 shrink-0" />
               ) : (
@@ -135,21 +172,21 @@ export function MarineWeatherPanel({
         </div>
 
         {/* Row 2: 전폭(100%) 기상 판정 히어로 브리핑 박스 */}
-        <div className="mt-1.5 rounded-2xl border border-sky-200 bg-gradient-to-r from-sky-50/90 via-teal-50/60 to-emerald-50/50 px-2.5 py-1.5">
-          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-            <div className="flex min-w-0 items-center gap-1.5">
+        <div className="mt-1.5 rounded-xl border border-sky-200 bg-gradient-to-r from-sky-50/90 via-teal-50/60 to-emerald-50/50 px-2 py-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-x-1.5 gap-y-1">
+            <div className="flex min-w-0 items-center gap-1">
               <span
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-white text-[10px] font-black text-white shadow"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-white text-[10px] font-black text-white shadow"
                 style={{ backgroundColor: gradeMeta.color }}
               >
                 {current?.grade === 'unknown' || !current ? '?' : ''}
               </span>
-              <span className="shrink-0 text-xl leading-none font-black tracking-tight whitespace-nowrap text-[#003360] sm:text-2xl">
+              <span className="max-w-[100px] truncate text-lg leading-none font-black tracking-tight whitespace-nowrap text-[#003360] sm:max-w-none sm:text-xl">
                 {weather.isLoading ? '예보 조회 중...' : gradeMeta.label}
               </span>
               {current && (
                 <span
-                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-extrabold whitespace-nowrap tabular-nums shadow-2xs ${gradeMeta.pillClass}`}
+                  className={`shrink-0 rounded-md px-1 py-0.5 text-[10px] font-extrabold whitespace-nowrap tabular-nums shadow-2xs ${gradeMeta.pillClass}`}
                 >
                   {current.displayTime}
                 </span>
@@ -158,13 +195,13 @@ export function MarineWeatherPanel({
 
             {current && (
               <div className="flex shrink-0 items-center gap-1 text-[11px] font-bold">
-                <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md border border-sky-300 bg-white px-1.5 py-0.5 font-mono whitespace-nowrap tabular-nums text-[#0066b3] shadow-2xs">
+                <span className="inline-flex shrink-0 items-center gap-0.5 font-mono whitespace-nowrap tabular-nums text-[#0066b3]">
                   <Wind className="h-3 w-3 shrink-0" />
                   {current.windSpeedKnots !== null
                     ? `${current.windSpeedKnots.toFixed(1)}kn`
                     : '?'}
                 </span>
-                <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md border border-teal-300 bg-white px-1.5 py-0.5 font-mono whitespace-nowrap tabular-nums text-[#00846c] shadow-2xs">
+                <span className="inline-flex shrink-0 items-center gap-0.5 font-mono whitespace-nowrap tabular-nums text-[#00846c]">
                   <Waves className="h-3 w-3 shrink-0" />
                   {current.waveHeightMeters !== null
                     ? `${current.waveHeightMeters.toFixed(2)}m`
@@ -174,21 +211,23 @@ export function MarineWeatherPanel({
             )}
           </div>
 
-          <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-[10px]">
-            <span className="font-bold text-slate-700">
-              {gradeMeta.desc}
-            </span>
-            <span className="font-mono font-semibold whitespace-nowrap tabular-nums text-slate-600">
-              {thresholds
-                ? `양호 <${thresholds.windKnot.good}kn·<${thresholds.waveMeter.good}m / 주의 ≤${thresholds.windKnot.moderate}kn·≤${thresholds.waveMeter.moderate}m`
-                : `${weather.lat.toFixed(3)}°N, ${weather.lng.toFixed(3)}°E`}
-            </span>
-          </div>
         </div>
       </div>
 
+      {isDateOpen && (
+        <div role="group" aria-label="예보 날짜" className="absolute right-2.5 bottom-full z-[1000] mb-2 grid w-[min(240px,calc(100vw-24px))] grid-cols-2 gap-1 rounded-xl border border-sky-300 bg-white p-2 shadow-xl">
+          {forecastDates.map((date) => (
+            <button key={date} type="button" aria-pressed={date === selectedDate}
+              onClick={() => { weather.selectForecastTime(`${date}T12:00`); setIsDateOpen(false); }}
+              className={`rounded-lg border px-1.5 py-1 text-[11px] font-bold ${date === selectedDate ? 'border-[#0066b3] bg-sky-50 text-[#0066b3]' : 'border-slate-200 bg-white text-[#003360]'}`}>
+              {`${Number(date.slice(5, 7))}/${Number(date.slice(8, 10))}`}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!isCollapsed && (
-        <div className="mt-2 min-h-0 flex-1 space-y-2 overflow-y-auto border-t border-sky-200/80 pt-2 pr-0.5">
+        <div className="mt-1.5 min-h-0 min-w-0 flex-1 space-y-1.5 overflow-y-auto border-t border-sky-200/80 pt-1.5">
           {/* 바닷길 시간계산 항로(출발·경유·도착) 해역 원터치 기상 연동 칩 */}
           {waypoints.length > 0 && onSelectWaypointWeather && (
             <div
@@ -249,48 +288,77 @@ export function MarineWeatherPanel({
             >
               <WifiOff className="h-4 w-4 shrink-0 text-red-600" />
               <span>
-                조회 실패 ({weather.error}) — 안전을 위해 &apos;?&apos;(미확인)로 표시합니다.
+                조회 실패: {weather.error}
               </span>
             </div>
           )}
 
           {/* 날짜/시간 좌우 타임라인 슬라이더 (API가 제공하는 예보 시각만 선택 가능) */}
           <div>
-            <div className="mb-1.5 flex items-center justify-between gap-1.5">
+            <div className="mb-1 flex items-center justify-between gap-1.5">
               <span className="truncate text-xs font-extrabold text-[#003360]">
-                예보 날짜·시각 선택 (48시간 KST)
+                시간별 예보
               </span>
               <div className="flex shrink-0 items-center gap-1.5">
-                {weather.selectedIndex !== 0 && weather.hourly.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => weather.setSelectedIndex(0)}
-                    className="rounded-md border border-sky-300 bg-sky-50 px-1.5 py-0.5 text-[10px] font-black text-[#0066b3] active:scale-95"
-                  >
-                    현재시각으로
-                  </button>
-                )}
                 <span className="font-mono text-xs font-bold text-[#0066b3]">
-                  {current?.displayTime ?? '자료 없음'}
+                  {current?.displayTime ?? `${Number(selectedDate.slice(5, 7))}/${Number(selectedDate.slice(8, 10))} ${weather.selectedTime.slice(11, 13)}시`}
                 </span>
               </div>
             </div>
 
-            {weather.hourly.length > 0 ? (
-              <div className="flex gap-1.5 overflow-x-auto pb-1.5 pt-0.5 scrollbar-none">
-                {weather.hourly.map((item, idx) => {
-                  const isSelected = idx === weather.selectedIndex;
+            {cards.length > 0 ? (
+              <div className="flex min-w-0 items-center gap-1">
+                <button type="button" aria-label="이전 예보 시간 보기" onClick={() => scrollTimeline(-1)}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-sky-300 bg-white text-[#0066b3] shadow-2xs">
+                  <ChevronDown className="h-3.5 w-3.5 rotate-90" />
+                </button>
+              <div ref={timelineRef}
+                onPointerDown={(event) => {
+                  if (event.pointerType !== 'mouse' || event.button !== 0) return;
+                  mouseDragRef.current = { startX: event.clientX, scrollLeft: event.currentTarget.scrollLeft, moved: false, active: true };
+                }}
+                onPointerMove={(event) => {
+                  const drag = mouseDragRef.current;
+                  if (!drag?.active || event.pointerType !== 'mouse') return;
+                  if ((event.buttons & 1) === 0) {
+                    mouseDragRef.current = null;
+                    return;
+                  }
+                  const distance = event.clientX - drag.startX;
+                  if (Math.abs(distance) > 4 && !drag.moved) {
+                    drag.moved = true;
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }
+                  if (drag.moved) event.currentTarget.scrollLeft = drag.scrollLeft - distance;
+                }}
+                onPointerUp={(event) => {
+                  if (event.pointerType === 'mouse' && mouseDragRef.current) mouseDragRef.current.active = false;
+                }}
+                onPointerCancel={() => { mouseDragRef.current = null; }}
+                onPointerLeave={() => {
+                  if (mouseDragRef.current && !mouseDragRef.current.moved) mouseDragRef.current = null;
+                }}
+                onClickCapture={(event) => {
+                  if (!mouseDragRef.current?.moved) return;
+                  event.stopPropagation();
+                  mouseDragRef.current = null;
+                }}
+                onDragStart={(event) => event.preventDefault()}
+                className="flex min-w-0 flex-1 cursor-grab select-none gap-1 overflow-x-auto overscroll-x-contain pb-0.5 touch-pan-x scrollbar-none active:cursor-grabbing"
+                style={{ WebkitOverflowScrolling: 'touch' }}>
+                {cards.map((item) => {
+                  const isSelected = item.time === weather.selectedTime;
                   const color =
                     item.grade === 'good'
-                      ? '#00846c'
+                      ? '#16A34A'
                       : item.grade === 'moderate'
-                        ? '#d97706'
+                        ? '#D97706'
                         : item.grade === 'bad'
-                          ? '#dc2626'
+                          ? '#DC2626'
                           : '#64748b';
                   const itemGradeLabel =
                     item.grade === 'good'
-                      ? '좋음'
+                      ? '양호'
                       : item.grade === 'moderate'
                         ? '보통'
                         : item.grade === 'bad'
@@ -300,24 +368,25 @@ export function MarineWeatherPanel({
                   return (
                     <button
                       key={`forecast-${item.time}`}
+                      data-forecast-time={item.time}
                       type="button"
                       aria-pressed={isSelected}
                       aria-label={`${item.datePart} ${item.hourPart} 기상 판정 ${itemGradeLabel}`}
-                      onClick={() => weather.setSelectedIndex(idx)}
-                      className={`flex min-h-14 w-16 shrink-0 flex-col items-center justify-center rounded-xl border-2 px-1 py-1.5 transition active:scale-95 ${
+                      onClick={() => weather.selectForecastTime(item.time)}
+                      className={`flex h-12 w-14 shrink-0 flex-col items-center justify-center rounded-lg border px-0.5 py-0.5 transition active:scale-95 ${
                         isSelected
                           ? 'border-[#0066b3] bg-sky-50 shadow-sm'
                           : 'border-slate-200 bg-white hover:border-sky-300'
                       }`}
                     >
-                      <span className="font-mono text-[10px] font-bold text-slate-500">
-                        {item.datePart}
+                      <span className="h-2.5 font-mono text-[9px] leading-2.5 font-bold text-slate-500">
+                        {item.hourPart === '00시' ? item.datePart : ''}
                       </span>
                       <span className="font-mono text-xs font-black text-[#003360]">
                         {item.hourPart}
                       </span>
                       <span
-                        className="mt-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white text-[9px] font-black text-white shadow-2xs"
+                        className="mt-0.5 flex h-3 w-3 items-center justify-center rounded-full border border-white text-[8px] font-black text-white shadow-2xs"
                         style={{ backgroundColor: color }}
                       >
                         {item.grade === 'unknown' ? '?' : ''}
@@ -326,36 +395,20 @@ export function MarineWeatherPanel({
                   );
                 })}
               </div>
+                <button type="button" aria-label="다음 예보 시간 보기" onClick={() => scrollTimeline(1)}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-sky-300 bg-white text-[#0066b3] shadow-2xs">
+                  <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
+                </button>
+              </div>
             ) : (
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-600">
                 {weather.isLoading
-                  ? '선택한 해역의 ECMWF 풍속(IFS)·파고(WAM) 예보를 조회하는 중입니다...'
-                  : '예보 자료가 없습니다 (?) — 해역 위치를 다시 선택하거나 새로고침하세요.'}
+                  ? '예보 조회 중...'
+                  : '예보 자료가 없습니다.'}
               </div>
             )}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-slate-600">
-            <span>
-              🌊 <strong className="font-extrabold text-[#003360]">유럽중기예보센터(ECMWF 9km)</strong> · Open-Meteo API
-            </span>
-            <div className="flex items-center gap-1.5">
-              {onOpenSourcesInfo && (
-                <button
-                  type="button"
-                  onClick={() => onOpenSourcesInfo('marine_weather')}
-                  className="inline-flex shrink-0 items-center gap-0.5 rounded-md border border-sky-300 bg-sky-50 px-1.5 py-0.5 text-[10px] font-extrabold text-[#0066b3] transition hover:border-[#0066b3] active:scale-95"
-                >
-                  <Info className="h-2.5 w-2.5" aria-hidden="true" />
-                  <span>출처·한계 상세</span>
-                </button>
-              )}
-              <span className="flex items-center gap-0.5 font-bold text-[#0066b3]">
-                <HelpCircle className="h-3 w-3" />
-                지도 탭·핀 드래그 이동
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </section>

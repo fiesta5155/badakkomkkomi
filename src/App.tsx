@@ -95,7 +95,6 @@ import { usePorpoiseStorage } from './hooks/usePorpoiseStorage';
 import { useMarineWeather } from './hooks/useMarineWeather';
 import {
   calculateRouteSummary,
-  describeNearestPortArea,
   resolveSmartWaypoint,
 } from './services/routeGeoService';
 import {
@@ -1178,10 +1177,6 @@ export function App() {
     showToast,
   ]);
 
-  const nearestWeatherAreaLabel = useMemo(
-    () => describeNearestPortArea(marineWeather.lat, marineWeather.lng, portsList),
-    [marineWeather.lat, marineWeather.lng, portsList],
-  );
 
   // MapView 및 하위 컴포넌트에 전달되는 핸들러/좌표 객체 참조 안정화 (불필요한 Kakao CustomOverlay 재렌더링 방지)
   const handleSelectFeatureOnMap = useCallback(
@@ -1224,7 +1219,7 @@ export function App() {
       updateWeatherCoordinates(lat, lng);
       replaceNavPanel('weather');
       handleFlyToPoint(lat, lng, 13);
-      showToast(`'${name}' 해역 기상상태판정 탭으로 전환되었습니다.`);
+      showToast(`'${name}' 해역 날씨콕콕 탭으로 전환되었습니다.`);
     },
     [updateWeatherCoordinates, replaceNavPanel, handleFlyToPoint, showToast],
   );
@@ -1320,7 +1315,7 @@ export function App() {
                 aria-hidden="true"
                 className="knps-tricolor-bar pointer-events-none absolute inset-x-0 top-0 h-1 opacity-95"
               />
-              <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+              <div className={`flex min-w-0 items-center gap-1.5 sm:gap-2 ${activeMainTab === 'navigation' ? 'flex-1' : ''}`}>
                 <button
                   type="button"
                   onClick={handleReturnToHome}
@@ -1346,7 +1341,7 @@ export function App() {
                     <h1
                       ref={workspaceHeadingRef}
                       tabIndex={-1}
-                      className="truncate text-xs leading-none font-black tracking-tight text-[#003360] outline-none sm:text-base"
+                      className={`${activeMainTab === 'navigation' ? 'whitespace-nowrap' : 'truncate'} text-xs leading-none font-black tracking-tight text-[#003360] outline-none sm:text-base`}
                     >
                       {activeMainTab === 'notebook' ? '꼬미의 바다수첩' : '바닷길 콕콕'}
                     </h1>
@@ -1355,7 +1350,7 @@ export function App() {
                       국립공원 · {APP_VERSION_DISPLAY}
                     </span>
                   </div>
-                  <p className="mt-0.5 truncate text-[10px] font-bold tabular-nums text-[#484843] sm:text-[11px]">
+                  <p className={`${activeMainTab === 'navigation' ? 'hidden sm:block' : ''} mt-0.5 truncate text-[10px] font-bold tabular-nums text-[#484843] sm:text-[11px]`}>
                     {activeMainTab === 'notebook'
                       ? isRedOnly && selectedRegion === 'all' && !dockingSearchQuery
                         ? `위험주의 ${filteredFeatures.length}개소 집중 표시`
@@ -1377,7 +1372,7 @@ export function App() {
                   }`}
                   alt=""
                   aria-hidden="true"
-                  className="hidden h-8 w-auto shrink-0 object-contain drop-shadow-xs min-[380px]:block sm:h-9"
+                  className={`h-8 w-auto shrink-0 object-contain drop-shadow-xs sm:h-9 ${activeMainTab === 'navigation' ? 'hidden sm:block' : 'hidden min-[380px]:block'}`}
                 />
               </div>
 
@@ -1409,6 +1404,7 @@ export function App() {
                   <span>{activeMainTab === 'notebook' ? '바닷길 콕콕' : '바다수첩'}</span>
                 </button>
 
+                {activeMainTab === 'notebook' && <>
                 {!isStandalone && (
                   <button
                     type="button"
@@ -1461,6 +1457,7 @@ export function App() {
                 >
                   <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${loading ? 'animate-spin' : ''}`} />
                 </button>
+                </>}
               </div>
             </div>
 
@@ -1937,24 +1934,24 @@ export function App() {
               }`}
             >
               <Waves className="hidden h-3.5 w-3.5 shrink-0 sm:inline" aria-hidden="true" />
-              <span>기상상태판정</span>
+              <span>날씨콕콕</span>
               <span
                 className={`rounded px-1.5 py-0.2 text-[10px] font-extrabold ${
                   marineWeather.current?.grade === 'bad'
-                    ? 'bg-rose-600 text-white'
+                    ? 'bg-[#DC2626] text-white'
                     : marineWeather.current?.grade === 'moderate'
-                      ? 'bg-amber-400 text-slate-950'
+                      ? 'bg-[#D97706] text-slate-950'
                       : marineWeather.current?.grade === 'good'
-                        ? 'bg-emerald-100 text-[#00846c]'
+                        ? 'bg-[#16A34A] text-white'
                         : 'bg-slate-200 text-slate-800'
                 }`}
               >
                 {marineWeather.current?.grade === 'bad'
-                  ? '출항보류'
+                  ? '나쁨'
                   : marineWeather.current?.grade === 'moderate'
-                    ? '주의운항'
+                    ? '보통'
                     : marineWeather.current?.grade === 'good'
-                      ? '정상운항'
+                      ? '양호'
                       : marineWeather.isLoading
                         ? '조회중…'
                         : '미확인(?)'}
@@ -2184,9 +2181,7 @@ export function App() {
             ) : (
               <MarineWeatherPanel
                 weather={marineWeather}
-                thresholds={marineWeather.thresholds}
                 waypoints={routeWaypoints}
-                nearestAreaLabel={nearestWeatherAreaLabel}
                 onSelectWaypointWeather={(lat, lng, name) => {
                   marineWeather.updateCoordinates(lat, lng);
                   handleFlyToPoint(lat, lng, 13);
@@ -2198,7 +2193,6 @@ export function App() {
                   setSettingsFocusSourceId(null);
                   setIsWeatherSettingsOpen(true);
                 }}
-                onOpenSourcesInfo={handleOpenSourcesInfo}
                 onRefresh={marineWeather.refresh}
               />
             )}

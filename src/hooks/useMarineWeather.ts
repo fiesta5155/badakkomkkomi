@@ -8,6 +8,7 @@ import type { WeatherDefaultsConfig } from '../types/config';
 import {
   evaluateHourlyWeatherSeries,
   fetchEcmwfMarineWeatherSeries,
+  getKstThreeHourTime,
   isValidWeatherThresholds,
   resolveEffectiveThresholds,
   SAFE_DEFAULT_THRESHOLDS,
@@ -69,7 +70,7 @@ export function useMarineWeather(
   }, [userThresholds, defaultThresholds]);
 
   const [rawHourly, setRawHourly] = useState<RawAlignedHourlyWeather[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [selectedTime, selectForecastTime] = useState<string>(getKstThreeHourTime);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchedAt, setLastFetchedAt] = useState<number | null>(null);
@@ -134,7 +135,6 @@ export function useMarineWeather(
       .then((alignedSeries) => {
         if (controller.signal.aborted) return;
         setRawHourly(alignedSeries);
-        setSelectedIndex(0);
         setError(null);
         setLastFetchedAt(Date.now());
       })
@@ -143,6 +143,7 @@ export function useMarineWeather(
         if (err instanceof DOMException && err.name === 'AbortError') return;
         const msg =
           err instanceof Error ? err.message : 'ECMWF 기상 정보를 불러오지 못했습니다.';
+        console.error('ECMWF marine weather request failed', { lat: coords.lat, lng: coords.lng, cause: err });
         // 조회 실패 시 이전 좌표의 좋음/보통 상태가 남지 않도록 즉시 비움 -> '?'(unknown) 표시 보장
         setRawHourly([]);
         setError(msg);
@@ -162,6 +163,7 @@ export function useMarineWeather(
   }, [rawHourly, thresholds]);
 
   const updateCoordinates = useCallback((lat: number, lng: number) => {
+    abortControllerRef.current?.abort();
     setIsLoading(true);
     setError(null);
     setRawHourly([]); // 새 위치 조회 중에는 '?'(unknown)로 초기화하여 오판 방지
@@ -170,13 +172,19 @@ export function useMarineWeather(
   }, []);
 
   const refresh = useCallback(() => {
+    abortControllerRef.current?.abort();
     setIsLoading(true);
     setError(null);
     setRawHourly([]);
     setFetchNonce((n) => n + 1);
   }, []);
 
-  const currentItem = hourlyData[selectedIndex] || null;
+  const selectedIndex = hourlyData.findIndex((item) => item.time === selectedTime);
+  const setSelectedIndex = useCallback((index: number) => {
+    const item = hourlyData[index];
+    if (item) selectForecastTime(item.time);
+  }, [hourlyData]);
+  const currentItem = selectedIndex >= 0 ? hourlyData[selectedIndex] : null;
 
   const result: MarineWeatherStatusResult = {
     lat: coords.lat,
@@ -184,6 +192,8 @@ export function useMarineWeather(
     hourly: hourlyData,
     selectedIndex,
     setSelectedIndex,
+    selectedTime,
+    selectForecastTime,
     current: currentItem,
     isLoading,
     error,

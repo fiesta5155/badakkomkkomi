@@ -541,15 +541,15 @@ export function buildWeatherPinSpec(
 ): MarkerTemplateSpec {
   const color =
     grade === 'good'
-      ? '#10b981'
+      ? '#16A34A'
       : grade === 'moderate'
-        ? '#94a3b8'
+        ? '#D97706'
         : grade === 'bad'
-          ? '#ef4444'
+          ? '#DC2626'
           : '#475569';
   const label =
     grade === 'good'
-      ? '좋음'
+      ? '양호'
       : grade === 'moderate'
         ? '보통'
         : grade === 'bad'
@@ -565,15 +565,15 @@ export function buildWeatherPinSpec(
       <div style="
         padding: 3px 9px;
         border-radius: 9999px;
-        background: #020617;
+        background: ${color};
         border: 2px solid ${color};
-        color: #ffffff;
+        color: ${grade === 'moderate' ? '#020617' : '#ffffff'};
         font-size: 11px;
         font-weight: 900;
         margin-bottom: 3px;
         white-space: nowrap;
         box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-      ">기상: ${label}</div>
+      ">${label}</div>
       <div style="
         width: 44px;
         height: 44px;

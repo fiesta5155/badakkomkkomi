@@ -1,18 +1,13 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import {
-  AlertTriangle,
-  Check,
   Compass,
-  Copy,
   Eye,
-  Globe,
   Layers,
   LocateFixed,
   Maximize,
   Minus,
   Mountain,
   Plus,
-  RefreshCw,
   Satellite,
   X,
 } from 'lucide-react';
@@ -28,13 +23,7 @@ import type {
   KakaoOverlayMapType,
   RoadviewTargetLocation,
 } from '../types/kakao';
-import {
-  getConfiguredKakaoApiKey,
-  getMaskedApiKey,
-  loadKakaoMapSdk,
-  type KakaoSdkDiagnostics,
-  type KakaoSdkErrorCode,
-} from '../services/kakaoMapLoader';
+import { loadKakaoMapSdk } from '../services/kakaoMapLoader';
 import { KakaoMapCanvas } from './map/KakaoMapCanvas';
 
 const LegacyLeafletCanvas = lazy(() =>
@@ -186,7 +175,6 @@ export function MapView({
   onClearExternalRoadviewTarget,
 }: MapViewProps) {
   // 1. GIS 엔진 상태 ('kakao' 기본, Kakao SDK 차단/오프라인 시 'leaflet' 자동 폴백) 및 다중 맵/3D 설정
-  const [preferredEngine, setPreferredEngine] = useState<'kakao' | 'leaflet'>('kakao');
   const [mapPrefs, setMapPrefs] = useState<KakaoMapTypePreferences>(() =>
     loadSavedMapTypePreferences(),
   );
@@ -279,31 +267,6 @@ export function MapView({
     zoom: 11,
   });
   const [kakaoNamespace, setKakaoNamespace] = useState<KakaoMapsNamespace | null>(null);
-  const [diagnostics, setDiagnostics] = useState<KakaoSdkDiagnostics>(() => {
-    const key = getConfiguredKakaoApiKey();
-    return {
-      status: 'loading',
-      currentOrigin: typeof window !== 'undefined' ? window.location.origin : '',
-      maskedKey: getMaskedApiKey(key),
-      lastCheckedAt: new Date().toLocaleTimeString('ko-KR'),
-    };
-  });
-  const [isDiagDismissed, setIsDiagDismissed] = useState<boolean>(false);
-  const [isDiagModalOpen, setIsDiagModalOpen] = useState<boolean>(false);
-  const diagDialogRef = useRef<HTMLDialogElement | null>(null);
-  const [copiedOrigin, setCopiedOrigin] = useState<boolean>(false);
-
-  useEffect(() => {
-    const dialog = diagDialogRef.current;
-    if (!dialog) return;
-    if (isDiagModalOpen) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-    } else if (dialog.open) {
-      dialog.close();
-    }
-  }, [isDiagModalOpen]);
   const [zoomStepTrigger, setZoomStepTrigger] = useState<{
     delta: number;
     nonce: number;
@@ -323,97 +286,24 @@ export function MapView({
     setViewport({ lat, lng, zoom });
   }, []);
 
-  // 진단 모달 Escape 키 닫기 지원 (proposal P2 접근성 반영)
+  // Kakao SDK를 한 번 자동 연결하고 실패하면 현재 뷰포트에서 Leaflet으로 전환한다.
   useEffect(() => {
-    if (!isDiagModalOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsDiagModalOpen(false);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isDiagModalOpen]);
-
-  // 3. Kakao Maps SDK 초기화 및 진단/자동 폴백
-  const connectKakaoSdk = useCallback((forceRetry: boolean) => {
-    const key = getConfiguredKakaoApiKey();
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-
-    loadKakaoMapSdk(forceRetry)
+    let active = true;
+    loadKakaoMapSdk(false)
       .then((ns) => {
+        if (!active) return;
         setKakaoNamespace(ns);
-        setPreferredEngine('kakao');
-        setDiagnostics({
-          status: 'ready',
-          currentOrigin: origin,
-          maskedKey: getMaskedApiKey(key),
-          lastCheckedAt: new Date().toLocaleTimeString('ko-KR'),
-        });
       })
-      .catch(
-        (err: {
-          code?: KakaoSdkErrorCode;
-          message?: string;
-        }) => {
-          setKakaoNamespace(null);
-          // Kakao SDK 실패 시 무중단 현장 가용성을 위해 즉시 레거시(Leaflet) 엔진으로 폴백
-          setPreferredEngine('leaflet');
-          setIsDiagDismissed(false);
-          setDiagnostics({
-            status: 'error',
-            errorCode: err?.code ?? 'DOMAIN_MISMATCH_OR_BLOCKED',
-            errorMessage:
-              err?.message ??
-              '카카오맵 SDK 로드에 실패하여 레거시 지도(OSM)로 자동 전환되었습니다.',
-            currentOrigin: origin,
-            maskedKey: getMaskedApiKey(key),
-            lastCheckedAt: new Date().toLocaleTimeString('ko-KR'),
-          });
-        },
-      );
+      .catch((err: unknown) => {
+        if (!active) return;
+        setKakaoNamespace(null);
+        console.error('Kakao Maps SDK connection failed; using Leaflet', err);
+      });
+    return () => { active = false; };
   }, []);
 
-  const handleRetryKakaoEngine = useCallback(() => {
-    const key = getConfiguredKakaoApiKey();
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    setDiagnostics({
-      status: 'loading',
-      currentOrigin: origin,
-      maskedKey: getMaskedApiKey(key),
-      lastCheckedAt: new Date().toLocaleTimeString('ko-KR'),
-    });
-    connectKakaoSdk(true);
-  }, [connectKakaoSdk]);
-
-  useEffect(() => {
-    connectKakaoSdk(false);
-  }, [connectKakaoSdk]);
-
-  const handleToggleEngine = useCallback(() => {
-    if (preferredEngine === 'kakao') {
-      setPreferredEngine('leaflet');
-      return;
-    }
-    if (kakaoNamespace) {
-      setPreferredEngine('kakao');
-    } else {
-      handleRetryKakaoEngine();
-    }
-  }, [preferredEngine, kakaoNamespace, handleRetryKakaoEngine]);
-
-  const handleCopyOrigin = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(diagnostics.currentOrigin);
-      setCopiedOrigin(true);
-      window.setTimeout(() => setCopiedOrigin(false), 2000);
-    } catch {
-      // ignore clipboard errors
-    }
-  }, [diagnostics.currentOrigin]);
-
   const activeEngine: 'kakao' | 'leaflet' =
-    preferredEngine === 'kakao' && kakaoNamespace ? 'kakao' : 'leaflet';
+    kakaoNamespace ? 'kakao' : 'leaflet';
 
   return (
     <main
@@ -538,58 +428,7 @@ export function MapView({
         </div>
       )}
 
-      {/* 2. Kakao SDK 도메인 미등록/오류 발생 시 상단 자동 폴백 & 진단 배너 */}
-      {diagnostics.status === 'error' && !isDiagDismissed && (
-        <div
-          role="alert"
-          className="fixed inset-x-2.5 top-[8.6rem] z-[900] mx-auto max-w-xl rounded-2xl border-2 border-amber-500 bg-white/98 p-2.5 text-xs text-[#003360] shadow-2xl backdrop-blur-md sm:top-[10.2rem]"
-        >
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              <div className="min-w-0">
-                <p className="font-black text-amber-900">
-                  카카오맵 도메인 승인 대기중 · 레거시 지도(OSM) 자동 폴백 가동됨
-                </p>
-                <p className="mt-0.5 text-[11px] leading-snug text-[#484843]">
-                  카카오 개발자 콘솔 [플랫폼 &gt; Web]에{' '}
-                  <code className="rounded bg-sky-100 px-1 py-0.5 font-mono text-sky-900">
-                    {diagnostics.currentOrigin}
-                  </code>{' '}
-                  등록 후 재시도하세요.
-                </p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setIsDiagModalOpen(true)}
-                    className="rounded-lg border border-amber-500 bg-amber-100 px-2 py-0.5 text-[11px] font-black text-amber-900 active:scale-95"
-                  >
-                    도메인 등록 방법 · 진단 보기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleRetryKakaoEngine}
-                    className="inline-flex items-center gap-1 rounded-lg border border-sky-400 bg-sky-100 px-2 py-0.5 text-[11px] font-black text-[#003360] active:scale-95"
-                  >
-                    <RefreshCw className="h-3 w-3" />
-                    <span>카카오맵 재연결</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsDiagDismissed(true)}
-              aria-label="진단 배너 닫기"
-              className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 3. 우측 상단(헤더 바로 아래) 도킹형 한 손 컨트롤러 */}
+      {/* 우측 상단(헤더 바로 아래) 도킹형 한 손 컨트롤러 */}
       <div
         className="fixed top-[6.25rem] right-2.5 z-[850] flex flex-col gap-1.5 sm:top-[7.25rem] sm:right-3 sm:gap-2"
         aria-label="지도 확대·축소, 배경지도 및 GPS 위치 컨트롤"
@@ -644,27 +483,6 @@ export function MapView({
               {overlayMapTypes.length}
             </span>
           )}
-        </button>
-
-        <button
-          type="button"
-          onClick={handleToggleEngine}
-          aria-label="지도 엔진 전환 (카카오맵 ↔ 레거시 OSM)"
-          title={
-            activeEngine === 'kakao'
-              ? '현재: 카카오맵 (클릭 시 레거시 OSM 지도로 전환)'
-              : '현재: 레거시 OSM (클릭 시 카카오맵 재연결/전환)'
-          }
-          className={`flex h-9 w-9 flex-col items-center justify-center rounded-xl border-2 shadow-xl transition active:scale-95 sm:h-11 sm:w-11 sm:rounded-2xl ${
-            activeEngine === 'kakao'
-              ? 'border-yellow-500 bg-yellow-400 text-slate-950'
-              : 'border-[#00a79d]/60 bg-white/96 text-[#003360] hover:bg-sky-50'
-          }`}
-        >
-          <Globe className="h-3.5 w-3.5 stroke-[2.3] sm:h-4 sm:w-4" />
-          <span className="text-[8px] leading-none font-black sm:text-[9px]">
-            {activeEngine === 'kakao' ? '카카오' : 'OSM'}
-          </span>
         </button>
 
         <button
@@ -968,145 +786,6 @@ export function MapView({
         </Suspense>
       )}
 
-      {/* 4. Kakao Map GIS 진단 & 도메인 등록 안내 모달 (HTML5 Native <dialog> Top-Layer) */}
-      {isDiagModalOpen && (
-        <dialog
-          ref={diagDialogRef}
-          aria-labelledby="kakao-diag-title"
-          onClose={() => setIsDiagModalOpen(false)}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsDiagModalOpen(false);
-            }
-          }}
-          className="bada-modal-dialog fixed inset-0 z-[1400] m-auto flex max-h-dvh max-w-none items-center justify-center border-none bg-transparent p-4 text-[#003360]"
-        >
-          <div
-            className="knps-modal-surface w-full max-w-md rounded-3xl border-2 border-amber-500 bg-white p-5 text-[#003360] shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-sky-200 pb-3">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
-                <h2 id="kakao-diag-title" className="text-base font-black text-[#003360]">
-                  Kakao Map GIS 연동 진단 및 조치 안내
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsDiagModalOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#003360] hover:bg-slate-100"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="mt-4 space-y-3 text-xs leading-relaxed text-[#484843]">
-              <div className="rounded-2xl border border-sky-200 bg-sky-50/80 p-3">
-                <p className="font-extrabold text-[#003360]">현재 GIS 엔진 진단 상태</p>
-                <ul className="mt-1.5 space-y-1 text-[11px] text-[#484843]">
-                  <li>
-                    • 활성 엔진:{' '}
-                    <strong className="text-[#00846c]">
-                      {activeEngine === 'kakao'
-                        ? 'Kakao Maps SDK v3'
-                        : 'Legacy Leaflet (OpenStreetMap 자동 폴백)'}
-                    </strong>
-                  </li>
-                  <li>
-                    • 인식된 API 키 (`.env`):{' '}
-                    <code className="rounded bg-white px-1.5 py-0.5 text-[#00846c]">
-                      {diagnostics.maskedKey}
-                    </code>
-                  </li>
-                  <li>• 최근 점검 시각: {diagnostics.lastCheckedAt}</li>
-                  {diagnostics.errorMessage && (
-                    <li className="text-[#870b41]">• 사유: {diagnostics.errorMessage}</li>
-                  )}
-                </ul>
-              </div>
-
-              <div className="rounded-2xl border border-[#d6c6b2] bg-[#f7f4ee] p-3">
-                <p className="font-extrabold text-[#003360]">
-                  [사용자 필수 조치] 카카오 개발자 콘솔 3단계 설정 확인
-                </p>
-                <ol className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-[#484843] [word-break:keep-all]">
-                  <li>
-                    <strong className="text-[#003360]">1. 카카오맵 활성화(ON):</strong>{' '}
-                    카카오 개발자 콘솔(developers.kakao.com) ➔ <strong>내 애플리케이션</strong> ➔{' '}
-                    <strong>카카오맵 설정</strong>에서 <strong>사용 설정(활성화)을 ON</strong>으로 변경
-                  </li>
-                  <li>
-                    <strong className="text-[#003360]">2. JavaScript 키 SDK 도메인 등록:</strong>{' '}
-                    <strong>앱 키 &gt; JavaScript 키</strong>(또는 웹 플랫폼 설정)의 도메인 목록에 아래 현재 접속 주소(하위 경로 제외)를 등록
-                  </li>
-                  <li>
-                    <strong className="text-[#003360]">3. 무료 쿼터 대상 확인:</strong>{' '}
-                    계정당 최초 활성화 무료 쿼터(일 300,000회) 적용 앱인지 쿼터 화면에서 확인
-                  </li>
-                </ol>
-
-                <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2">
-                  <code className="truncate font-mono text-xs font-bold text-[#003360]">
-                    {diagnostics.currentOrigin}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={handleCopyOrigin}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-[#003360] px-2.5 py-1 text-[11px] font-black text-white active:scale-95"
-                  >
-                    {copiedOrigin ? (
-                      <>
-                        <Check className="h-3.5 w-3.5" />
-                        <span>복사됨</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        <span>주소 복사</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                <p className="mt-2 text-[11px] text-[#484843] [word-break:keep-all]">
-                  권장 등록 도메인 형식 (하위 경로 <code className="font-bold">/bada-kkomkkomi/</code> 제외):
-                  <br />• 로컬 개발: <code className="font-bold text-[#003360]">http://localhost:5173</code>,{' '}
-                  <code className="font-bold text-[#003360]">http://127.0.0.1:5173</code>
-                  <br />• 운영 배포:{' '}
-                  <code className="font-bold text-[#003360]">
-                    {diagnostics.currentOrigin.includes('localhost') ||
-                    diagnostics.currentOrigin.includes('127.0.0.1')
-                      ? 'https://<운영자GitHub아이디>.github.io'
-                      : diagnostics.currentOrigin}
-                  </code>
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsDiagModalOpen(false);
-                  handleRetryKakaoEngine();
-                }}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#00846c] py-2.5 text-xs font-black text-white shadow-xs active:scale-95"
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span>도메인 등록 완료 · 카카오맵 즉시 재연결</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsDiagModalOpen(false)}
-                className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-[#003360]"
-              >
-                닫기
-              </button>
-            </div>
-          </div>
-        </dialog>
-      )}
     </main>
   );
 }
