@@ -6,12 +6,9 @@ import {
   Check,
   ChevronDown,
   ChevronLeft,
-  Database,
-  Download,
   Layers,
   Mail,
   Navigation,
-  RefreshCw,
   Search,
   ShieldCheck,
   SlidersHorizontal,
@@ -21,7 +18,6 @@ import {
 
 import { HomeScreen, type NotebookLaunchPreset } from './components/home/HomeScreen';
 import type { SettingsInitialSection } from './components/navigation/WeatherThresholdSettings';
-import { APP_VERSION_DISPLAY } from './config/appVersion';
 import type { SourceCategoryKey } from './config/dataSources';
 
 const MapView = lazy(() =>
@@ -189,9 +185,7 @@ export function App() {
   const [showPortMarkersOnMap, setShowPortMarkersOnMap] = useState<boolean>(true);
   const [selectedLegIndex, setSelectedLegIndex] = useState<number | null>(null);
   const [fitRouteBoundsTrigger, setFitRouteBoundsTrigger] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [reloadNonce, setReloadNonce] = useState<number>(0);
 
   // '위험주의(red)' 우선 인지(Hazard-First) 기본값 + 권역(전체/통영/거제) 및 검색어 필터 (선속·필터 설정만 영속 복원, 초기 경로는 항상 빈 배열 [])
   const initialWorkspaceDraft = useMemo(
@@ -504,20 +498,9 @@ export function App() {
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
         setErrorMsg(err instanceof Error ? err.message : '데이터 로드 실패');
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
       });
 
     return () => controller.abort();
-  }, [reloadNonce]);
-
-  const handleManualReload = useCallback(() => {
-    setLoading(true);
-    setErrorMsg(null);
-    setReloadNonce((n) => n + 1);
   }, []);
 
   // 접안지 등급별 건수 사전 집계
@@ -1304,18 +1287,17 @@ export function App() {
               : ''
           }`}
         >
-          {/* 상단 고정 2단 슬림 HUD 헤더 (페이지 전용 타이틀 + 원터치 교차 전환 스위치) */}
+          {/* 두 작업 화면이 공유하는 고정 헤더 */}
           <header
             className="pointer-events-none fixed inset-x-0 top-0 z-[1000] flex flex-col gap-1 px-2 py-1 sm:gap-1.5 sm:p-3"
             style={{ paddingTop: 'calc(var(--safe-top) + 0.25rem)' }}
           >
-            {/* Row 1: 홈 복귀 + 현재 페이지 전용 정체성 타이틀(국립공원공단 배지) + 상대 페이지 원터치 스위치 + 상태 유틸 */}
-            <div className="knps-hud-surface pointer-events-auto relative mx-auto flex w-full max-w-3xl items-center justify-between gap-1.5 overflow-hidden rounded-2xl border-2 border-[#00a79d]/60 bg-white/96 px-2 py-1 text-[#003360] shadow-xl backdrop-blur-md sm:gap-2 sm:px-3 sm:py-2">
+            <div className="knps-hud-surface pointer-events-auto relative mx-auto flex h-10 w-full max-w-3xl items-center justify-between gap-1.5 overflow-hidden rounded-2xl border-2 border-[#00a79d]/60 bg-white/96 px-2 text-[#003360] shadow-xl backdrop-blur-md sm:h-[52px] sm:gap-2 sm:px-3">
               <div
                 aria-hidden="true"
                 className="knps-tricolor-bar pointer-events-none absolute inset-x-0 top-0 h-1 opacity-95"
               />
-              <div className={`flex min-w-0 items-center gap-1.5 sm:gap-2 ${activeMainTab === 'navigation' ? 'flex-1' : ''}`}>
+              <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={handleReturnToHome}
@@ -1336,47 +1318,28 @@ export function App() {
                   aria-hidden="true"
                   className="h-8 w-9 shrink-0 rounded-xl border border-sky-200 bg-sky-50 object-contain p-0.5 shadow-xs sm:h-9 sm:w-10"
                 />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1 sm:gap-1.5">
-                    <h1
-                      ref={workspaceHeadingRef}
-                      tabIndex={-1}
-                      className={`${activeMainTab === 'navigation' ? 'whitespace-nowrap' : 'truncate'} text-xs leading-none font-black tracking-tight text-[#003360] outline-none sm:text-base`}
-                    >
-                      {activeMainTab === 'notebook' ? '꼬미의 바다수첩' : '바닷길 콕콕'}
-                    </h1>
-                    <span className="hidden shrink-0 items-center gap-1 rounded-md border border-[#00846c]/50 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-black text-[#00846c] sm:inline-flex">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#00846c]" />
-                      국립공원 · {APP_VERSION_DISPLAY}
-                    </span>
-                  </div>
-                  <p className={`${activeMainTab === 'navigation' ? 'hidden sm:block' : ''} mt-0.5 truncate text-[10px] font-bold tabular-nums text-[#484843] sm:text-[11px]`}>
-                    {activeMainTab === 'notebook'
-                      ? isRedOnly && selectedRegion === 'all' && !dockingSearchQuery
-                        ? `위험주의 ${filteredFeatures.length}개소 집중 표시`
-                        : `${
-                            selectedRegion === 'tongyeong'
-                              ? '통영권 '
-                              : selectedRegion === 'geoje'
-                                ? '거제권 '
-                                : ''
-                          }${filteredFeatures.length}/${totalDockingCount}개 접안지 표시`
-                      : `직선거리 ${routeCalculation.totalDistanceKm.toFixed(1)}km · 약 ${Math.round(routeCalculation.totalDurationMinutes)}분`}
-                  </p>
+                <h1
+                  ref={workspaceHeadingRef}
+                  tabIndex={-1}
+                  className="min-w-0 truncate whitespace-nowrap text-[11px] leading-none font-black tracking-tight text-[#003360] outline-none min-[375px]:text-xs sm:text-base"
+                >
+                  {activeMainTab === 'notebook' ? '꼬미의 바다수첩' : '바닷길 콕콕'}
+                </h1>
+                <div className="hidden h-9 w-9 shrink-0 items-center justify-center sm:flex">
+                  <img
+                    src={`${import.meta.env.BASE_URL}images/brand/${
+                      activeMainTab === 'notebook'
+                        ? 'kkomi_header_clipboard.png'
+                        : 'kkomi_header_binoculars.png'
+                    }`}
+                    alt=""
+                    aria-hidden="true"
+                    className="max-h-9 max-w-9 object-contain drop-shadow-xs"
+                  />
                 </div>
-                <img
-                  src={`${import.meta.env.BASE_URL}images/brand/${
-                    activeMainTab === 'notebook'
-                      ? 'kkomi_header_clipboard.png'
-                      : 'kkomi_header_binoculars.png'
-                  }`}
-                  alt=""
-                  aria-hidden="true"
-                  className={`h-8 w-auto shrink-0 object-contain drop-shadow-xs sm:h-9 ${activeMainTab === 'navigation' ? 'hidden sm:block' : 'hidden min-[380px]:block'}`}
-                />
               </div>
 
-              <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+              <div className="flex shrink-0 items-center">
                 {/* 교차 작업공간 원터치 스위치 버튼 (기존 2행 대메뉴 바를 대체하여 지도 시야 44px 확보) */}
                 <button
                   type="button"
@@ -1394,70 +1357,16 @@ export function App() {
                       ? '바닷길 콕콕(항로·기상)으로 전환'
                       : '꼬미의 바다수첩(접안지·레이어)으로 전환'
                   }
-                  className={`flex h-8 shrink-0 items-center gap-1 rounded-xl border-2 px-2 text-[11px] font-black shadow-sm transition active:scale-95 sm:h-9 sm:px-2.5 sm:text-xs ${
+                  className={`flex h-8 w-24 shrink-0 items-center justify-center gap-1 rounded-xl border-2 px-1 text-[11px] font-black whitespace-nowrap shadow-sm transition active:scale-95 sm:h-9 sm:w-32 sm:px-2.5 sm:text-xs ${
                     activeMainTab === 'notebook'
                       ? 'border-[#0284c7] bg-sky-50 text-[#003360] hover:bg-sky-100'
                       : 'border-[#00846c] bg-emerald-50 text-[#00846c] hover:bg-emerald-100'
                   }`}
                 >
-                  <ArrowLeftRight className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+                  <ArrowLeftRight className="hidden h-3 w-3 shrink-0 min-[375px]:block sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                   <span>{activeMainTab === 'notebook' ? '바닷길 콕콕' : '바다수첩'}</span>
                 </button>
 
-                {activeMainTab === 'notebook' && <>
-                {!isStandalone && (
-                  <button
-                    type="button"
-                    onClick={handleInstallClick}
-                    className="hidden h-8 items-center gap-1 rounded-xl border-2 border-amber-500 bg-amber-400 px-2 text-[11px] font-black text-slate-950 shadow-sm transition active:scale-95 sm:flex sm:h-9 sm:px-2.5 sm:text-xs"
-                    title="앱 설치"
-                  >
-                    <Download className="h-3.5 w-3.5 stroke-[2.8]" />
-                    <span>앱 설치</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => handleOpenSourcesInfo()}
-                  aria-label="데이터·기술 출처 확인 열기"
-                  title="공공데이터·해양기상·지도·알고리즘 출처 확인"
-                  className="flex h-8 shrink-0 items-center gap-1 rounded-xl border border-sky-300 bg-sky-50 px-2 text-xs font-extrabold text-[#003360] transition hover:border-sky-400 hover:bg-sky-100 active:scale-95 sm:h-9 sm:px-2.5"
-                >
-                  <Database className="h-3.5 w-3.5 text-[#0284c7] sm:h-4 sm:w-4" aria-hidden="true" />
-                  <span className="hidden md:inline">출처 ⓘ</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSettingsInitialSection('thresholds');
-                    setSettingsFocusSourceId(null);
-                    setIsWeatherSettingsOpen(true);
-                  }}
-                  aria-label="설정 및 이용 안내 열기"
-                  title="기상 판정 기준 설정 및 이용 안내"
-                  className="relative flex h-8 shrink-0 items-center gap-1 rounded-xl border border-sky-300 bg-sky-50 px-2 text-xs font-extrabold text-[#003360] transition hover:border-sky-400 hover:bg-sky-100 active:scale-95 sm:h-9 sm:px-2.5"
-                >
-                  <SlidersHorizontal className="h-3.5 w-3.5 text-[#00a79d] sm:h-4 sm:w-4" aria-hidden="true" />
-                  <span className="hidden md:inline">설정</span>
-                  {marineWeather.isCustomThresholds && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-[#00a79d]"
-                    />
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleManualReload}
-                  aria-label="데이터 새로고침"
-                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-sky-300 bg-sky-50 text-[#003360] hover:bg-sky-100 active:scale-95 sm:h-9 sm:w-9"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${loading ? 'animate-spin' : ''}`} />
-                </button>
-                </>}
               </div>
             </div>
 
@@ -1529,7 +1438,7 @@ export function App() {
                 </button>
               </div>
 
-              {/* 우측: '위험주의' 고정 경보 칩 + 필요한 사용자만 여는 '[+ 등급 선택 ▾]' 버튼 */}
+              {/* 우측: 위험주의 빠른 필터와 등급 선택 */}
               <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
                 <button
                   type="button"
@@ -1551,15 +1460,6 @@ export function App() {
                     />
                   </span>
                   <span>{MARKER_COLOR_MAP.red.shortLabel}</span>
-                  <span
-                    className={`rounded px-1 py-0.2 text-[10px] font-black ${
-                      selectedColors.includes('red')
-                        ? 'bg-white/20 text-white'
-                        : 'bg-rose-100 text-[#870b41]'
-                    }`}
-                  >
-                    {colorCounts.red}
-                  </span>
                 </button>
 
                 <button
