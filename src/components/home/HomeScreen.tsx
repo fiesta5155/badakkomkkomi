@@ -5,6 +5,7 @@ import {
   ShipWheel
 } from 'lucide-react';
 import type { NavPanelType } from '../../hooks/useAppRoute';
+import { AccountPanel } from '../auth/AccountPanel';
 
 export type NotebookLaunchPreset = 'hazard' | 'all' | 'layers';
 
@@ -105,6 +106,8 @@ export function HomeScreen({
             )}
           </div>
         </div>
+
+        <AccountPanel />
 
         {/* 상단 히어로 배너: 국립공원공단 공식 CI + 바다꼼꼬미 + 해양 레인저 꼬미 */}
         <section

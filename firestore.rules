@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSelf(uid) {
+      return request.auth != null
+        && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function validProfile(uid) {
+      let data = request.resource.data;
+      return data.keys().hasAll(['uid', 'realName', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'realName', 'createdAt', 'updatedAt'])
+        && data.uid == uid
+        && data.realName is string
+        && data.realName.size() == 2
+        && data.realName.matches('^[가-힣]{2}$')
+        && data.createdAt is timestamp
+        && data.updatedAt == request.time;
+    }
+
+    match /users/{uid} {
+      allow get: if isSelf(uid);
+      allow list, delete: if false;
+      allow create: if isSelf(uid) && validProfile(uid)
+        && request.resource.data.createdAt == request.time;
+      allow update: if isSelf(uid) && validProfile(uid)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function calendarUser() {
+      return request.auth != null && isSelf(request.auth.uid)
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.uid == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName is string
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName.matches('^[가-힣]{2}$');
+    }
+
+    function calendarAdmin() {
+      return exists(/databases/$(database)/documents/calendarAdmins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/calendarAdmins/$(request.auth.uid)).data.enabled == true;
+    }
+
+    function validCalendarDate(value) {
+      // 형식을 먼저 검사한다. 불완전한 입력은 분할·정수 변환하지 않는다.
+      return value is string
+        && value.matches('^[1-9][0-9]{3}-[0-9]{2}-[0-9]{2}$')
+        && validCalendarDateParts(value.split('-'));
+    }
+
+    function validCalendarDateParts(parts) {
+      // validCalendarDate의 형식 검사를 통과한 세 개의 숫자 문자열만 받는다.
+      let year = int(parts[0]);
+      let month = int(parts[1]);
+      let day = int(parts[2]);
+      let leap = year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
+      let maxDay = month == 2 ? (leap ? 29 : 28) : (month in [4, 6, 9, 11] ? 30 : 31);
+      return month >= 1 && month <= 12 && day >= 1 && day <= maxDay;
+    }
+
+    function validEntry(vessel, entryId) {
+      let d = request.resource.data;
+      return vessel in ['101', '103']
+        && d.keys().hasAll(['schemaVersion', 'date', 'kind', 'content', 'authorUid', 'authorName', 'createdAt', 'updatedAt', 'revision'])
+        && d.keys().hasOnly(['schemaVersion', 'date', 'kind', 'content', 'authorUid', 'authorName', 'createdAt', 'updatedAt', 'revision'])
+        && d.schemaVersion is int && d.schemaVersion == 1
+        && d.date is string && validCalendarDate(d.date)
+        && d.kind in ['planned', 'unavailable', 'memo']
+        && ((d.kind == 'memo' && entryId.matches('^memo_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'))
+          || (d.kind in ['planned', 'unavailable'] && entryId == 'status_' + d.date))
+        && d.content is string && d.content.size() > 0 && d.content.size() <= 2000
+        // ASCII 공백과 Unicode 구분 공백·세로 탭·BOM만 있는 내용은 거부한다.
+        && d.content.matches('[\\s\\S]*[^\\s\\p{Z}\\x{000B}\\x{FEFF}][\\s\\S]*')
+        && d.authorUid is string && d.authorName is string && d.authorName.matches('^[가-힣]{2}$')
+        && d.createdAt is timestamp && d.updatedAt == request.time
+        && d.revision is int && d.revision >= 1;
+    }
+
+    match /calendarVessels/{vessel}/entries/{entryId} {
+      allow read: if calendarUser() && vessel in ['101', '103'];
+      allow create: if calendarUser() && validEntry(vessel, entryId)
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+        && request.resource.data.createdAt == request.time && request.resource.data.revision == 1;
+      allow update: if calendarUser() && validEntry(vessel, entryId)
+        && resource.data.authorUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['kind', 'content', 'updatedAt', 'revision'])
+        && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if calendarUser() && vessel in ['101', '103']
+        && (resource.data.authorUid == request.auth.uid || calendarAdmin());
+    }
+
+    match /calendarAdmins/{uid} {
+      allow get: if calendarUser() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    // 명시적으로 허용하지 않은 경로는 기본 거부한다.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

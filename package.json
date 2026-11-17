@@ -11,12 +11,14 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "node --test src/tests/*.test.ts",
+    "test:rules": "npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project demo-bada-profile \"node --test --test-concurrency=1 src/tests/firebaseProfile.rules.mjs src/tests/firebaseCalendar.rules.mjs\"",
     "verify": "node scripts/verify-integrity.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
     "fflate": "^0.8.3",
+    "firebase": "^12.10.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.70.0",
     "proj4": "^2.22.0",
@@ -25,7 +27,13 @@
     "react-leaflet": "^5.0.0",
     "tailwindcss": "^4.3.5"
   },
+  "overrides": {
+    "@firebase/firestore": {
+      "@grpc/grpc-js": "1.13.6"
+    }
+  },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
     "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.19.2",

@@ -138,6 +138,8 @@ bada-kkomkkomi/
 │   ├── data/
 │   │   └── coastlinePolygons.ts       # 한려해상(통영·거제·고성·창원) 378개 실측 해안선·도서 폴리곤(12,794정점) 정본
 │   ├── hooks/
+│   │   ├── useFirebaseAuth.ts         # Google 로그인·본인 실명 프로필 상태 및 계정 동작
+│   │   ├── useSharedCalendar.ts       # 선박·월·계정별 Firestore 구독 및 정리
 │   │   ├── useAppRoute.ts             # URL Query 딥링크, Depth-Aware 히스토리 라우터(navigateHome), 프리셋 관리
 │   │   ├── useAppConfig.ts            # app_config.json + IndexedDB 레이어 통합 로더 및 즉시 운영 반영
 │   │   ├── useMarineWeather.ts        # ECMWF API 병렬 조회, KST 타임스탬프 매칭 및 3단계 등급 연산
@@ -145,7 +147,11 @@ bada-kkomkkomi/
 │   ├── utils/
 │   │   └── geojsonMeta.ts             # 초기 부팅용 무의존성 WGS84 GeoJSON 메타데이터·BBox 정규화 유틸리티
 │   ├── services/
-│   │   ├── calendarRepository.ts      # 101호·103호 일정 로컬 저장 및 날짜별 운항·메모 변경
+│   │   ├── firebaseClient.ts          # VITE_FIREBASE_* 기반 SDK 초기화 (설정 누락 시 기존 기능 유지)
+│   │   ├── userProfileService.ts      # UID별 실명 프로필 서버 조회·저장 및 한글 두 글자 검증
+│   │   ├── calendarRepository.ts      # 기존 로컬 일정 호환 및 선박 선택 저장
+│   │   ├── calendarFirestoreService.ts # 공유 일정 실시간 조회·트랜잭션 저장
+│   │   ├── sharedCalendarModel.ts     # 공유 형식·한국 날짜·충돌 검사·로컬 백업 읽기
 │   │   ├── routeIslandLabels.ts       # 실제 항구·해안선 데이터의 섬 이름을 경로 순서대로 표시
 │   │   ├── straightRouteService.ts     # 클릭 좌표 보존·순서 번호·마지막 점 제거
 │   │   ├── kakaoMapLoader.ts          # KAKAO_MAP_API_KEY 기반 SDK 동적 로더, 줌 레벨 변환기, 도메인 검증 진단기
@@ -170,6 +176,8 @@ bada-kkomkkomi/
 ---
 
 ## 4. 로컬 개발 및 검증 명령
+
+Google 로그인·실명 등록의 환경변수와 1단계 콘솔 설정은 [Firebase 로그인 설정 안내](docs/FIREBASE_AUTH_SETUP.md)를 참고하세요. 2단계 공유 달력의 코드·로컬 규칙은 구현되었으며 운영 반영은 승인 대기 중입니다. 기존 localStorage 일정은 원본을 보존하고 공유 일정과 분리하며 자동 이전하지 않습니다. 규칙 게시·검증 절차는 [공유 달력 인수인계](HANDOVER.md)를 참고하세요.
 
 ```bash
 # 의존성 설치

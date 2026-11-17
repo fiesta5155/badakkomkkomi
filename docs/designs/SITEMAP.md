@@ -39,7 +39,7 @@
 - [`src/components/notebook/LayerControlModal.tsx`](../../src/components/notebook/LayerControlModal.tsx): `LayerControlModal(props)`
 - [`src/components/notebook/FieldReportModal.tsx`](../../src/components/notebook/FieldReportModal.tsx): `FieldReportModal(props)`
 - [`src/components/notebook/PorpoiseObservationModal.tsx`](../../src/components/notebook/PorpoiseObservationModal.tsx): `PorpoiseObservationModal(props)`
-- [`src/components/calendar/CalendarScreen.tsx`](../../src/components/calendar/CalendarScreen.tsx): `CalendarScreen(props)` — 선박별 월간 달력, 날짜 상세, 일정 작성
+- [`src/components/calendar/CalendarScreen.tsx`](../../src/components/calendar/CalendarScreen.tsx): `CalendarScreen(props)` — 인증된 사용자용 공유 달력, 날짜 상세·작성·권한별 수정/삭제, 기존 로컬 원본 JSON 백업. 물때/날씨/운항/메모 고정 2×2 배치 유지
 - [`src/components/navigation/RouteTimeCalculator.tsx`](../../src/components/navigation/RouteTimeCalculator.tsx): `RouteTimeCalculator(props)`
 - [`src/components/navigation/PortSelectModal.tsx`](../../src/components/navigation/PortSelectModal.tsx): `PortSelectModal(props)`
 - [`src/components/navigation/MarineWeatherPanel.tsx`](../../src/components/navigation/MarineWeatherPanel.tsx): `MarineWeatherPanel(props)`
@@ -62,7 +62,11 @@
 
 ## 2. Core Domain Services (`src/services`)
 
-- [`src/services/calendarRepository.ts`](../../src/services/calendarRepository.ts): `createCalendarRepository()`, `monthCells()`, `setVoyageStatus()`, `setCalendarMemo()` — 선박별 일정 로컬 저장
+- [`src/services/calendarRepository.ts`](../../src/services/calendarRepository.ts): `createCalendarRepository()`, `monthCells()`, `setVoyageStatus()`, `setCalendarMemo()` — 기존 선박별 로컬 일정 호환. 공유 화면은 원본 저장 함수를 호출하지 않고 선박 선택 기능만 재사용
+- [`src/services/calendarFirestoreService.ts`](../../src/services/calendarFirestoreService.ts): `subscribeCalendar()`, `saveSharedEntry()`, `deleteSharedEntry()` — 선박·월별 실시간 조회, 날짜당 고정 상태 1건, 트랜잭션 충돌 검증
+- [`src/services/sharedCalendarModel.ts`](../../src/services/sharedCalendarModel.ts): `parseSharedEntry()`, `koreaToday()`, `legacyBackup()`, `guardedSubscription()` — 공유 자료 검증·한국 날짜·원본 백업·정리 후 콜백 차단
+- [`src/services/firebaseClient.ts`](../../src/services/firebaseClient.ts): `getFirebaseClient()` — 기존 웹 앱 설정으로 Authentication·Firestore 초기화. Analytics·Storage는 초기화하지 않음
+- [`src/services/userProfileService.ts`](../../src/services/userProfileService.ts): `loadUserProfile()`, `saveUserProfile()`, `isValidRealName()` — UID 기준 본인 실명 프로필 조회·저장, 한글 완성형 두 글자 검사. 달력 데이터와 분리
 
 ### Overview
 UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 어댑터 계층입니다. 직선거리 기반 예상시간 계산, 등록 항구 선택 상태 머신, QGIS 바이너리 파일 파싱 및 측지계 변환, ECMWF 기상 시계열 정합, 로컬/원격 레이어 영속화를 담당합니다.
@@ -87,7 +91,7 @@ UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 
 
 ### Side Effects
 - `layerStorageService.ts` 및 `workspaceDraftRepository.ts`는 `IndexedDB`와 `localStorage`를 읽고 씁니다.
-- `kakaoMapLoader.ts`는 `<script>` 태그를 주입하며, `githubLayerSyncService.ts`는 GitHub REST API를 호출합니다. 나머지 서비스 모듈은 부수효과 없는 순수 함수입니다.
+- `kakaoMapLoader.ts`는 `<script>` 태그를 주입하며, `githubLayerSyncService.ts`는 GitHub REST API를 호출합니다. `firebaseClient.ts`와 `userProfileService.ts`는 설정된 Firebase 프로젝트에서 인증 상태와 본인 프로필을 처리합니다. 나머지 서비스 모듈은 부수효과 없는 순수 함수입니다.
 
 ### Verification
 - Run: `npm test`
@@ -101,6 +105,7 @@ React 컴포넌트에 라우팅, 공간레이어 설정, 실시간 해상기상,
 
 ### Interface
 - [`src/hooks/useAppRoute.ts`](../../src/hooks/useAppRoute.ts): `useAppRoute()`, `parseRouteFromUrl()`
+- [`src/hooks/useFirebaseAuth.ts`](../../src/hooks/useFirebaseAuth.ts): `useFirebaseAuth()` — 로그인·로그아웃·실명 등록·이름 변경. 별도 직원 승인 없이 Google 로그인 사용자의 본인 프로필만 접근
 - [`src/hooks/useAppConfig.ts`](../../src/hooks/useAppConfig.ts): `useAppConfig()`
 - [`src/hooks/useMarineWeather.ts`](../../src/hooks/useMarineWeather.ts): `useMarineWeather()`
 - [`src/hooks/usePorpoiseStorage.ts`](../../src/hooks/usePorpoiseStorage.ts): `usePorpoiseStorage()`
@@ -161,3 +166,5 @@ React 컴포넌트에 라우팅, 공간레이어 설정, 실시간 해상기상,
 
 ### Verification
 - Run: `npm test && npm run verify`
+
+[`src/hooks/useSharedCalendar.ts`](../../src/hooks/useSharedCalendar.ts)는 UID·선박·월 변경 및 화면 이탈 때 기존 구독을 정리합니다. 공유 달력 운영 반영·권한·백업·테스트 계약은 [공유 달력 인수인계](../../HANDOVER.md)를 참고합니다.

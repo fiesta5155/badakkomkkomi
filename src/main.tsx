@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import './index.css';
 import App from './App.tsx';
+import { FirebaseAuthProvider } from './components/auth/FirebaseAuthProvider';
 
 const CHUNK_RELOAD_GUARD_KEY = 'bada_chunk_reload_guard_ts_v1';
 
@@ -46,6 +47,8 @@ registerSW({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <FirebaseAuthProvider>
+      <App />
+    </FirebaseAuthProvider>
   </StrictMode>,
 );
