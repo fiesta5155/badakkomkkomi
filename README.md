@@ -140,6 +140,7 @@ bada-kkomkkomi/
 │   ├── hooks/
 │   │   ├── useFirebaseAuth.ts         # Google 로그인·본인 실명 프로필 상태 및 계정 동작
 │   │   ├── useSharedCalendar.ts       # 선박·월·계정별 Firestore 구독 및 정리
+│   │   ├── useCalendarWeather.ts      # 캐시 우선 날씨 표시·한국 날짜/3시간 갱신·재진입 구독
 │   │   ├── useAppRoute.ts             # URL Query 딥링크, Depth-Aware 히스토리 라우터(navigateHome), 프리셋 관리
 │   │   ├── useAppConfig.ts            # app_config.json + IndexedDB 레이어 통합 로더 및 즉시 운영 반영
 │   │   ├── useMarineWeather.ts        # ECMWF API 병렬 조회, KST 타임스탬프 매칭 및 3단계 등급 연산
@@ -151,6 +152,7 @@ bada-kkomkkomi/
 │   │   ├── userProfileService.ts      # UID별 실명 프로필 서버 조회·저장 및 한글 두 글자 검증
 │   │   ├── calendarRepository.ts      # 기존 로컬 일정 호환 및 선박 선택 저장
 │   │   ├── calendarFirestoreService.ts # 공유 일정 실시간 조회·트랜잭션 저장
+│   │   ├── calendarWeatherCache.ts    # 지역·날짜별 날씨 캐시·요청 병합·실패 시 보존
 │   │   ├── sharedCalendarModel.ts     # 공유 형식·한국 날짜·충돌 검사·로컬 백업 읽기
 │   │   ├── routeIslandLabels.ts       # 실제 항구·해안선 데이터의 섬 이름을 경로 순서대로 표시
 │   │   ├── straightRouteService.ts     # 클릭 좌표 보존·순서 번호·마지막 점 제거
@@ -166,6 +168,7 @@ bada-kkomkkomi/
 │   │   └── workspaceDraftRepository.ts# 항로·선속·필터·제보자명 localStorage 드래프트 영속화 및 GPS 오류 분류기
 │   ├── tests/
 │   │   ├── calendarRepository.test.ts # 달력 월 배열·선박 분리·수정·삭제·저장 복원 테스트
+│   │   ├── calendarWeatherCache.test.ts # 날씨 복원·갱신·실패·응답 순서·중복 요청 검사
 │   │   └── coreServices.test.ts       # 핵심 도메인(해상 항로·즉시 항구 선택·기상·딥링크·워크스페이스·출처·EGM 계약) 단위 테스트
 │   └── types/                         # 도메인별 TypeScript 엄격 타입 정의 (kakao, config, spatialLayer, docking, port, route, weather, porpoise, report)
 ├── DEPLOY_GUIDE.md                    # 비개발자 운영자용 데이터 교체 및 무상 배포 가이드

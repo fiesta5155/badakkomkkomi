@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, Cloud, CloudRain, CloudSnow, CloudSun, FileText, Pencil, Plus, Ship, Sun, Trash2 } from 'lucide-react';
-import { fetchCalendarWeather, tideNameForDate, weatherDescription, type CalendarRegion } from './calendarConditions';
+import { tideNameForDate, weatherDescription, type CalendarRegion } from './calendarConditions';
 import { createCalendarRepository, monthCells, type CalendarVessel, type VoyageKind } from '../../services/calendarRepository';
 import { useFirebaseAuth } from '../../hooks/useFirebaseAuth';
 import { useSharedCalendar } from '../../hooks/useSharedCalendar';
+import { useCalendarWeather } from '../../hooks/useCalendarWeather';
 import { getFirebaseClient } from '../../services/firebaseClient';
 import { deleteSharedEntry, saveSharedEntry } from '../../services/calendarFirestoreService';
 import { calendarErrorMessage, entriesForDay, koreaToday, legacyBackup } from '../../services/sharedCalendarModel';
@@ -22,6 +23,11 @@ const entryLabels: Record<EntryKind, string> = {
 function fullDateLabel(value: string): string {
   return new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
     .format(new Date(`${value}T12:00:00+09:00`));
+}
+
+function weatherTimeLabel(value: number): string {
+  return new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value));
 }
 
 export function CalendarScreen({ onBackHome }: { onBackHome: () => void }) {
@@ -70,7 +76,7 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
     try { return window.localStorage.getItem('bada_kkomkkomi_calendar_region_v1') === 'geoje' ? 'geoje' : 'tongyeong'; }
     catch { return 'tongyeong'; }
   });
-  const [weather, setWeather] = useState<{ region: CalendarRegion; values: Record<string, number> }>({ region, values: {} });
+  const weather = useCalendarWeather(region);
   const [displayMonth, setDisplayMonth] = useState(() => new Date(koreaToday().slice(0, 7) + '-01T12:00:00'));
   const [selectedDate, setSelectedDate] = useState(koreaToday);
   const [todayKey, setTodayKey] = useState(koreaToday);
@@ -95,14 +101,6 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
   const canEdit = (entry: SharedEntry) => entry.authorUid === profile.uid;
   const canDelete = (entry: SharedEntry) => canEdit(entry) || shared.isAdmin;
   const cells = useMemo(() => monthCells(displayMonth.getFullYear(), displayMonth.getMonth()), [displayMonth]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchCalendarWeather(region, controller.signal)
-      .then((next) => { if (!controller.signal.aborted) setWeather({ region, values: next }); })
-      .catch(() => { if (!controller.signal.aborted) setWeather({ region, values: {} }); });
-    return () => controller.abort();
-  }, [region]);
 
   const selectRegion = (next: CalendarRegion) => {
     setRegion(next);
@@ -203,6 +201,14 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
               {(['tongyeong', 'geoje'] as const).map((item) => <button key={item} type="button" onClick={() => selectRegion(item)} aria-pressed={region === item} className={`min-h-9 rounded-lg border px-3 text-xs font-bold ${region === item ? 'border-[#0066b3] bg-[#0066b3] text-white' : 'border-sky-200 bg-white text-[#003360]'}`}>{item === 'tongyeong' ? '통영' : '거제'}</button>)}
             </div>
 
+            <div role="status" aria-live="polite" className={`mb-2 rounded-lg px-2 py-1.5 text-[11px] ${weather.stale || weather.error ? 'bg-amber-50 text-amber-800' : 'bg-sky-50 text-sky-800'}`}>
+              <p>{weather.refreshing ? (weather.cache ? '날씨 갱신 중 · 기존 예보 유지' : '날씨 조회 중') : weather.stale ? '오래된 예보 표시 중' : weather.cache ? '날씨 최신 조회 완료' : weather.error ? '날씨 예보 확인 불가' : '날씨 예보 확인 중'}</p>
+              {weather.cache && <p>마지막 갱신·저장: {weatherTimeLabel(weather.cache.savedAt)} · 조회 기준: {weatherTimeLabel(weather.cache.forecastReferenceAt)} (한국시간)</p>}
+              {weather.cache && <p>조회 기준은 요청 시각이며 모델 발표 시각은 제공되지 않습니다.</p>}
+              {weather.error && <p>{weather.error}</p>}
+              {weather.storageError && <p>기기 저장소를 사용할 수 없어 새로고침 후 예보가 복원되지 않을 수 있습니다.</p>}
+            </div>
+
             <section className="rounded-2xl border border-sky-200 bg-white p-2.5 shadow-sm" aria-label="월간 달력">
               <div className="mb-3 flex items-center justify-between gap-1">
                 <button type="button" onClick={() => setDisplayMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() - 1, 1))} aria-label="이전 달" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200"><ChevronLeft className="h-5 w-5" /></button>
@@ -221,14 +227,15 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
                   const entry = entriesForDay(shared.entries, date);
                   const weekday = index % 7;
                   const tide = tideNameForDate(date);
-                  const condition = weatherDescription(weather.region === region ? weather.values[date] : NaN);
+                  const condition = weatherDescription(weather.cache?.values[date] ?? NaN);
+                  const weatherLabel = condition ? `${condition}${weather.stale ? ' · 오래된 예보' : ''}` : null;
                   const WeatherIcon = condition === '맑음' ? Sun : condition === '구름' ? CloudSun : condition === '흐림' ? Cloud : condition === '눈' ? CloudSnow : CloudRain;
                   return (
-                    <button key={date} type="button" onClick={() => { setSelectedDate(date); setView('detail'); }} aria-label={`${fullDateLabel(date)}, ${tide ?? '물때 정보 없음'}, ${condition ?? '날씨 예보 없음'}, ${ready ? (entry.status ? entryLabels[entry.status.kind] : '운항 상태 없음') + ', 메모 ' + entry.memos.length + '건' : '공유 일정 확인 전'}`} className={`flex min-h-[72px] min-w-0 flex-col items-center rounded-lg border px-0.5 py-0.5 text-center ${selectedDate === date ? 'border-2 border-[#00a79d] bg-cyan-50' : date === todayKey ? 'border-sky-400 bg-sky-50' : 'border-sky-100 bg-white'}`}>
+                    <button key={date} type="button" onClick={() => { setSelectedDate(date); setView('detail'); }} aria-label={`${fullDateLabel(date)}, ${tide ?? '물때 정보 없음'}, ${weatherLabel ?? '날씨 예보 없음'}, ${ready ? (entry.status ? entryLabels[entry.status.kind] : '운항 상태 없음') + ', 메모 ' + entry.memos.length + '건' : '공유 일정 확인 전'}`} className={`flex min-h-[72px] min-w-0 flex-col items-center rounded-lg border px-0.5 py-0.5 text-center ${selectedDate === date ? 'border-2 border-[#00a79d] bg-cyan-50' : date === todayKey ? 'border-sky-400 bg-sky-50' : 'border-sky-100 bg-white'}`}>
                       <span className={`text-sm font-bold tabular-nums ${weekday === 0 ? 'text-red-600' : weekday === 6 ? 'text-blue-600' : 'text-[#003360]'}`}>{Number(date.slice(-2))}</span>
                       <span className="mt-1 grid w-full grid-cols-2 grid-rows-2 place-items-center gap-y-1">
                         <span className="h-4 whitespace-nowrap text-[10px] font-bold leading-4">{tide}</span>
-                        <span className="flex h-4 items-center justify-center" title={condition ?? undefined}>{condition && <WeatherIcon className="h-3.5 w-3.5 text-sky-600" aria-hidden="true" />}</span>
+                        <span className="flex h-4 items-center justify-center" title={weatherLabel ?? undefined}>{condition && <WeatherIcon className={`h-3.5 w-3.5 ${weather.stale ? 'text-amber-600' : 'text-sky-600'}`} aria-hidden="true" />}</span>
                         <span className="flex h-4 items-center justify-center">{entry.status && <Ship className={`h-3.5 w-3.5 ${entry.status.kind === 'planned' ? 'text-[#0066b3]' : 'text-red-600'}`} fill="currentColor" aria-hidden="true" />}</span>
                         <span className="relative flex h-4 items-center justify-center">{entry.memos.length > 0 && <><FileText className="h-3.5 w-3.5 text-[#003360]" aria-hidden="true" />{entry.memos.length > 1 && <span className="absolute -top-1 left-[calc(50%+3px)] rounded-full bg-sky-100 px-0.5 text-[8px] font-black leading-3 text-[#0066b3]">{entry.memos.length}</span>}</>}</span>
                       </span>

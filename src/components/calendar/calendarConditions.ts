@@ -1,4 +1,5 @@
 import { buildEcmwfWeatherUrls } from '../../services/ecmwfWeatherService.ts';
+import { validCalendarDate } from '../../services/sharedCalendarModel.ts';
 
 export type CalendarRegion = 'tongyeong' | 'geoje';
 
@@ -50,13 +51,18 @@ export async function fetchCalendarWeather(region: CalendarRegion, signal?: Abor
   if (!response.ok) throw new Error('Calendar weather request failed');
   const payload: unknown = await response.json();
   const daily = (payload as { daily?: { time?: unknown; weather_code?: unknown } })?.daily;
-  if (!Array.isArray(daily?.time) || !Array.isArray(daily.weather_code)) throw new Error('Invalid calendar weather response');
+  if (!Array.isArray(daily?.time) || !Array.isArray(daily.weather_code)
+    || daily.time.length !== daily.weather_code.length || daily.time.length === 0) throw new Error('Invalid calendar weather response');
   const dates: unknown[] = daily.time;
   const codes: unknown[] = daily.weather_code;
   const result: Record<string, number> = {};
+  const seen = new Set<string>();
   dates.forEach((day, index) => {
+    if (typeof day !== 'string' || !validCalendarDate(day) || seen.has(day)) throw new Error('Invalid calendar weather date');
+    seen.add(day);
     const code = codes[index];
-    if (typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day) && typeof code === 'number' && weatherDescription(code)) result[day] = code;
+    if (typeof code === 'number' && weatherDescription(code)) result[day] = code;
   });
+  if (Object.keys(result).length === 0) throw new Error('Calendar weather contains no forecast');
   return result;
 }

@@ -64,6 +64,7 @@
 
 - [`src/services/calendarRepository.ts`](../../src/services/calendarRepository.ts): `createCalendarRepository()`, `monthCells()`, `setVoyageStatus()`, `setCalendarMemo()` — 기존 선박별 로컬 일정 호환. 공유 화면은 원본 저장 함수를 호출하지 않고 선박 선택 기능만 재사용
 - [`src/services/calendarFirestoreService.ts`](../../src/services/calendarFirestoreService.ts): `subscribeCalendar()`, `saveSharedEntry()`, `deleteSharedEntry()` — 선박·월별 실시간 조회, 날짜당 고정 상태 1건, 트랜잭션 충돌 검증
+- [`src/services/calendarWeatherCache.ts`](../../src/services/calendarWeatherCache.ts): `createCalendarWeatherStore()`, `weatherRefreshDue()` — 지역·날짜별 localStorage 날씨 캐시, 한국 날짜 첫 조회·3시간 갱신, 중복 요청 병합, 실패 시 보존. 해상 안전등급 캐시와 별도
 - [`src/services/sharedCalendarModel.ts`](../../src/services/sharedCalendarModel.ts): `parseSharedEntry()`, `koreaToday()`, `legacyBackup()`, `guardedSubscription()` — 공유 자료 검증·한국 날짜·원본 백업·정리 후 콜백 차단
 - [`src/services/firebaseClient.ts`](../../src/services/firebaseClient.ts): `getFirebaseClient()` — 기존 웹 앱 설정으로 Authentication·Firestore 초기화. Analytics·Storage는 초기화하지 않음
 - [`src/services/userProfileService.ts`](../../src/services/userProfileService.ts): `loadUserProfile()`, `saveUserProfile()`, `isValidRealName()` — UID 기준 본인 실명 프로필 조회·저장, 한글 완성형 두 글자 검사. 달력 데이터와 분리
@@ -168,3 +169,5 @@ React 컴포넌트에 라우팅, 공간레이어 설정, 실시간 해상기상,
 - Run: `npm test && npm run verify`
 
 [`src/hooks/useSharedCalendar.ts`](../../src/hooks/useSharedCalendar.ts)는 UID·선박·월 변경 및 화면 이탈 때 기존 구독을 정리합니다. 공유 달력 운영 반영·권한·백업·테스트 계약은 [공유 달력 인수인계](../../HANDOVER.md)를 참고합니다.
+
+[`src/hooks/useCalendarWeather.ts`](../../src/hooks/useCalendarWeather.ts)는 캐시 우선 날씨 표시와 갱신 상태를 제공하며, 진입·지역 전환·포커스·온라인 복귀·한국 날짜 변경·3시간 경과를 검사합니다. 컴포넌트 이탈 시 타이머·이벤트·구독은 정리하고 이미 시작한 지역별 공유 요청은 완료 후 캐시에 저장합니다.

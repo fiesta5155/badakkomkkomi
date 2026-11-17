@@ -36,3 +36,21 @@ test('weather lookup keeps only actual forecast days and changes coordinates by 
     globalThis.fetch = originalFetch;
   }
 });
+
+test('calendar weather rejects HTTP errors, malformed dates, duplicate dates and shifted arrays', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    for (const daily of [
+      { time: ['2026-11-17'], weather_code: [] },
+      { time: ['2026-02-30'], weather_code: [0] },
+      { time: ['2026-11-17', '2026-11-17'], weather_code: [0, 63] },
+      { time: ['2026-11-17'], weather_code: [null] },
+      { time: [], weather_code: [] },
+    ]) {
+      globalThis.fetch = async () => new Response(JSON.stringify({ daily }), { status: 200 });
+      await assert.rejects(fetchCalendarWeather('tongyeong'));
+    }
+    globalThis.fetch = async () => new Response('{}', { status: 429 });
+    await assert.rejects(fetchCalendarWeather('tongyeong'));
+  } finally { globalThis.fetch = originalFetch; }
+});
