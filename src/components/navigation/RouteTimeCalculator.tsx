@@ -285,10 +285,10 @@ export function RouteTimeCalculator({
       `[바다꼼꼬미 바닷길 소요시간 요약]`,
       `• 구간: ${wpChain}`,
       `• 선속: ${speedKnots} kn`,
-      `• 예상 소요시간: 약 ${timeFormatted} (현 시각 출항 시 ${etaTimeKst} 도착 예정)`,
-      `• 총 거리: ${calculation.totalDistanceNm.toFixed(1)} NM (${calculation.totalDistanceKm.toFixed(1)} km)`,
+      `• 직선거리 기준 예상 소요시간: 약 ${timeFormatted} (현 시각 출항 시 ${etaTimeKst} 도착 예상)`,
+      `• 총 직선거리: ${calculation.totalDistanceNm.toFixed(1)} NM (${calculation.totalDistanceKm.toFixed(1)} km)`,
       ...legLines,
-      `※ 본 결과는 선속·해상항로 기반 추정치이며 조류·기상·선박 특성에 따라 달라질 수 있습니다.`,
+      `※ 본 결과는 사용자 지정 지점 간 직선거리와 입력 선속 기준 예상 소요시간입니다. 직선이 육지·항해 위험구역을 통과할 수 있으며 실제 항해 가능 경로를 보장하지 않습니다. 조류·기상·선박 특성에 따라 달라지므로 공식 해도·ECDIS 및 선장의 현장 판단을 대체하지 않습니다.`,
     ].join('\n');
 
     try {
@@ -318,7 +318,7 @@ export function RouteTimeCalculator({
       >
         <div aria-hidden="true" className="knps-tricolor-bar pointer-events-none absolute inset-x-0 top-0 h-1" />
         <div className="flex items-center justify-between gap-2">
-          <strong className={`text-sky-700 ${freeDrawStage === 'summary' ? 'text-xs font-bold' : 'text-base font-black'}`}>예상시간</strong>
+          <strong className={`text-sky-700 ${freeDrawStage === 'summary' ? 'text-xs font-bold' : 'text-base font-black'}`}>직선거리 기준 예상 소요시간</strong>
           {freeDrawStage !== 'summary' && <button
             type="button"
             onClick={() => setSheetStage(isExpanded ? 'compact' : 'full')}
@@ -444,7 +444,7 @@ export function RouteTimeCalculator({
           className="knps-tricolor-bar pointer-events-none absolute inset-x-0 top-0 h-1 opacity-95"
         />
         <div className="text-center text-[11px] leading-tight font-bold tracking-wide text-sky-700">
-          전체 예상 소요시간
+          직선거리 기준 전체 예상 소요시간
         </div>
         <div className="mt-0.5 rounded-xl border border-[#00a79d]/35 bg-[#f0f9ff] px-2 py-1.5">
           <div className="text-center text-3xl leading-none font-black tracking-tight tabular-nums text-[#003360] sm:text-[2rem]">
@@ -683,7 +683,7 @@ export function RouteTimeCalculator({
             )}
             <span
               className="inline-flex shrink-0 items-center rounded-md border border-slate-300 bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-slate-700"
-              title="직선거리·입력 속력 기반 추정치이며 실제 항로와 다를 수 있습니다."
+              title="직선거리 기준 예상 소요시간이며 실제 항해 가능 경로를 보장하지 않습니다."
             >
               추정치·참고용
             </span>
@@ -1199,7 +1199,7 @@ export function RouteTimeCalculator({
           <div className="space-y-1 px-1">
             <div className="flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-bold text-slate-600">
               <span>
-                🧭 <strong className="font-extrabold text-[#003360]">직선거리 기반 예상시간</strong> (사용자 지정 지점 순서대로 연결)
+                🧭 <strong className="font-extrabold text-[#003360]">직선거리 기준 예상 소요시간</strong> (사용자 지정 지점 순서대로 연결)
               </span>
               {onOpenSourcesInfo && (
                 <button

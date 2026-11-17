@@ -1099,7 +1099,7 @@ describe('8. Handover Readiness: Zero-Config Base Path & GitHub Repo Auto-Infere
     );
     assert.deepEqual(
       inferDefaultGitHubRepoCoords({ hostname: 'localhost', pathname: '/' }),
-      { owner: 'gunnysis', repo: 'bada-kkomkkomi' },
+      { owner: 'fiesta5155', repo: 'badakkomkkomi' },
     );
   });
 

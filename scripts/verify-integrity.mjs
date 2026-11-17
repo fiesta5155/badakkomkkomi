@@ -232,7 +232,7 @@ assert(
   appTsx.includes("calculateRouteSummary(routeWaypoints, speedKnots, portsList, marineWaypoints, 'direct')") &&
     routeCalcTsx.includes('getRouteIslandNames') &&
     routeCalcTsx.includes('이동경로') &&
-    routeCalcTsx.includes('>예상시간</strong>') &&
+    routeCalcTsx.includes('>직선거리 기준 예상 소요시간</strong>') &&
     !routeCalcTsx.includes('해상 실항로 정밀 계산'),
   'RouteTimeCalculator.tsx and App.tsx must use and describe straight-line distance calculation',
 );

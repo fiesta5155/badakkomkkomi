@@ -13,8 +13,8 @@ export interface GitHubRepoCoords {
 }
 
 const FALLBACK_REPO_COORDS: GitHubRepoCoords = {
-  owner: 'gunnysis',
-  repo: 'bada-kkomkkomi',
+  owner: 'fiesta5155',
+  repo: 'badakkomkkomi',
 };
 
 /**
@@ -331,7 +331,7 @@ export async function commitLayersToGitHubRepository(params: {
       success: false,
       status: 'failed',
       message: `기기 내 운영 반영은 완료되었으나 원격 GitHub 동기화 중 오류가 발생했습니다: ${
-        err instanceof Error ? err.message : '알 수 없는 오류'
+        err instanceof Error ? err.message.replaceAll(token, '[REDACTED]') : '알 수 없는 오류'
       }`,
     };
   }

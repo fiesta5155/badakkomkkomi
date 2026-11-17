@@ -703,11 +703,11 @@ export function WeatherThresholdSettings({
                 </span>
                 <Compass className="h-4 w-4 shrink-0 text-[#00846c]" aria-hidden="true" />
                 <span className="text-xs font-black text-[#003360]">
-                  바닷길 콕콕 (실항로 시간계산 · 해상기상 판정)
+                  바닷길 콕콕 (직선거리 시간계산 · 해상기상 판정)
                 </span>
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-slate-700">
-                136개 항포구·선착장 간 육지·섬을 우회하는 해상 실항로 거리·소요시간을 계산합니다. 구간 카드를 탭하면 해당 구간이 자동 확대되며, 설정한 풍속·파고 기준치로 48시간 기상 신호등(좋음·보통·나쁨)을 즉시 판정합니다.
+                사용자가 지정한 지점을 순서대로 직선 연결하고, 직선거리와 입력 선속으로 예상 소요시간을 계산합니다. 직선이 육지·항해 위험구역을 통과할 수 있으며 실제 항해 가능 경로를 보장하지 않습니다. 육지 통과 및 항해 위험구역 경고를 확인하고, 설정한 풍속·파고 기준치로 48시간 기상 신호등(좋음·보통·나쁨)을 판정합니다.
               </p>
             </div>
 
