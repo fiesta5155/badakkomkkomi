@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { SettingsAccountSection } from './SettingsAccountSection';
 import {
   AlertCircle,
   Anchor,
@@ -44,6 +45,9 @@ interface WeatherThresholdSettingsProps {
   focusSourceId?: SourceCategoryKey | null;
   onSave: (thresholds: WeatherThresholds) => boolean | void;
   onReset?: () => void;
+  isStandalone: boolean;
+  canInstall: boolean;
+  onInstall: () => Promise<void>;
 }
 
 const KNOT_TO_MS = 0.514444;
@@ -95,6 +99,9 @@ export function WeatherThresholdSettings({
   focusSourceId = null,
   onSave,
   onReset,
+  isStandalone,
+  canInstall,
+  onInstall,
 }: WeatherThresholdSettingsProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const thresholdSectionRef = useRef<HTMLElement | null>(null);
@@ -383,6 +390,7 @@ export function WeatherThresholdSettings({
       </div>
 
       <div className="space-y-5 px-3.5 pt-4 pb-6 sm:px-5">
+        <SettingsAccountSection isStandalone={isStandalone} canInstall={canInstall} onInstall={onInstall} />
         {/* 섹션 1: 바닷길 콕콕 풍속·파고 판정 기준 설정 */}
         <section
           ref={thresholdSectionRef}

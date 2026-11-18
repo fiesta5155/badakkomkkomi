@@ -1,14 +1,31 @@
 import { useEffect, useRef } from 'react';
-import {
-  ArrowRight,
-  Download,
-  ShipWheel
-} from 'lucide-react';
+import type { ReactNode, Ref } from 'react';
+import { ArrowRight } from 'lucide-react';
 import type { NavPanelType } from '../../hooks/useAppRoute';
-import { AccountPanel } from '../auth/AccountPanel';
 import { HomeNotices } from './HomeNotices';
+import './homeMenuCards.css';
+import './homeHero.css';
 
 export type NotebookLaunchPreset = 'hazard' | 'all' | 'layers';
+
+function HomeMenuCard({ title, description, theme, icon, onClick, buttonRef }: {
+  title: string;
+  description: string;
+  theme: 'notebook' | 'navigation' | 'calendar' | 'settings';
+  icon: ReactNode;
+  onClick: () => void;
+  buttonRef?: Ref<HTMLButtonElement>;
+}) {
+  return <article className="home-menu-item" aria-label={theme === 'settings' ? '설정' : title}>
+    <button ref={buttonRef} type="button" className="home-menu-card" data-theme={theme} onClick={onClick}>
+      <span className="home-menu-card__icon" aria-hidden="true">{icon}</span>
+      <span className="home-menu-card__text">
+        <span className="home-menu-card__title">{title}</span>
+        <span className="home-menu-card__description">{description}</span>
+      </span>
+    </button>
+  </article>;
+}
 
 export interface HomeScreenProps {
   lastTriggeredCardId: 'notebook' | 'navigation' | null;
@@ -25,13 +42,11 @@ export interface HomeScreenProps {
   totalDockingCount?: number;
   totalPortsCount?: number;
   isOnline?: boolean;
-  isStandalone: boolean;
-  onInstallClick: () => void;
 }
 
 /**
  * 초기 접속 인트로 허브 (HomeScreen v2.4 — 미니멀 포스터 카드)
- * - 공식 국립공원공단 CI, 망원경 든 해양 레인저 꼬미, 240x180 정규화 4대 기능 카드 일러스트 아이콘을 유지합니다.
+ * - 승인된 꼬미 배너와 4대 기능 카드의 투명 배경 확정 시안 아이콘을 사용합니다.
  * - 직원 사용성 극대화를 위해 각 카드 내부의 상단 배지 및 하단 다중 액션 버튼 바를 제거하고,
  *   원터치로 바로 주요 기능에 진입할 수 있는 깔끔한 포스터 카드 형태로 구성했습니다.
  */
@@ -45,8 +60,6 @@ export function HomeScreen({
   hasActiveWorkspace = false,
   activeWorkspaceSummary,
   onResumeWorkspace,
-  isStandalone,
-  onInstallClick,
 }: HomeScreenProps) {
   const notebookBtnRef = useRef<HTMLButtonElement | null>(null);
   const navigationBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -79,176 +92,60 @@ export function HomeScreen({
 
   return (
     <div
-      className="fixed inset-0 z-[1200] flex min-h-dvh w-full flex-col justify-center overflow-y-auto bg-gradient-to-b from-[#bae6fd] via-[#7dd3fc] to-[#24a9e1] text-slate-900 select-none"
+      className="fixed inset-0 z-[1200] flex min-h-dvh w-full flex-col overflow-x-hidden overflow-y-auto bg-gradient-to-b from-[#bae6fd] via-[#7dd3fc] to-[#24a9e1] text-slate-900 select-none"
       style={{
         paddingTop: 'var(--safe-top)',
         paddingBottom: 'var(--safe-bottom)',
       }}
     >
-      <main className="relative z-10 mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-3 py-2 sm:px-5 sm:py-3">
-        {/* 상단 상태 유틸리티 바: 히어로 일러스트(꼬미 레인저 모자·로고)를 가리지 않도록 상단 우측에 독립 정렬 */}
-        <div className="mb-1.5 flex items-center justify-between gap-1 px-0.5 sm:gap-2 sm:px-1">
-          <span className="inline-flex h-7 items-center gap-1 rounded-full border border-white/85 bg-white/95 px-2 text-[10px] font-black whitespace-nowrap text-[#072a40] shadow-sm backdrop-blur-md min-[360px]:gap-1.5 min-[360px]:px-2.5 min-[360px]:text-[11px]">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-[#00854a]" />
-            <span className="min-[360px]:hidden">한려해상 현장업무 PWA</span>
-            <span className="hidden min-[360px]:inline">한려해상국립공원 현장업무 PWA</span>
-          </span>
-
-          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-            {!isStandalone && (
-              <button
-                type="button"
-                onClick={onInstallClick}
-                className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-white/85 bg-[#00854a] px-2 text-[10px] font-black whitespace-nowrap text-white shadow-sm transition hover:bg-[#047857] active:scale-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-slate-950 min-[360px]:px-2.5 min-[360px]:text-[11px]"
-              >
-                <Download className="h-3 w-3 shrink-0 stroke-[2.6]" aria-hidden="true" />
-                <span>앱 설치</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        <AccountPanel />
-
-        {/* 상단 히어로 배너: 국립공원공단 공식 CI + 바다꼼꼬미 + 해양 레인저 꼬미 */}
+      <main className="relative z-10 mx-auto my-auto flex w-full min-w-0 max-w-lg flex-none flex-col px-3 py-2 sm:px-5 sm:py-3">
+        <div className="home-launchpad overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-lg">
+        {/* 승인된 최종 배너 원본을 그대로 표시하고 제목은 접근 가능한 텍스트로 유지 */}
         <section
           aria-labelledby="home-hero-title"
-          className="relative overflow-hidden rounded-t-[2rem] border-x-4 border-t-4 border-white/95 shadow-lg"
+          className="home-hero relative"
         >
           <img
-            src={`${base}images/brand/hero_banner.png`}
-            alt="국립공원공단 바다꼼꼬미 — 우리 손안의 해양공원 업무수첩 (해양 레인저 꼬미)"
-            className="block h-auto w-full object-cover"
+            src={`${base}images/brand/home_banner_final_b6c9666f60c9.png`}
+            alt="국립공원공단 꼬미가 망원경으로 바다를 관찰하는 모습"
+            className="home-hero__banner"
+            width={2109}
+            height={746}
             decoding="async"
           />
-          <h1 id="home-hero-title" className="sr-only">
-            바다꼼꼬미 — 국립공원공단 우리 손안의 해양공원 업무수첩
-          </h1>
+          <h1 id="home-hero-title" className="sr-only">바다꼼꼬미</h1>
+          <p className="sr-only">우리 손안의 해양공원 업무수첩</p>
         </section>
 
-        {/* 4대 주요 기능 카드 컨테이너: 히어로 배너와 직결되는 2x2 그리드 (미니멀 포스터 카드) */}
+        {/* 배너 전체를 가리지 않고 16px 아래에 기존 2x2 메뉴 배치 */}
         <nav
           aria-label="주요 기능"
-          className="relative z-10 -mt-3 overflow-hidden rounded-[2rem] border-4 border-white bg-white/96 p-2.5 shadow-2xl backdrop-blur-md min-[380px]:p-3 sm:p-4"
+          className="px-2.5 pt-4 pb-2.5 min-[380px]:px-3 min-[380px]:pb-3 sm:px-4 sm:pb-4"
         >
-          <div className="grid grid-cols-2 gap-2.5 min-[380px]:gap-3 sm:gap-3.5">
-            {/* 카드 1 (활성): 꼬미의 바다수첩 */}
-            <article
-              aria-label="꼬미의 바다수첩"
-              className="[container-type:inline-size] flex h-full flex-col rounded-3xl border-2 border-[#38bdf8] bg-gradient-to-b from-[#e0f4fe] via-[#ccecfc] to-[#98daf9] shadow-md transition hover:border-[#0066b3] hover:shadow-lg"
-            >
-              <button
-                ref={notebookBtnRef}
-                type="button"
-                onClick={() => handleLaunchNotebook('hazard')}
-                className="group flex min-h-36 w-full flex-1 flex-col items-center justify-center rounded-3xl px-2 py-4 text-center transition active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0066b3] sm:min-h-44 sm:py-5"
-              >
-                <div className="mb-2.5 flex h-20 w-full items-center justify-center sm:h-24">
-                  <img
-                    src={`${base}images/brand/icon_notebook_map_alpha.png`}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-full w-auto object-contain transition-transform group-hover:scale-105"
-                  />
-                </div>
-
-                <div className="flex w-full flex-col items-center">
-                  <span className="text-[16px] leading-tight font-black tracking-tight whitespace-nowrap text-[#072a40] [text-wrap:balance] min-[380px]:text-[18px] sm:text-xl">
-                    꼬미의 바다수첩
-                  </span>
-                  <span className="mt-1 flex min-h-[1.25rem] items-center justify-center text-[10.5px] leading-tight font-extrabold tracking-tight whitespace-nowrap text-[#0c3c56] min-[380px]:text-[11.5px] sm:text-xs">
-                    해양정보 · 현장기록
-                  </span>
-                </div>
-              </button>
-            </article>
-
-            {/* 카드 2 (활성): 바닷길 콕콕 */}
-            <article
-              aria-label="바닷길 콕콕"
-              className="[container-type:inline-size] flex h-full flex-col rounded-3xl border-2 border-[#2dd4bf] bg-gradient-to-b from-[#e0fbf6] via-[#cbf6ee] to-[#8ce7d5] shadow-md transition hover:border-[#00854a] hover:shadow-lg"
-            >
-              <button
-                ref={navigationBtnRef}
-                type="button"
-                onClick={() => handleLaunchNavigation('route')}
-                className="group flex min-h-36 w-full flex-1 flex-col items-center justify-center rounded-3xl px-2 py-4 text-center transition active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#00854a] sm:min-h-44 sm:py-5"
-              >
-                <div className="mb-2.5 flex h-20 w-full items-center justify-center sm:h-24">
-                  <img
-                    src={`${base}images/brand/icon_navigation_clock_alpha.png`}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-full w-auto object-contain transition-transform group-hover:scale-105"
-                  />
-                </div>
-
-                <div className="flex w-full flex-col items-center">
-                  <span className="text-[16px] leading-tight font-black tracking-tight whitespace-nowrap text-[#072a40] [text-wrap:balance] min-[380px]:text-[18px] sm:text-xl">
-                    바닷길 콕콕
-                  </span>
-                  <span className="mt-1 flex min-h-[1.25rem] items-center justify-center text-[10.5px] leading-tight font-extrabold tracking-tight whitespace-nowrap text-[#0f403c] min-[380px]:text-[11.5px] sm:text-xs">
-                    시간계산 · 날씨콕콕
-                  </span>
-                </div>
-              </button>
-            </article>
-
-            {/* 카드 3: 꼬미의 달력 */}
-            <button
-              type="button"
-              onClick={onSelectCalendar}
-              className="[container-type:inline-size] flex min-h-36 h-full flex-col items-center justify-center rounded-3xl border-2 border-[#93c5fd] bg-gradient-to-b from-[#e8f2fe] via-[#dbeafe] to-[#b9d6fc] px-2 py-4 text-center shadow-sm transition hover:border-[#0066b3] hover:shadow-lg active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0066b3] sm:min-h-44 sm:py-5"
-            >
-              <div className="mb-2.5 flex h-20 w-full items-center justify-center sm:h-24">
-                <img
-                  src={`${base}images/brand/icon_calendar_boat_alpha.png`}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-full w-auto object-contain"
-                />
-              </div>
-
-              <div className="flex w-full flex-col items-center">
-                <span className="text-[16px] leading-tight font-black tracking-tight whitespace-nowrap text-[#072a40] [text-wrap:balance] min-[380px]:text-[18px] sm:text-xl">
-                  꼬미의 달력
-                </span>
-                <span className="mt-1 flex min-h-[1.25rem] items-center justify-center text-[10.5px] leading-tight font-extrabold tracking-tight whitespace-nowrap text-[#173354] min-[380px]:text-[11.5px] sm:text-xs">
-                  운항일정 · 직원메모
-                </span>
-              </div>
-            </button>
-
-            {/* 카드 4 (활성): 설정 (3.4 기상 판정 기준 설정 · 이용 안내 · 데이터·기술 출처 확인) */}
-            <article
-              aria-label="설정"
-              className="[container-type:inline-size] flex h-full flex-col rounded-3xl border-2 border-[#2dd4bf] bg-gradient-to-b from-[#e6fcf8] via-[#d2f7ef] to-[#98ebdc] shadow-md transition hover:border-[#0d9488] hover:shadow-lg"
-            >
-              <button
-                type="button"
-                onClick={() => onOpenSettings?.('thresholds')}
-                className="group flex min-h-36 w-full flex-1 flex-col items-center justify-center rounded-3xl px-2 py-4 text-center transition active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0d9488] sm:min-h-44 sm:py-5"
-              >
-                <div className="mb-2.5 flex h-20 w-full items-center justify-center sm:h-24">
-                  <ShipWheel
-                    className="h-14 w-14 text-[#0f766e] transition-transform group-hover:scale-105 min-[380px]:h-16 min-[380px]:w-16 sm:h-[4.5rem] sm:w-[4.5rem]"
-                    strokeWidth={2}
-                    aria-hidden="true"
-                  />
-                </div>
-
-                <div className="flex w-full flex-col items-center">
-                  <span className="text-[16px] leading-tight font-black tracking-tight whitespace-nowrap text-[#072a40] [text-wrap:balance] min-[380px]:text-[18px] sm:text-xl">
-                    꼬미의 조타실
-                  </span>
-                  <span className="mt-1 flex min-h-[1.25rem] items-center justify-center text-[10.5px] leading-tight font-extrabold tracking-tight whitespace-nowrap text-[#0f403c] min-[380px]:text-[11.5px] sm:text-xs">
-                    환경설정 · 이용안내
-                  </span>
-                </div>
-              </button>
-            </article>
+          <div className="home-menu-grid">
+            <HomeMenuCard
+              title="꼬미의 바다수첩" description="해양정보 · 현장기록" theme="notebook"
+              buttonRef={notebookBtnRef} onClick={() => handleLaunchNotebook('hazard')}
+              icon={<img src={base + 'images/brand/icon_notebook_map_final.png'} alt="" />}
+            />
+            <HomeMenuCard
+              title="바닷길 콕콕" description="시간계산 · 날씨콕콕" theme="navigation"
+              buttonRef={navigationBtnRef} onClick={() => handleLaunchNavigation('route')}
+              icon={<img src={base + 'images/brand/icon_navigation_clock_final.png'} alt="" />}
+            />
+            <HomeMenuCard
+              title="꼬미의 달력" description="운항일정 · 직원메모" theme="calendar"
+              onClick={() => onSelectCalendar?.()}
+              icon={<img src={base + 'images/brand/icon_calendar_boat_final.png'} alt="" />}
+            />
+            <HomeMenuCard
+              title="꼬미의 조타실" description="환경설정 · 이용안내" theme="settings"
+              onClick={() => onOpenSettings?.('thresholds')}
+              icon={<img src={base + 'images/brand/icon_settings_helm_final.png'} alt="" />}
+            />
           </div>
         </nav>
+        </div>
 
         <HomeNotices />
 

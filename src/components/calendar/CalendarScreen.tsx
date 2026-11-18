@@ -175,25 +175,32 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
         <LegacyCalendarBackup />
         {view === 'month' && (
           <>
-            <div className="mb-3 grid grid-cols-2 gap-1 rounded-2xl border border-sky-200 bg-sky-50 p-1" role="tablist" aria-label="선박 선택">
-              {(['101', '103'] as const).map((item) => (
-                <button key={item} type="button" role="tab" aria-selected={vessel === item} onClick={() => selectVessel(item)} className={`min-h-11 rounded-xl text-sm font-black ${vessel === item ? 'bg-[#0066b3] text-white shadow-sm' : 'bg-white text-[#003360]'}`}>
-                  {item}호
-                </button>
-              ))}
-            </div>
-
-            <div className="mb-2 flex justify-end gap-1" role="group" aria-label="지역 선택">
-              {(['tongyeong', 'geoje'] as const).map((item) => <button key={item} type="button" onClick={() => selectRegion(item)} aria-pressed={region === item} className={`min-h-9 rounded-lg border px-3 text-xs font-bold ${region === item ? 'border-[#0066b3] bg-[#0066b3] text-white' : 'border-sky-200 bg-white text-[#003360]'}`}>{item === 'tongyeong' ? '통영' : '거제'}</button>)}
+            <div className="mb-3 flex items-center gap-2 rounded-2xl border border-sky-200 bg-sky-50 p-1">
+              <div className="grid min-w-0 flex-1 grid-cols-2 gap-1" role="group" aria-label="선박 선택">
+                {(['101', '103'] as const).map((item) => (
+                  <button key={item} type="button" aria-pressed={vessel === item} onClick={() => selectVessel(item)} className={`min-h-11 min-w-0 rounded-xl px-2 text-sm font-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066b3] ${vessel === item ? 'bg-[#0066b3] text-white shadow-sm' : 'bg-white text-[#003360]'}`}>
+                    {item}호
+                  </button>
+                ))}
+              </div>
+              <select
+                aria-label="지역 선택"
+                value={region}
+                onChange={(event) => selectRegion(event.target.value === 'geoje' ? 'geoje' : 'tongyeong')}
+                className="h-11 w-24 shrink-0 rounded-xl border border-sky-200 bg-white px-2 text-base font-bold text-[#003360] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066b3]"
+              >
+                <option value="tongyeong">통영</option>
+                <option value="geoje">거제</option>
+              </select>
             </div>
 
             <section className="rounded-2xl border border-sky-200 bg-white p-2.5 shadow-sm" aria-label="월간 달력">
-              <div className="mb-3 flex items-center justify-between gap-1">
-                <button type="button" onClick={() => setDisplayMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() - 1, 1))} aria-label="이전 달" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200"><ChevronLeft className="h-5 w-5" /></button>
-                <h2 className="text-lg font-black tabular-nums">{displayMonth.getFullYear()}년 {displayMonth.getMonth() + 1}월</h2>
-                <div className="flex items-center gap-1">
-                  <button type="button" onClick={goToday} className="min-h-9 rounded-full border border-cyan-300 px-2.5 text-xs font-bold text-[#007e9e]">오늘</button>
-                  <button type="button" onClick={() => setDisplayMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() + 1, 1))} aria-label="다음 달" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200"><ChevronRight className="h-5 w-5" /></button>
+              <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1">
+                <button type="button" onClick={() => setDisplayMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() - 1, 1))} aria-label="이전 달" className="flex h-11 w-11 items-center justify-center rounded-full border border-sky-200"><ChevronLeft className="h-5 w-5" /></button>
+                <h2 className="whitespace-nowrap text-sm font-black tabular-nums min-[360px]:text-base sm:text-lg">{displayMonth.getFullYear()}년 {displayMonth.getMonth() + 1}월</h2>
+                <div className="flex justify-end gap-1">
+                  <button type="button" onClick={goToday} className="h-11 w-11 shrink-0 rounded-full border border-cyan-300 text-xs font-bold text-[#007e9e]">오늘</button>
+                  <button type="button" onClick={() => setDisplayMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() + 1, 1))} aria-label="다음 달" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-sky-200"><ChevronRight className="h-5 w-5" /></button>
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-0.5 rounded-lg bg-sky-50 py-1 text-center text-xs font-black">
@@ -214,7 +221,7 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
                       <span className="mt-1 grid w-full grid-cols-2 grid-rows-2 place-items-center gap-y-1">
                         <span className="h-4 whitespace-nowrap text-[10px] font-bold leading-4">{tide}</span>
                         <span className="flex h-4 items-center justify-center" title={weatherLabel ?? undefined}>{condition && <WeatherIcon className="h-3.5 w-3.5 text-sky-600" aria-hidden="true" />}</span>
-                        <span className="flex h-4 items-center justify-center">{entry.status && <Ship className={`h-3.5 w-3.5 ${entry.status.kind === 'planned' ? 'text-[#0066b3]' : 'text-red-600'}`} fill="currentColor" aria-hidden="true" />}</span>
+                        <span className="flex h-4 items-center justify-center">{entry.status && <Ship className={`h-3.5 w-3.5 ${entry.status.kind === 'planned' ? 'text-[#0066b3]' : 'text-red-600'}`} fill="none" aria-hidden="true" />}</span>
                         <span className="relative flex h-4 items-center justify-center">{entry.memos.length > 0 && <><FileText className="h-3.5 w-3.5 text-[#003360]" aria-hidden="true" />{entry.memos.length > 1 && <span className="absolute -top-1 left-[calc(50%+3px)] rounded-full bg-sky-100 px-0.5 text-[8px] font-black leading-3 text-[#0066b3]">{entry.memos.length}</span>}</>}</span>
                       </span>
                     </button>
@@ -223,8 +230,8 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
               </div>
             </section>
             <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold">
-              <span className="flex items-center gap-1 text-[#0066b3]"><Ship className="h-3.5 w-3.5" fill="currentColor" />운항예정</span>
-              <span className="flex items-center gap-1 text-red-600"><Ship className="h-3.5 w-3.5" fill="currentColor" />운항불가</span>
+              <span className="flex items-center gap-1 text-[#0066b3]"><Ship className="h-3.5 w-3.5" fill="none" />운항예정</span>
+              <span className="flex items-center gap-1 text-red-600"><Ship className="h-3.5 w-3.5" fill="none" />운항불가</span>
               <span className="flex items-center gap-1"><FileText className="h-3.5 w-3.5" />메모</span>
             </div>
           </>

@@ -151,6 +151,7 @@ bada-kkomkkomi/
 │   ├── services/
 │   │   ├── firebaseClient.ts          # VITE_FIREBASE_* 기반 SDK 초기화 (설정 누락 시 기존 기능 유지)
 │   │   ├── userProfileService.ts      # UID별 실명 프로필 서버 조회·저장 및 한글 두 글자 검증
+│   │   ├── pwaInstallation.ts         # 조타실의 기기별 홈 화면 추가 안내 (실제 설치 가능 여부는 브라우저 이벤트 기준)
 │   │   ├── calendarRepository.ts      # 기존 로컬 일정 호환 및 선박 선택 저장
 │   │   ├── calendarFirestoreService.ts # 공유 일정 실시간 조회·트랜잭션 저장
 │   │   ├── calendarWeatherCache.ts    # 지역·날짜별 날씨 캐시·요청 병합·실패 시 보존

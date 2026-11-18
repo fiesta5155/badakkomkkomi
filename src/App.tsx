@@ -708,22 +708,13 @@ export function App() {
 
   // PWA 앱 설치 핸들러
   const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-      if (choiceResult.outcome === 'accepted') setDeferredPrompt(null);
-    } else {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS) {
-        alert(
-          '아이폰/아이패드 설치 방법:\n하단 공유 버튼(네모+화살표)을 누르고 "홈 화면에 추가"를 선택하세요.',
-        );
-      } else {
-        alert(
-          '브라우저 우측 상단 점 3개 메뉴를 누르고 "앱 설치" 또는 "홈 화면에 추가"를 선택하세요.',
-        );
-      }
-    }
+    if (isStandalone) return;
+    const prompt = deferredPrompt;
+    if (!prompt) throw new Error('Installation prompt is unavailable');
+    // Native prompts are single-use, including when the user dismisses one.
+    setDeferredPrompt(null);
+    await prompt.prompt();
+    await prompt.userChoice;
   };
 
   // [3.2.C] 등록된 136개 항구·선착장 즉시 선택 처리 (지도 마커 선택 및 [항구선택] 모달 공통 창구)
@@ -1265,8 +1256,6 @@ export function App() {
           totalDockingCount={totalDockingCount || 55}
           totalPortsCount={portsList.length || 136}
           isOnline={isOnline}
-          isStandalone={isStandalone}
-          onInstallClick={handleInstallClick}
         />
       )}
 
@@ -2275,6 +2264,9 @@ export function App() {
             isCustomThresholds={marineWeather.isCustomThresholds}
             initialSection={settingsInitialSection}
             focusSourceId={settingsFocusSourceId}
+            isStandalone={isStandalone}
+            canInstall={Boolean(deferredPrompt)}
+            onInstall={handleInstallClick}
             onSave={(newThresholds) => {
               const ok = marineWeather.updateThresholds(newThresholds);
               if (ok) {

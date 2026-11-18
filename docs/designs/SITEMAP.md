@@ -62,6 +62,8 @@
 
 ## 2. Core Domain Services (`src/services`)
 
+- [`src/services/pwaInstallation.ts`](../../src/services/pwaInstallation.ts): `installationInstructions()` — 조타실에서 iPhone·iPad·Android·PC의 홈 화면 추가 방법 안내. 설치 가능 여부는 기존 `beforeinstallprompt` 이벤트를 사용하며 인증·사용자 저장소를 변경하지 않음
+
 - [`src/services/calendarRepository.ts`](../../src/services/calendarRepository.ts): `createCalendarRepository()`, `monthCells()`, `setVoyageStatus()`, `setCalendarMemo()` — 기존 선박별 로컬 일정 호환. 공유 화면은 원본 저장 함수를 호출하지 않고 선박 선택 기능만 재사용
 - [`src/services/calendarFirestoreService.ts`](../../src/services/calendarFirestoreService.ts): `subscribeCalendar()`, `saveSharedEntry()`, `deleteSharedEntry()` — 선박·월별 실시간 조회, 날짜당 고정 상태 1건, 트랜잭션 충돌 검증
 - [`src/services/calendarWeatherCache.ts`](../../src/services/calendarWeatherCache.ts): `createCalendarWeatherStore()`, `weatherRefreshDue()` — 지역·날짜별 localStorage 날씨 캐시, 한국 날짜 첫 조회·3시간 갱신, 중복 요청 병합, 실패 시 보존. 해상 안전등급 캐시와 별도

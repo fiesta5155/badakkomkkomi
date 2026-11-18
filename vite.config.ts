@@ -92,22 +92,28 @@ export default defineConfig({
         categories: ['navigation', 'utilities', 'productivity'],
         icons: [
           {
-            src: 'icons/favicon-32x32.png',
-            sizes: '32x32',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: 'icons/pwa-192x192.png',
+            src: 'icons/kkomi-v3-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: 'icons/pwa-512x512.png',
+            src: 'icons/kkomi-v3-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/kkomi-v3-maskable-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icons/kkomi-v3-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },
