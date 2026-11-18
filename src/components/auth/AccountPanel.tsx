@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useFirebaseAuth } from '../../hooks/useFirebaseAuth';
 
-function UidDisclosure({ uid, allowCopy }: { uid: string; allowCopy: boolean }) {
+function UidDisclosure({ uid, allowCopy, label }: { uid: string; allowCopy: boolean; label: string }) {
   const input = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState('');
   const copy = async () => {
@@ -15,7 +15,7 @@ function UidDisclosure({ uid, allowCopy }: { uid: string; allowCopy: boolean }) 
     }
   };
   return <details className="mt-1 text-xs">
-    <summary className={`cursor-pointer ${allowCopy ? 'min-h-11 py-3' : 'py-1'}`}>내 Firebase UID 확인</summary>
+    <summary className={`cursor-pointer ${allowCopy ? 'min-h-11 py-3' : 'py-1'}`}>{label}</summary>
     <p className="mt-1">현재 로그인 계정의 UID입니다. 관리자 지정은 이 값으로 확인합니다.</p>
     <input ref={input} aria-label="내 Firebase Auth UID" readOnly value={uid} onFocus={(event) => event.target.select()}
       className={`mt-1 min-h-9 w-full rounded-lg border border-sky-200 bg-sky-50 px-2 font-mono select-text ${allowCopy ? 'text-base' : 'text-xs'}`} />
@@ -26,7 +26,7 @@ function UidDisclosure({ uid, allowCopy }: { uid: string; allowCopy: boolean }) 
   </details>;
 }
 
-export function AccountPanel({ showUidCopy = false }: { showUidCopy?: boolean }) {
+export function AccountPanel({ showUidCopy = false, uidLabel = '내 Firebase UID 확인' }: { showUidCopy?: boolean; uidLabel?: string }) {
   const auth = useFirebaseAuth();
   return (
     <section aria-label="사용자 계정" className="mb-2 rounded-xl border border-white/90 bg-white/95 px-3 py-2 text-[#003360] shadow-sm">
@@ -43,7 +43,7 @@ export function AccountPanel({ showUidCopy = false }: { showUidCopy?: boolean })
         </div>
       </div>
       {auth.error && <p role="alert" className="mt-1 text-xs leading-relaxed text-rose-700">{auth.error}</p>}
-      {auth.user && <UidDisclosure key={auth.user.uid} uid={auth.user.uid} allowCopy={showUidCopy} />}
+      {auth.user && <UidDisclosure key={auth.user.uid} uid={auth.user.uid} allowCopy={showUidCopy} label={uidLabel} />}
     </section>
   );
 }

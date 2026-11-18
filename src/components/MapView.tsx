@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Compass,
   Eye,
@@ -25,6 +25,8 @@ import type {
 } from '../types/kakao';
 import { loadKakaoMapSdk } from '../services/kakaoMapLoader';
 import { KakaoMapCanvas } from './map/KakaoMapCanvas';
+import { MapControls } from './map/MapControls';
+import { guardMapInteraction, normalizeVisibleMapPreferences, TONGYEONG_GEOJE_OVERVIEW } from './map/mapUiConfig';
 
 const LegacyLeafletCanvas = lazy(() =>
   import('./map/LegacyLeafletCanvas').then((m) => ({
@@ -55,16 +57,7 @@ function loadSavedMapTypePreferences(): KakaoMapTypePreferences {
   try {
     const raw = window.localStorage.getItem(MAP_TYPE_PREFS_STORAGE_KEY);
     if (!raw) return { baseMapType: 'roadmap', overlayMapTypes: [] };
-    const parsed = JSON.parse(raw);
-    const baseMapType: KakaoBaseMapType = VALID_BASE_MAP_TYPES.includes(parsed?.baseMapType)
-      ? parsed.baseMapType
-      : 'roadmap';
-    const overlayMapTypes: KakaoOverlayMapType[] = Array.isArray(parsed?.overlayMapTypes)
-      ? parsed.overlayMapTypes.filter((item: unknown): item is KakaoOverlayMapType =>
-          VALID_OVERLAY_MAP_TYPES.includes(item as KakaoOverlayMapType),
-        )
-      : [];
-    return { baseMapType, overlayMapTypes };
+    return normalizeVisibleMapPreferences(JSON.parse(raw));
   } catch {
     return { baseMapType: 'roadmap', overlayMapTypes: [] };
   }
@@ -78,6 +71,8 @@ interface UserGpsLocation {
 }
 
 export interface MapViewProps {
+  isMapFocused: boolean;
+  onMapFocusChange: (focused: boolean) => void;
   activeMainTab: 'notebook' | 'navigation';
   navSubTab: 'route' | 'weather';
 
@@ -131,6 +126,8 @@ export interface MapViewProps {
 }
 
 export function MapView({
+  isMapFocused,
+  onMapFocusChange,
   activeMainTab,
   navSubTab,
   features,
@@ -174,6 +171,25 @@ export function MapView({
   externalRoadviewTarget,
   onClearExternalRoadviewTarget,
 }: MapViewProps) {
+  const focusedRef = useRef(isMapFocused);
+  useLayoutEffect(() => { focusedRef.current = isMapFocused; }, [isMapFocused]);
+  const mapActions = useMemo(() => {
+    const guard = <Args extends unknown[]>(action: (...args: Args) => void) =>
+      guardMapInteraction(() => focusedRef.current, action);
+    return {
+      onSelectFeature: guard(onSelectFeature),
+      onSelectPorpoise: guard(onSelectPorpoise),
+      onMapClickForPorpoise: guard(onMapClickForPorpoise),
+      onMapClickForReport: guard(onMapClickForReport),
+      onSelectLeg: onSelectLeg ? guard(onSelectLeg) : undefined,
+      onSelectRoutePort: onSelectRoutePort ? guard(onSelectRoutePort) : undefined,
+      onUpdateWaypointPos: guard(onUpdateWaypointPos),
+      onRemoveWaypoint: onRemoveWaypoint ? guard(onRemoveWaypoint) : undefined,
+      onMapClickForRoute: guard(onMapClickForRoute),
+      onUpdateWeatherCoords: guard(onUpdateWeatherCoords),
+    };
+  }, [onSelectFeature, onSelectPorpoise, onMapClickForPorpoise, onMapClickForReport, onSelectLeg, onSelectRoutePort, onUpdateWaypointPos, onRemoveWaypoint, onMapClickForRoute, onUpdateWeatherCoords]);
+
   // 1. GIS 엔진 상태 ('kakao' 기본, Kakao SDK 차단/오프라인 시 'leaflet' 자동 폴백) 및 다중 맵/3D 설정
   const [mapPrefs, setMapPrefs] = useState<KakaoMapTypePreferences>(() =>
     loadSavedMapTypePreferences(),
@@ -188,18 +204,20 @@ export function MapView({
     nonce: number;
   } | null>(null);
 
-  const baseMapType = mapPrefs.baseMapType;
-  const overlayMapTypes = mapPrefs.overlayMapTypes;
+  const visibleMapPrefs = useMemo(() => normalizeVisibleMapPreferences(mapPrefs), [mapPrefs]);
+  const baseMapType = visibleMapPrefs.baseMapType;
+  const overlayMapTypes = visibleMapPrefs.overlayMapTypes;
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(MAP_TYPE_PREFS_STORAGE_KEY, JSON.stringify(mapPrefs));
+      window.localStorage.setItem(MAP_TYPE_PREFS_STORAGE_KEY, JSON.stringify(normalizeVisibleMapPreferences(mapPrefs)));
     } catch {
       // ignore storage quota errors
     }
   }, [mapPrefs]);
 
   const handleSetBaseMapType = useCallback((nextBase: KakaoBaseMapType) => {
+    if (!VALID_BASE_MAP_TYPES.includes(nextBase)) return;
     setMapPrefs((prev) => ({
       ...prev,
       baseMapType: nextBase,
@@ -207,6 +225,7 @@ export function MapView({
   }, []);
 
   const handleToggleOverlayMapType = useCallback((key: KakaoOverlayMapType) => {
+    if (!VALID_OVERLAY_MAP_TYPES.includes(key)) return;
     setMapPrefs((prev) => {
       const exists = prev.overlayMapTypes.includes(key);
       return {
@@ -260,7 +279,8 @@ export function MapView({
     });
   }, []);
 
-  const effectiveFlyTarget = internalFlyOverride ?? flyTarget;
+  const effectiveFlyTarget = internalFlyOverride && (!flyTarget || internalFlyOverride.nonce >= flyTarget.nonce)
+    ? internalFlyOverride : flyTarget;
   const [viewport, setViewport] = useState<{ lat: number; lng: number; zoom: number }>({
     lat: 34.8195,
     lng: 128.552,
@@ -302,11 +322,40 @@ export function MapView({
     return () => { active = false; };
   }, []);
 
+  const focusButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mapRegionRef = useRef<HTMLElement | null>(null);
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showFocusExit, setShowFocusExit] = useState(false);
+  const revealFocusExit = useCallback(() => {
+    if (!isMapFocused) return;
+    setShowFocusExit(true);
+    if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+    exitTimerRef.current = setTimeout(() => setShowFocusExit(false), 3000);
+  }, [isMapFocused]);
+  const exitFocus = useCallback(() => {
+    onMapFocusChange(false);
+    requestAnimationFrame(() => focusButtonRef.current?.focus({ preventScroll: true }));
+  }, [onMapFocusChange]);
+  useEffect(() => {
+    if (!isMapFocused) return;
+    mapRegionRef.current?.focus({ preventScroll: true });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); exitFocus(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+    };
+  }, [isMapFocused, exitFocus]);
+
   const activeEngine: 'kakao' | 'leaflet' =
     kakaoNamespace ? 'kakao' : 'leaflet';
 
   return (
     <main
+      ref={mapRegionRef}
+      onPointerUpCapture={revealFocusExit}
       className="bada-map-viewport relative h-dvh w-full"
       tabIndex={0}
       role="region"
@@ -322,41 +371,43 @@ export function MapView({
           navSubTab={navSubTab}
           features={features}
           selectedFeature={selectedFeature}
-          onSelectFeature={onSelectFeature}
+          onSelectFeature={mapActions.onSelectFeature}
           layers={layers}
           geoJsonLayersData={geoJsonLayersData}
           showPorpoiseLayer={showPorpoiseLayer}
           isPorpoiseAddMode={isPorpoiseAddMode}
           isReportPickMode={isReportPickMode}
           porpoiseRecords={porpoiseRecords}
-          onSelectPorpoise={onSelectPorpoise}
-          onMapClickForPorpoise={onMapClickForPorpoise}
-          onMapClickForReport={onMapClickForReport}
+          onSelectPorpoise={mapActions.onSelectPorpoise}
+          onMapClickForPorpoise={mapActions.onMapClickForPorpoise}
+          onMapClickForReport={mapActions.onMapClickForReport}
           onMapClickForRoadview={handleMapClickForRoadview}
           routeWaypoints={routeWaypoints}
           routeLegs={routeLegs}
           portsList={portsList}
           showPortMarkersOnMap={showPortMarkersOnMap}
           selectedLegIndex={selectedLegIndex}
-          onSelectLeg={onSelectLeg}
+          onSelectLeg={mapActions.onSelectLeg}
           showDirectionArrows={showDirectionArrows}
           showLegDurationOnMap={showLegDurationOnMap}
           showLegDistanceOnMap={showLegDistanceOnMap}
           routeDistanceUnit={routeDistanceUnit}
           fitRouteBoundsTrigger={fitRouteBoundsTrigger}
           candidatePortId={candidatePortId}
-          onSelectRoutePort={onSelectRoutePort}
-          onUpdateWaypointPos={onUpdateWaypointPos}
-          onRemoveWaypoint={onRemoveWaypoint}
-          onMapClickForRoute={onMapClickForRoute}
+          onSelectRoutePort={mapActions.onSelectRoutePort}
+          onUpdateWaypointPos={mapActions.onUpdateWaypointPos}
+          onRemoveWaypoint={mapActions.onRemoveWaypoint}
+          onMapClickForRoute={mapActions.onMapClickForRoute}
           weatherCoords={weatherCoords}
           weatherGrade={weatherGrade}
-          onUpdateWeatherCoords={onUpdateWeatherCoords}
+          onUpdateWeatherCoords={mapActions.onUpdateWeatherCoords}
           userLocation={userLocation}
           viewport={viewport}
           onViewportChange={handleViewportChange}
+
           flyTarget={effectiveFlyTarget}
           zoomStepTrigger={zoomStepTrigger}
+          isMapFocused={isMapFocused}
         />
       ) : (
         <Suspense
@@ -373,44 +424,47 @@ export function MapView({
             navSubTab={navSubTab}
             features={features}
             selectedFeature={selectedFeature}
-            onSelectFeature={onSelectFeature}
+            onSelectFeature={mapActions.onSelectFeature}
             layers={layers}
             geoJsonLayersData={geoJsonLayersData}
             showPorpoiseLayer={showPorpoiseLayer}
             isPorpoiseAddMode={isPorpoiseAddMode}
             isReportPickMode={isReportPickMode}
             porpoiseRecords={porpoiseRecords}
-            onSelectPorpoise={onSelectPorpoise}
-            onMapClickForPorpoise={onMapClickForPorpoise}
-            onMapClickForReport={onMapClickForReport}
+            onSelectPorpoise={mapActions.onSelectPorpoise}
+            onMapClickForPorpoise={mapActions.onMapClickForPorpoise}
+            onMapClickForReport={mapActions.onMapClickForReport}
             routeWaypoints={routeWaypoints}
             routeLegs={routeLegs}
             portsList={portsList}
             showPortMarkersOnMap={showPortMarkersOnMap}
             selectedLegIndex={selectedLegIndex}
-            onSelectLeg={onSelectLeg}
+            onSelectLeg={mapActions.onSelectLeg}
             showDirectionArrows={showDirectionArrows}
             showLegDurationOnMap={showLegDurationOnMap}
             showLegDistanceOnMap={showLegDistanceOnMap}
             routeDistanceUnit={routeDistanceUnit}
             fitRouteBoundsTrigger={fitRouteBoundsTrigger}
             candidatePortId={candidatePortId}
-            onSelectRoutePort={onSelectRoutePort}
-            onUpdateWaypointPos={onUpdateWaypointPos}
-            onRemoveWaypoint={onRemoveWaypoint}
-            onMapClickForRoute={onMapClickForRoute}
+            onSelectRoutePort={mapActions.onSelectRoutePort}
+            onUpdateWaypointPos={mapActions.onUpdateWaypointPos}
+            onRemoveWaypoint={mapActions.onRemoveWaypoint}
+            onMapClickForRoute={mapActions.onMapClickForRoute}
             weatherCoords={weatherCoords}
             weatherGrade={weatherGrade}
-            onUpdateWeatherCoords={onUpdateWeatherCoords}
+            onUpdateWeatherCoords={mapActions.onUpdateWeatherCoords}
             userLocation={userLocation}
             viewport={viewport}
             onViewportChange={handleViewportChange}
+
             flyTarget={effectiveFlyTarget}
             zoomStepTrigger={zoomStepTrigger}
+            isMapFocused={isMapFocused}
           />
         </Suspense>
       )}
 
+      <div hidden={isMapFocused}>
       {/* 1-B. 공간정보 GeoJSON 레이어 로드 오류 발생 시 재시도 배너 */}
       {layerLoadErrorIds.length > 0 && (
         <div
@@ -428,6 +482,12 @@ export function MapView({
         </div>
       )}
 
+      <MapControls onGps={onRequestGps} onBackground={() => setIsMapTypePopoverOpen((open) => !open)}
+        onOverview={() => setInternalFlyOverride({ ...TONGYEONG_GEOJE_OVERVIEW, nonce: Date.now() })}
+        onFocus={() => { setShowFocusExit(false); setIsMapTypePopoverOpen(false); onMapFocusChange(true); }}
+        backgroundOpen={isMapTypePopoverOpen} focusButtonRef={focusButtonRef} />
+      {/* Retained legacy controls for future recovery; not part of the public map UI. */}
+      <div hidden>{/* legacy */}
       {/* 우측 상단(헤더 바로 아래) 도킹형 한 손 컨트롤러 */}
       <div
         className="fixed top-[6.25rem] right-2.5 z-[850] flex flex-col gap-1.5 sm:top-[7.25rem] sm:right-3 sm:gap-2"
@@ -447,6 +507,8 @@ export function MapView({
           <LocateFixed className="h-4 w-4 stroke-[2.4] sm:h-5 sm:w-5" />
         </button>
 
+        {/* 바닷길 콕콕에서는 버튼만 숨김. 내부 핸들러와 바다수첩 버튼은 유지. */}
+        {activeMainTab !== 'navigation' && (
         <button
           type="button"
           onClick={onSimulateFieldGps}
@@ -457,6 +519,7 @@ export function MapView({
           <Compass className="h-3.5 w-3.5 stroke-[2.3] text-amber-700 sm:h-4 sm:w-4" />
           <span className="text-[8px] leading-none font-black sm:text-[9px]">현장GPS</span>
         </button>
+        )}
 
         <button
           type="button"
@@ -485,6 +548,8 @@ export function MapView({
           )}
         </button>
 
+        {/* 바닷길 콕콕에서는 버튼만 숨김. 내부 핸들러와 바다수첩 버튼은 유지. */}
+        {activeMainTab !== 'navigation' && (
         <button
           type="button"
           onClick={onResetBounds}
@@ -494,7 +559,9 @@ export function MapView({
         >
           <Maximize className="h-4 w-4 stroke-[2.3] sm:h-5 sm:w-5" />
         </button>
+        )}
 
+        {activeMainTab !== 'navigation' && (
         <div className="flex flex-col overflow-hidden rounded-xl border-2 border-[#00a79d]/60 bg-white/96 shadow-xl sm:rounded-2xl">
           <button
             type="button"
@@ -513,8 +580,26 @@ export function MapView({
             <Minus className="h-4 w-4 stroke-[2.6] sm:h-5 sm:w-5" />
           </button>
         </div>
+        )}
       </div>
 
+      </div>
+      {isMapTypePopoverOpen && <section id="map-background-options" role="dialog" aria-label="배경지도"
+        className="fixed top-[6.25rem] right-16 z-[920] w-[min(18rem,calc(100vw-5rem))] rounded-2xl border-2 border-[#00a79d]/70 bg-white p-3 text-[#003360] shadow-xl sm:top-[7.25rem]">
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-black">배경지도</h2>
+          <button type="button" aria-label="배경지도 닫기" title="배경지도 닫기" onClick={() => setIsMapTypePopoverOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-xl active:bg-sky-50"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {([{ id: 'roadmap', label: '일반지도' }, { id: 'skyview', label: '순수위성' }, { id: 'hybrid', label: '하이브리드' }] as const).map((item) =>
+            <button key={item.id} type="button" aria-pressed={baseMapType === item.id} onClick={() => handleSetBaseMapType(item.id)}
+              className={`min-h-11 rounded-xl border px-1 text-xs font-bold active:bg-sky-100 ${baseMapType === item.id ? 'border-[#003360] bg-[#003360] text-white' : 'border-slate-200 bg-white'}`}>{item.label}</button>)}
+        </div>
+        <h3 className="mt-4 text-xs font-bold">추가 지도</h3>
+        <button type="button" role="switch" aria-checked={overlayMapTypes.includes('use_district')} onClick={() => handleToggleOverlayMapType('use_district')}
+          className="mt-1 flex min-h-11 w-full items-center justify-between rounded-xl border border-slate-200 px-3 text-xs font-bold active:bg-sky-50">지적편집도<span>{overlayMapTypes.includes('use_district') ? '켜짐' : '꺼짐'}</span></button>
+        <p className="mt-3 text-[10px] leading-relaxed text-slate-600">지도: 카카오맵 / 보조 지도: OpenStreetMap(ODbL)</p>
+      </section>}
+      <div hidden>
       {/* 3-B. 우측 독에서 펼쳐지는 지도유형 · 2.5D 지형 · 3D 로드뷰 선택 팝오버 카드 */}
       {isMapTypePopoverOpen && (
         <div
@@ -740,6 +825,7 @@ export function MapView({
         </div>
       )}
 
+      </div>
       {/* 3-C. 3D 로드뷰 구간(ROADVIEW) 오버레이 활성 시 상단 인터랙션 안내 배너 */}
       {overlayMapTypes.includes('roadview') && (
         <div
@@ -774,7 +860,7 @@ export function MapView({
       )}
 
       {/* 3-E. 360° 3D 구면 현장 로드뷰 모달 */}
-      {activeRoadviewTarget && (
+      {!isMapFocused && activeRoadviewTarget && (
         <Suspense fallback={null}>
           <Roadview3DModal
             key={`${activeRoadviewTarget.lat.toFixed(5)}:${activeRoadviewTarget.lng.toFixed(5)}:${activeRoadviewTarget.pointId ?? ''}`}
@@ -786,6 +872,11 @@ export function MapView({
         </Suspense>
       )}
 
+      </div>
+      {isMapFocused && showFocusExit && <button type="button" onClick={exitFocus}
+        onFocus={() => { if (exitTimerRef.current) clearTimeout(exitTimerRef.current); }}
+        aria-label="집중 모드 종료" title="집중 모드 종료 (Esc)"
+        className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-3 z-[1200] min-h-11 touch-manipulation rounded-xl border border-slate-200 bg-white/95 px-3 text-xs font-bold text-[#003360] shadow-lg">집중 모드 종료</button>}
     </main>
   );
 }

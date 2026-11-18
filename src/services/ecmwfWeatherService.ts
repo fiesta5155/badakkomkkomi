@@ -16,9 +16,15 @@ export const ECMWF_WEATHER_MODELS = {
 } as const;
 
 export const SAFE_DEFAULT_THRESHOLDS: WeatherThresholds = {
-  windKnot: { good: 14, moderate: 20 },
-  waveMeter: { good: 1.0, moderate: 1.8 },
+  windKnot: { good: 10, moderate: 18 },
+  waveMeter: { good: 0.4, moderate: 0.7 },
 };
+
+/** Exact legacy standard; other saved values remain user customizations. */
+export function isLegacyDefaultThresholds(value: WeatherThresholds): boolean {
+  return value.windKnot.good === 14 && value.windKnot.moderate === 20
+    && value.waveMeter.good === 1 && value.waveMeter.moderate === 1.8;
+}
 
 export interface RawAlignedHourlyWeather {
   time: string;
@@ -69,7 +75,7 @@ export function resolveEffectiveThresholds(
       windKnot: configDefaults.wind_threshold_knot,
       waveMeter: configDefaults.wave_threshold_meter,
     };
-    if (isValidWeatherThresholds(candidate)) {
+    if (isValidWeatherThresholds(candidate) && !isLegacyDefaultThresholds(candidate)) {
       return candidate;
     }
   }
@@ -227,10 +233,14 @@ export function alignEcmwfWindAndWaveSeries(params: {
 export function judgeSingleWeatherMetric(
   value: number | null,
   thresholds: { good: number; moderate: number },
+  decimalPlaces: 0 | 1 = 0,
 ): MarineWeatherGrade {
   if (value === null || !Number.isFinite(value)) return 'unknown';
-  if (value < thresholds.good) return 'good';
-  if (value <= thresholds.moderate) return 'moderate';
+  // Round only the comparison value; retain the original forecast in the result.
+  const scale = 10 ** decimalPlaces;
+  const rounded = Math.round(value * scale) / scale;
+  if (rounded <= thresholds.good) return 'good';
+  if (rounded <= thresholds.moderate) return 'moderate';
   return 'bad';
 }
 
@@ -261,7 +271,7 @@ export function evaluateHourlyWeatherSeries(
 ): HourlyMarineWeather[] {
   return rawSeries.map((item) => {
     const windGrade = judgeSingleWeatherMetric(item.windSpeedKnots, thresholds.windKnot);
-    const waveGrade = judgeSingleWeatherMetric(item.waveHeightMeters, thresholds.waveMeter);
+    const waveGrade = judgeSingleWeatherMetric(item.waveHeightMeters, thresholds.waveMeter, 1);
     const grade = evaluateCombinedWeatherGrade(windGrade, waveGrade);
     return {
       ...item,

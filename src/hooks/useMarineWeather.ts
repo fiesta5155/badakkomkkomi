@@ -15,23 +15,9 @@ import {
   type RawAlignedHourlyWeather,
 } from '../services/ecmwfWeatherService';
 
-const STORAGE_KEY_THRESHOLDS = 'bada_weather_thresholds_v1';
+import { readSavedUserThresholds, saveUserThresholds, resetSavedUserThresholds } from '../services/weatherThresholdStorage';
 
 export const DEFAULT_THRESHOLDS: WeatherThresholds = SAFE_DEFAULT_THRESHOLDS;
-
-function readSavedUserThresholds(): WeatherThresholds | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_THRESHOLDS);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (isValidWeatherThresholds(parsed)) {
-      return parsed;
-    }
-  } catch {
-    // ignore storage error
-  }
-  return null;
-}
 
 export function useMarineWeather(
   initialLat = 34.8195,
@@ -44,7 +30,7 @@ export function useMarineWeather(
   });
   const [fetchNonce, setFetchNonce] = useState<number>(0);
 
-  // 사용자가 직접 수정해 저장한 임계값 (없으면 null -> configWeatherDefaults -> SAFE_DEFAULT_THRESHOLDS 순으로 폴백)
+  // 사용자가 직접 수정해 저장한 임계값 (구형 표준값은 새 기본값으로 전환하고 나머지 지정값 유지)
   const [userThresholds, setUserThresholds] = useState<WeatherThresholds | null>(() =>
     readSavedUserThresholds(),
   );
@@ -82,7 +68,7 @@ export function useMarineWeather(
     if (!isValidWeatherThresholds(newThresholds)) return false;
     setUserThresholds(newThresholds);
     try {
-      localStorage.setItem(STORAGE_KEY_THRESHOLDS, JSON.stringify(newThresholds));
+      saveUserThresholds(localStorage, newThresholds);
     } catch {
       // ignore storage error
     }
@@ -93,7 +79,7 @@ export function useMarineWeather(
   const resetThresholds = useCallback(() => {
     setUserThresholds(null);
     try {
-      localStorage.removeItem(STORAGE_KEY_THRESHOLDS);
+      resetSavedUserThresholds(localStorage);
     } catch {
       // ignore storage error
     }

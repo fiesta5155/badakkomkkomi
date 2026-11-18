@@ -84,6 +84,7 @@ UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 
 - [`src/services/layerStorageService.ts`](../../src/services/layerStorageService.ts): `loadOperationalLayerState()`, `saveOperationalLayerState()`, `listOperationalSnapshots()`, `restoreOperationalSnapshot()`, `hasLegacyDummyFeatures()`
 - [`src/services/githubLayerSyncService.ts`](../../src/services/githubLayerSyncService.ts): `resolveViteBasePath()`, `inferDefaultGitHubRepoCoords()`, `loadGitHubSyncConfig()`, `saveGitHubSyncConfig()`, `commitLayersToGitHubRepository()`
 - [`src/services/ecmwfWeatherService.ts`](../../src/services/ecmwfWeatherService.ts): `buildEcmwfWeatherUrls()`, `alignEcmwfWindAndWaveSeries()`, `evaluateHourlyWeatherSeries()`, `evaluateCombinedWeatherGrade()`, `resolveEffectiveThresholds()`
+- [`src/services/weatherThresholdStorage.ts`](../../src/services/weatherThresholdStorage.ts): 기상 기준 저장·불러오기·초기화. 버전 없는 구형 표준값(14/20kn, 1.0/1.8m)은 새 기본값으로 전환하고 다른 사용자 지정값은 유지합니다. 새 저장값에는 `criteriaVersion: 2`를 기록합니다.
 - [`src/services/emailReportService.ts`](../../src/services/emailReportService.ts): `buildFieldReportEmailSubject()`, `buildFieldReportEmailBody()`, `buildMailtoUri()`
 - [`src/services/kakaoMapLoader.ts`](../../src/services/kakaoMapLoader.ts): `loadKakaoMapSdk()`, `leafletZoomToKakaoLevel()`, `kakaoLevelToLeafletZoom()`, `diagnoseKakaoMapFailure()`
 - [`src/services/workspaceDraftRepository.ts`](../../src/services/workspaceDraftRepository.ts): `loadWorkspaceDraft()`, `saveWorkspaceDraft()`, `sanitizeWorkspaceDraft()`, `isValidRouteWaypointsDraft()`, `classifyGpsError()`

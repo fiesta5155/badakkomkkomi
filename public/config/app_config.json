@@ -14,12 +14,12 @@
   },
   "weather_defaults": {
     "wind_threshold_knot": {
-      "good": 14,
-      "moderate": 20
+      "good": 10,
+      "moderate": 18
     },
     "wave_threshold_meter": {
-      "good": 1.0,
-      "moderate": 1.8
+      "good": 0.4,
+      "moderate": 0.7
     }
   },
   "layers": [

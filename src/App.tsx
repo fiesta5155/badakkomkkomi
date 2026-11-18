@@ -228,6 +228,9 @@ export function App() {
   const [porpoiseModalCoords, setPorpoiseModalCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPorpoise, setSelectedPorpoise] = useState<PorpoiseRecord | null>(null);
 
+  const [isMapFocused, setIsMapFocused] = useState(false);
+  useEffect(() => { if (isHomeScreen || isCalendarScreen) setIsMapFocused(false); }, [isHomeScreen, isCalendarScreen]);
+
   const [isWeatherSettingsOpen, setIsWeatherSettingsOpen] = useState(false);
   const [settingsInitialSection, setSettingsInitialSection] =
     useState<SettingsInitialSection>('thresholds');
@@ -1242,7 +1245,7 @@ export function App() {
           onSelectNavigationPanel={handleOpenNavigationPanelFromHome}
           onSelectCalendar={() => navigateToScreen('calendar')}
           onOpenSettings={(section = 'thresholds') => {
-            setSettingsInitialSection(section);
+            setSettingsInitialSection(section === 'thresholds' ? 'main' : section);
             setSettingsFocusSourceId(null);
             setIsWeatherSettingsOpen(true);
           }}
@@ -1268,9 +1271,10 @@ export function App() {
       {/* 2. 메인 작업공간 (WorkspaceScreen): 첫 기능 카드 선택 또는 직접 URL(?screen=...) 진입 시 마운트 후 유지 */}
       {(hasEnteredWorkspace || (!isHomeScreen && !isCalendarScreen)) && (
         <div
+          data-map-focused={isMapFocused}
           aria-hidden={isHomeScreen || isCalendarScreen}
           inert={isHomeScreen || isCalendarScreen ? true : undefined}
-          className={`relative h-dvh w-full ${
+          className={`bada-workspace relative h-dvh w-full ${
             isHomeScreen || isCalendarScreen
               ? 'pointer-events-none invisible [content-visibility:hidden]'
               : ''
@@ -1886,6 +1890,8 @@ export function App() {
         }
       >
         <MapView
+          isMapFocused={isMapFocused}
+          onMapFocusChange={setIsMapFocused}
           activeMainTab={activeMainTab}
           navSubTab={navSubTab}
           features={filteredFeatures}
@@ -2090,7 +2096,7 @@ export function App() {
       )}
 
       {/* 모달 1: 접안 상세 시트 (선택된 포인트가 있을 때만 지연 로드) */}
-      {selectedFeature && (
+      {!isMapFocused && selectedFeature && (
         <Suspense fallback={null}>
           <DockingDetailSheet
             key={selectedFeature.properties.id}
@@ -2118,7 +2124,7 @@ export function App() {
       )}
 
       {/* 모달 2: 공간정보 레이어 관리 (열릴 때만 SHP/GeoJSON 파서 번들과 함께 지연 로드) */}
-      {isLayerModalOpen && (
+      {!isMapFocused && isLayerModalOpen && (
         <Suspense fallback={null}>
           <LayerControlModal
             key="layer-modal-open"
@@ -2149,7 +2155,7 @@ export function App() {
       )}
 
       {/* 모달 3: 현장정보 이메일 제보 */}
-      {isReportModalOpen && (
+      {!isMapFocused && isReportModalOpen && (
         <Suspense fallback={null}>
           <FieldReportModal
             key={`report-${reportTargetFeature?.properties.id ?? 'custom'}-${reportLat.toFixed(4)}-${reportLng.toFixed(4)}`}
@@ -2175,7 +2181,7 @@ export function App() {
       )}
 
       {/* 모달 4: 상괭이 관찰기록 */}
-      {(porpoiseModalCoords || selectedPorpoise) && (
+      {!isMapFocused && (porpoiseModalCoords || selectedPorpoise) && (
         <Suspense fallback={null}>
           <PorpoiseObservationModal
             key={
@@ -2206,7 +2212,7 @@ export function App() {
       )}
 
       {/* 모달 5: 항포구·접안지 검색 및 선택 모달 */}
-      {portSelectorTarget && (
+      {!isMapFocused && portSelectorTarget && (
         <Suspense fallback={null}>
           <PortSelectModal
             key={portSelectorTarget.waypointId}
@@ -2253,7 +2259,7 @@ export function App() {
       {isWeatherSettingsOpen && (
         <Suspense fallback={null}>
           <WeatherThresholdSettings
-            key={`weather-settings-${settingsInitialSection}-${settingsFocusSourceId ?? 'none'}-${marineWeather.thresholds.windKnot.good}-${marineWeather.thresholds.windKnot.moderate}-${marineWeather.thresholds.waveMeter.good}-${marineWeather.thresholds.waveMeter.moderate}`}
+            key={`weather-settings-${settingsInitialSection}-${settingsFocusSourceId ?? 'none'}`}
             isOpen={isWeatherSettingsOpen}
             onClose={() => {
               setIsWeatherSettingsOpen(false);

@@ -165,6 +165,7 @@ bada-kkomkkomi/
 │   │   ├── layerStorageService.ts     # IndexedDB + localStorage 레이어 영속 저장소 및 12개 버전 스냅샷 롤백
 │   │   ├── githubLayerSyncService.ts  # [저장] 시 GitHub Git Data API 기반 원격 main 브랜치 원자적 자동 커밋
 │   │   ├── ecmwfWeatherService.ts     # ECMWF IFS(풍속) + WAM(파고) 전용 URL 생성 및 KST 타임스탬프 결합기
+│   │   ├── weatherThresholdStorage.ts # 공통 기상 기준 저장·복원 및 구형 기본값 호환 처리
 │   │   ├── emailReportService.ts      # 이메일 제보 전문 포맷팅, mailto URI 생성, 클립보드 복사
 │   │   ├── routeGeoService.ts         # Haversine 직선거리·예상시간 계산 및 실측 해안선 교차 경고
 │   │   ├── routeLegLabelService.ts    # 줌 레벨·구간 길이 적응형 지도 구간 배지(시간·NM) 포맷팅 서비스

@@ -81,6 +81,7 @@ export interface LegacyLeafletCanvasProps {
   onViewportChange: (lat: number, lng: number, zoom: number) => void;
   flyTarget: { lat: number; lng: number; zoom: number; nonce: number } | null;
   zoomStepTrigger: { delta: number; nonce: number } | null;
+  isMapFocused?: boolean;
 }
 
 const DEFAULT_ZOOM = 11;
@@ -239,6 +240,7 @@ function MapEventsAndCameraController({
   onViewportChange,
   flyTarget,
   zoomStepTrigger,
+  isMapFocused,
   fitRouteBoundsTrigger,
   routeBoundsPositions,
 }: {
@@ -254,10 +256,23 @@ function MapEventsAndCameraController({
   onViewportChange: (lat: number, lng: number, zoom: number) => void;
   flyTarget: { lat: number; lng: number; zoom: number; nonce: number } | null;
   zoomStepTrigger: { delta: number; nonce: number } | null;
+  isMapFocused?: boolean;
   fitRouteBoundsTrigger?: number;
   routeBoundsPositions?: [number, number][];
 }) {
   const map = useMap();
+  useEffect(() => {
+    const resize = () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      map.invalidateSize({ pan: false, animate: false });
+      map.setView(center, zoom, { animate: false });
+    };
+    const frame = requestAnimationFrame(resize);
+    const observer = new ResizeObserver(resize);
+    observer.observe(map.getContainer());
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
+  }, [map, isMapFocused]);
 
   useMapEvents({
     zoomend() {
@@ -272,6 +287,7 @@ function MapEventsAndCameraController({
       onViewportChange(c.lat, c.lng, z);
     },
     click(e) {
+      if (isMapFocused) return;
       const { lat, lng } = e.latlng;
       if (isReportPickMode) {
         onMapClickForReport(lat, lng);
@@ -389,6 +405,7 @@ export function LegacyLeafletCanvas({
   onViewportChange,
   flyTarget,
   zoomStepTrigger,
+  isMapFocused,
 }: LegacyLeafletCanvasProps) {
   const gpsPulseIcon = useMemo(() => getGpsPulseIcon(), []);
   const [currentZoom, setCurrentZoom] = useState<number>(viewport.zoom || DEFAULT_ZOOM);
@@ -471,6 +488,7 @@ export function LegacyLeafletCanvas({
         onViewportChange={onViewportChange}
         flyTarget={flyTarget}
         zoomStepTrigger={zoomStepTrigger}
+        isMapFocused={isMapFocused}
         fitRouteBoundsTrigger={fitRouteBoundsTrigger}
         routeBoundsPositions={polylinePositions}
       />
@@ -707,10 +725,11 @@ export function LegacyLeafletCanvas({
               key={wp.id}
               position={[wp.lat, wp.lng]}
               icon={getRouteWaypointIcon(wp.type, wp.name, idx, wp.id)}
-              draggable={true}
+              draggable={!isMapFocused}
               zIndexOffset={700}
               eventHandlers={{
                 click: (e) => {
+                  if (isMapFocused) return;
                   e.originalEvent?.stopPropagation();
                   const origTarget = e.originalEvent?.target as HTMLElement | null;
                   const removeBtn = origTarget?.closest(
@@ -727,6 +746,7 @@ export function LegacyLeafletCanvas({
                   }
                 },
                 dragend: (e) => {
+                  if (isMapFocused) { e.target.setLatLng([wp.lat, wp.lng]); return; }
                   const latlng = e.target.getLatLng();
                   onUpdateWaypointPos(wp.id, latlng.lat, latlng.lng);
                 },
@@ -741,10 +761,11 @@ export function LegacyLeafletCanvas({
         <Marker
           position={[weatherCoords.lat, weatherCoords.lng]}
           icon={getWeatherPinIcon(weatherGrade)}
-          draggable={true}
+          draggable={!isMapFocused}
           zIndexOffset={800}
           eventHandlers={{
             dragend: (e) => {
+              if (isMapFocused) { e.target.setLatLng([weatherCoords.lat, weatherCoords.lng]); return; }
               const latlng = e.target.getLatLng();
               onUpdateWeatherCoords(latlng.lat, latlng.lng);
             },

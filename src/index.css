@@ -337,3 +337,8 @@ dialog.bada-modal-dialog::backdrop {
     contain: layout style paint;
   }
 }
+
+/* Preserve mounted workspace forms while showing only the existing map in focus mode. */
+.bada-workspace[data-map-focused="true"] > :not(.bada-map-viewport) {
+  display: none !important;
+}

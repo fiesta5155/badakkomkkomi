@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DockingFeature } from '../../types/docking';
 import type { PorpoiseRecord } from '../../types/porpoise';
 import type { MarinePort } from '../../types/port';
@@ -90,6 +90,7 @@ export interface KakaoMapCanvasProps {
   onViewportChange: (lat: number, lng: number, zoom: number) => void;
   flyTarget: { lat: number; lng: number; zoom: number; nonce: number } | null;
   zoomStepTrigger: { delta: number; nonce: number } | null;
+  isMapFocused?: boolean;
 }
 
 const DEFAULT_LEAFLET_ZOOM = 11;
@@ -162,6 +163,7 @@ function attachDraggableToCustomOverlay(
   onDragEnd: (lat: number, lng: number) => void,
   onRemoveWaypoint?: (id: string) => void,
   onClickWithoutDrag?: () => void,
+  canEdit: () => boolean = () => true,
 ): void {
   let isPointerDown = false;
   let hasMoved = false;
@@ -171,8 +173,8 @@ function attachDraggableToCustomOverlay(
   let activePointerId: number | null = null;
   let initialPosition: KakaoLatLng | null = null;
 
-  el.style.touchAction = 'none';
-  el.style.cursor = 'grab';
+  el.style.touchAction = canEdit() ? 'none' : 'auto';
+  el.style.cursor = canEdit() ? 'grab' : '';
 
   const stopBubble = (e: Event) => {
     e.stopPropagation();
@@ -183,9 +185,10 @@ function attachDraggableToCustomOverlay(
     }
   };
 
-  el.addEventListener('mousedown', stopBubble);
-  el.addEventListener('touchstart', stopBubble, { passive: true });
+  el.addEventListener('mousedown', (event) => { if (canEdit()) stopBubble(event); });
+  el.addEventListener('touchstart', (event) => { if (canEdit()) stopBubble(event); }, { passive: true });
   el.addEventListener('click', (e: MouseEvent) => {
+    if (!canEdit()) return;
     stopBubble(e);
     const target = e.target as HTMLElement | null;
     const removeBtn = target?.closest('[data-remove-waypoint-id]') as HTMLElement | null;
@@ -206,6 +209,7 @@ function attachDraggableToCustomOverlay(
   });
 
   el.addEventListener('pointerdown', (e: PointerEvent) => {
+    if (!canEdit()) return;
     stopBubble(e);
     const target = e.target as HTMLElement | null;
     if (target?.closest('button, input, select, textarea, a, [data-remove-waypoint-id]')) {
@@ -231,6 +235,7 @@ function attachDraggableToCustomOverlay(
 
   el.addEventListener('pointermove', (e: PointerEvent) => {
     if (!isPointerDown || e.pointerId !== activePointerId) return;
+    if (!canEdit()) return;
     stopBubble(e);
 
     if (!hasMoved) {
@@ -257,7 +262,7 @@ function attachDraggableToCustomOverlay(
     if (!isPointerDown || e.pointerId !== activePointerId) return;
     stopBubble(e);
     const didMove = hasMoved;
-    const isCancelled = e.type === 'pointercancel';
+    const isCancelled = e.type === 'pointercancel' || !canEdit();
     isPointerDown = false;
     hasMoved = false;
     activePointerId = null;
@@ -445,7 +450,11 @@ export function KakaoMapCanvas({
   onViewportChange,
   flyTarget,
   zoomStepTrigger,
+  isMapFocused,
 }: KakaoMapCanvasProps) {
+  const focusedRef = useRef(isMapFocused);
+  useLayoutEffect(() => { focusedRef.current = isMapFocused; }, [isMapFocused]);
+  const canEdit = useCallback(() => !focusedRef.current, []);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<KakaoMap | null>(null);
   const appliedOverlayTypeIdsRef = useRef<number[]>([]);
@@ -510,9 +519,12 @@ export function KakaoMapCanvas({
     onMapClickForRoadview,
     onMapClickForRoute,
     onUpdateWeatherCoords,
+    isMapFocused,
+    canEdit,
   ]);
 
   const handleCoordinateClick = useCallback((lat: number, lng: number) => {
+    if (!canEdit()) return;
     const ctx = clickContextRef.current;
     if (ctx.isReportPickMode) {
       ctx.onMapClickForReport(lat, lng);
@@ -534,7 +546,7 @@ export function KakaoMapCanvas({
         ctx.onUpdateWeatherCoords(lat, lng);
       }
     }
-  }, []);
+  }, [canEdit]);
 
   // 1. Kakao Map 인스턴스 초기화 및 ResizeObserver 등록
   useEffect(() => {
@@ -584,6 +596,17 @@ export function KakaoMapCanvas({
       container.innerHTML = '';
     };
   }, [kakaoMaps, handleCoordinateClick]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const map = mapRef.current;
+      if (!map) return;
+      const center = map.getCenter();
+      map.relayout();
+      map.setCenter(center);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isMapFocused, kakaoMaps]);
 
   // 2. 베이스 맵 3종(ROADMAP / SKYVIEW / HYBRID) 및 중첩 오버레이 5종(TERRAIN / USE_DISTRICT / ROADVIEW / TRAFFIC / BICYCLE) 원자적 동기화
   useEffect(() => {
@@ -1183,6 +1206,7 @@ export function KakaoMapCanvas({
             onMapClickForRoute(wp.lat, wp.lng);
           }
         },
+        canEdit,
       );
 
       createdWaypoints.push(wpOverlay);
@@ -1212,6 +1236,8 @@ export function KakaoMapCanvas({
     onMapClickForRoute,
     onUpdateWaypointPos,
     onRemoveWaypoint,
+    isMapFocused,
+    canEdit,
   ]);
 
   // 10. [3.2 바닷길 콕콕 - 해상기상] 3단계 신호등 드래그 마커
@@ -1248,6 +1274,9 @@ export function KakaoMapCanvas({
       (nextLat, nextLng) => {
         onUpdateWeatherCoords(nextLat, nextLng);
       },
+      undefined,
+      undefined,
+      canEdit,
     );
 
     weatherOverlayRef.current = overlay;
@@ -1262,6 +1291,8 @@ export function KakaoMapCanvas({
     weatherCoords.lng,
     weatherGrade,
     onUpdateWeatherCoords,
+    isMapFocused,
+    canEdit,
   ]);
 
   // 11. GPS 현재 위치 정확도 반경 Circle & 펄스 마커

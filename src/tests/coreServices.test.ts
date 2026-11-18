@@ -537,7 +537,7 @@ describe('2. ECMWF Marine Weather Service & Threshold Validation (ecmwfWeatherSe
       windTimes: ['2026-11-10T12:00', '2026-11-10T13:00', '2026-11-10T14:00'],
       windValues: [10, 16, null],
       waveTimes: ['2026-11-10T12:00', '2026-11-10T13:00', '2026-11-10T14:00'],
-      waveValues: [0.6, 1.2, 0.8],
+      waveValues: [0.4, 0.6, 0.8],
       nowHourPrefix: '2026-11-10T12',
     });
 

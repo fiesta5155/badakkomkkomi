@@ -1,8 +1,13 @@
 import { useState } from 'react';
+import { ChevronRight, Download } from 'lucide-react';
 import { AccountPanel } from '../auth/AccountPanel';
 import { installationInstructions } from '../../services/pwaInstallation';
 
-export function SettingsAccountSection({ isStandalone, canInstall, onInstall }: {
+export function SettingsAccountSection() {
+  return <AccountPanel showUidCopy uidLabel="고급 정보" />;
+}
+
+export function SettingsInstallMenuItem({ isStandalone, canInstall, onInstall }: {
   isStandalone: boolean;
   canInstall: boolean;
   onInstall: () => Promise<void>;
@@ -15,26 +20,24 @@ export function SettingsAccountSection({ isStandalone, canInstall, onInstall }: 
     if (!canInstall) { setShowGuide((value) => !value); return; }
     setInstalling(true); setError('');
     try { await onInstall(); }
-    catch { setError('설치 창을 열지 못했습니다. 아래 안내에 따라 브라우저 메뉴에서 추가해 주세요.'); setShowGuide(true); }
+    catch { setError('설치 창을 열지 못했습니다. 브라우저 메뉴에서 추가해 주세요.'); setShowGuide(true); }
     finally { setInstalling(false); }
   };
-  return <section aria-labelledby="settings-account-title" className="space-y-3">
-    <h3 id="settings-account-title" className="text-sm font-black text-[#003360]">계정 관리</h3>
-    <AccountPanel showUidCopy />
-    <div className="rounded-2xl border border-sky-200 bg-sky-50 p-3 text-[#003360]">
-      <h4 className="text-sm font-black">홈 화면에 추가</h4>
-      {isStandalone ? <p role="status" className="mt-2 text-sm">설치된 앱으로 사용 중입니다.</p> : <>
-        <p className="mt-2 text-xs leading-relaxed">휴대폰 홈 화면에서 바다꼼꼬미를 바로 열 수 있습니다.</p>
-        <button type="button" disabled={installing} onClick={() => void install()}
-          aria-expanded={!canInstall ? showGuide : undefined}
-          className="mt-3 min-h-11 rounded-xl bg-[#0066b3] px-3 text-sm font-bold text-white disabled:opacity-50">
-          {installing ? '설치 창 여는 중…' : '홈 화면에 추가'}
-        </button>
-        {error && <p role="alert" className="mt-2 text-sm text-rose-700">{error}</p>}
-        {showGuide && <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
-          {installationInstructions(navigator).map((step) => <li key={step}>{step}</li>)}
-        </ol>}
-      </>}
-    </div>
-  </section>;
+  return <div className="border-b border-sky-100">
+    <button type="button" disabled={installing || isStandalone} onClick={() => void install()}
+      aria-expanded={!isStandalone && (!canInstall || showGuide) ? showGuide : undefined}
+      aria-controls={!isStandalone ? 'settings-install-guide' : undefined}
+      className="flex min-h-20 w-full touch-manipulation items-center gap-3 rounded-xl px-2 py-3 text-left active:bg-sky-50 disabled:cursor-default">
+      <Download className="h-5 w-5 shrink-0 text-[#00846c]" aria-hidden="true" />
+      <span className="min-w-0 flex-1"><span className="block text-sm font-bold">홈 화면에 추가</span>
+        <span className="mt-1 block text-xs text-slate-600" role="status">{isStandalone ? '홈 화면에서 사용 중' : installing ? '설치 창 여는 중…' : '휴대폰 홈 화면에서 바로 열기'}</span></span>
+      {!isStandalone && <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />}
+    </button>
+    {!isStandalone && <div id="settings-install-guide">
+      {error && <p role="alert" className="px-2 pb-2 text-sm text-rose-700">{error}</p>}
+      {showGuide && <ol className="list-decimal space-y-2 pr-2 pb-4 pl-8 text-sm leading-relaxed text-slate-700">
+        {installationInstructions(navigator).map((step) => <li key={step}>{step}</li>)}
+      </ol>}
+    </div>}
+  </div>;
 }
