@@ -1,7 +1,7 @@
 import type { MarkerColor } from '../../types/docking';
-import { MARKER_COLOR_MAP } from '../../types/docking';
+import { MARKER_COLOR_MAP } from '../../types/docking.ts';
 import type { MarinePort } from '../../types/port';
-import { getRouteLegLabelParts } from '../../services/routeLegLabelService';
+import { getRouteLegLabelParts } from '../../services/routeLegLabelService.ts';
 
 export interface MarkerTemplateSpec {
   html: string;
@@ -97,7 +97,8 @@ export function buildDockingMarkerSpec(
   const html = `
     <div class="bada-marker-hit-target" style="${scaleStyle}">
       <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-        <div style="
+        <div aria-hidden="${isHazardRed}" data-docking-code style="
+          visibility: ${isHazardRed ? 'hidden' : 'visible'};
           margin-bottom: 2px;
           padding: 1px 6px;
           border-radius: 6px;

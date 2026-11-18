@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
@@ -60,6 +61,12 @@ interface LayerControlModalProps {
   layers: MapLayerConfig[];
   geoJsonLayersData: Record<string, SpatialFeatureCollection>;
   onToggleLayer: (layerId: string) => void;
+  showHazardInformation: boolean;
+  onToggleHazardInformation: () => void;
+  dockingCount: number;
+  hazardCount: number;
+  onFitProtectedAreas: () => void;
+  notebookDisplayControls: ReactNode;
   onSaveOperationalLayers: (params: {
     nextLayers: MapLayerConfig[];
     nextGeoJsonById: Record<string, SpatialFeatureCollection>;
@@ -150,6 +157,13 @@ export function LayerControlModal({
   onClose,
   layers,
   geoJsonLayersData,
+  onToggleLayer,
+  showHazardInformation,
+  onToggleHazardInformation,
+  dockingCount,
+  hazardCount,
+  onFitProtectedAreas,
+  notebookDisplayControls,
   onSaveOperationalLayers,
   onFlyToPoint,
   releaseId,
@@ -263,9 +277,10 @@ export function LayerControlModal({
       setDraftLayers((prev) =>
         prev.map((l) => (l.id === layerId ? { ...l, visible: !l.visible } : l)),
       );
+      if (layerId === 'docking' || layerId === 'protected_area') onToggleLayer(layerId);
       recordChangeNote(`레이어 표시 전환 (${layerId})`);
     },
-    [recordChangeNote],
+    [recordChangeNote, onToggleLayer],
   );
 
   const handleUpdateLayerMeta = useCallback(
@@ -954,6 +969,29 @@ export function LayerControlModal({
              ================================================================ */}
           {activeTab === 'list' && (
             <div className="space-y-3">
+              <section aria-label="지도 표시 설정" className="rounded-2xl border border-sky-200 p-3">
+                <h3 className="mb-2 text-sm font-bold">지도에 표시할 정보</h3>
+                <div className="divide-y divide-sky-100">
+                  {draftLayers.filter((layer) => layer.id === 'docking' || layer.id === 'protected_area').map((layer) => {
+                    const count = layer.id === 'docking' ? dockingCount : (geoJsonLayersData[layer.id]?.features.length ?? layer.featureCount ?? 0);
+                    return <div key={layer.id} className="flex items-center gap-2">
+                      <button type="button" role="switch" aria-checked={layer.visible} onClick={() => handleToggleDraftLayer(layer.id)}
+                        className="flex min-h-11 flex-1 touch-manipulation items-center justify-between gap-2 py-2 text-left text-sm">
+                        <span>{layer.id === 'docking' ? '갯바위 접안 포인트' : '특별보호구역'} <span className="text-xs text-slate-500">({count})</span></span>
+                        <span className={layer.visible ? 'font-bold text-[#00846c]' : 'text-slate-500'}>{layer.visible ? 'ON' : 'OFF'}</span>
+                      </button>
+                      {layer.id === 'protected_area' && <button type="button" onClick={onFitProtectedAreas} className="min-h-11 touch-manipulation rounded-lg px-2 text-xs font-bold text-[#0066b3] active:bg-sky-50">구역맞춤</button>}
+                    </div>;
+                  })}
+                  <button type="button" role="switch" aria-checked={showHazardInformation} onClick={onToggleHazardInformation}
+                    className="flex min-h-11 w-full touch-manipulation items-center justify-between gap-2 py-2 text-left text-sm">
+                    <span>위험정보 <span className="text-xs text-slate-500">({hazardCount})</span></span>
+                    <span className={showHazardInformation ? 'font-bold text-[#00846c]' : 'text-slate-500'}>{showHazardInformation ? 'ON' : 'OFF'}</span>
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">표시를 꺼도 기록과 필터는 유지됩니다.</p>
+              </section>
+              {notebookDisplayControls}
               {/* 상단 빠른 파일 등록 & 실무 샘플 원클릭 테스트 바 */}
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sky-300 bg-[#f0f9ff] p-3">
                 <div className="text-xs text-[#003360]">
