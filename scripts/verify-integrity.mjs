@@ -266,6 +266,7 @@ if (fs.existsSync('dist/sw.js')) {
   const swContent = fs.readFileSync('dist/sw.js', 'utf8');
   const urlMatches = [...swContent.matchAll(/\{url:"([^"]+)",revision:/g)].map((m) => m[1]);
   const uniqueUrls = new Set(urlMatches);
+  assert(!urlMatches.some(url => /(^|\/)data\/tides\//.test(url)), 'Tide JSON must never enter the SW precache');
   assert(
     urlMatches.length > 0 && urlMatches.length === uniqueUrls.size,
     `Duplicate precache URLs detected in dist/sw.js: total=${urlMatches.length}, unique=${uniqueUrls.size}`,

@@ -1,5 +1,7 @@
 # 바다꼼꼬미 (Bada-Kkomkkomi) 외부 데이터 · API · 지도 · 기술 출처 명세서 (`DATA_AND_TECH_SOURCES.md`)
 
+KHOA 조석예보(고·저조)는 [공식 API](https://www.data.go.kr/data/15156018/openapi.do)를 Actions에서 조회해 정적 JSON으로 배포하는 기반을 추가했습니다. 통영·고현항, KST 기준 조회일 32일, 조위 단위 cm이며 예측 시각의 시간대·조위 기준면은 미검증입니다. [운영 계약](KHOA_TIDES_OPERATIONS.md)을 참고하세요. 현재 달력 UI에는 연결하지 않았습니다.
+
 - **문서 버전**: `v2.4` (기준일: `2026-11-11`, Asia/Seoul · 앱 버전 `v2.4` / `2.4.0` 정합)
 - **코드 단일 정본(SSOT)**: [`src/config/dataSources.ts`](../src/config/dataSources.ts) · [`src/config/appVersion.ts`](../src/config/appVersion.ts)
 - **통합 구현 설계서**: [`docs/ARCHITECTURE_AND_DESIGN.md`](./ARCHITECTURE_AND_DESIGN.md)

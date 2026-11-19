@@ -17,6 +17,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+public/data/tides/
 dev-dist
 .env
 .env.*

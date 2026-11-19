@@ -149,6 +149,8 @@ bada-kkomkkomi/
 │   ├── utils/
 │   │   └── geojsonMeta.ts             # 초기 부팅용 무의존성 WGS84 GeoJSON 메타데이터·BBox 정규화 유틸리티
 │   ├── services/
+│   │   ├── khoaTideSchema.ts          # KHOA 32일 묶음 검증·갱신 시각·신선도
+│   │   ├── khoaTideService.ts         # 정적 조석 JSON 조회 (달력 UI 미연결)
 │   │   ├── firebaseClient.ts          # VITE_FIREBASE_* 기반 SDK 초기화 (설정 누락 시 기존 기능 유지)
 │   │   ├── userProfileService.ts      # UID별 실명 프로필 서버 조회·저장 및 한글 두 글자 검증
 │   │   ├── pwaInstallation.ts         # 조타실의 기기별 홈 화면 추가 안내 (실제 설치 가능 여부는 브라우저 이벤트 기준)

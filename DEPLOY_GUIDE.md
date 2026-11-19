@@ -19,6 +19,8 @@
 
 ## 전체 자동 배포 및 자립 유지보수 흐름 한눈에 보기
 
+KHOA 조석예보 자동 갱신 기반(달력 UI 미연결)의 실행·Secret 준비·정상 JSON 복구·캐시·실패 정책은 [KHOA 운영 안내](docs/KHOA_TIDES_OPERATIONS.md)를 참고하세요. 이 기반의 실제 GitHub 실행 및 배포는 아직 수행하지 않았습니다.
+
 ```text
 [경로 A: 일상 데이터/레이어 관리 (코드 수정 0줄)]
   • 기본 권장: GitHub 웹 편집기 / GitHub Desktop / 로컬 VS Code에서 사진·JSON 수정 후 커밋

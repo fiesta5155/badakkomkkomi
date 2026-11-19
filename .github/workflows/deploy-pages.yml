@@ -4,25 +4,37 @@ on:
   push:
     branches: ['main']
   workflow_dispatch:
+  schedule:
+    # 19:17 UTC on the previous day = 04:17 KST. Scheduling may be delayed.
+    - cron: '17 19 * * *'
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+  actions: read
 
 concurrency:
   group: 'pages'
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
+    # One path for push, schedule and manual refresh. Never deploy arbitrary refs.
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,6 +44,59 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Find last successfully deployed tide backup
+        id: backup
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Bound history scanning; expiry/deletion falls back to the published JSON.
+            for (let page = 1; page <= 3; page++) {
+              const { data } = await github.rest.actions.listArtifactsForRepo({...context.repo, per_page: 100, page});
+              for (const artifact of data.artifacts) {
+                if (artifact.expired || !/^khoa-tides-\d+-\d+$/.test(artifact.name) || artifact.workflow_run?.head_branch !== 'main') continue;
+                const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id: artifact.workflow_run.id});
+                if (run.conclusion !== 'success' || run.path !== '.github/workflows/deploy-pages.yml' || run.event === 'pull_request') continue;
+                core.setOutput('id', String(artifact.id));
+                core.setOutput('run', String(run.id));
+                return;
+              }
+              if (data.artifacts.length < 100) break;
+            }
+
+      - name: Download verified backup
+        if: steps.backup.outputs.id != ''
+        # Deleted/expired between discovery and download: published JSON is the fallback.
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.backup.outputs.id }}
+          run-id: ${{ steps.backup.outputs.run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/khoa-recovery
+          merge-multiple: true
+
+      - name: Recover verified tide snapshot
+        id: recovery
+        env:
+          KHOA_RECOVERY_FILE: ${{ runner.temp }}/khoa-recovery/latest.json
+          KHOA_PAGES_URL: ${{ steps.pages.outputs.base_url }}/data/tides/latest.json
+        run: node scripts/prepare-khoa-tides.mjs
+
+      - name: Collect 32 days of KHOA forecasts
+        # First push needs bootstrap; subsequent pushes inherit the last good data.
+        if: github.event_name != 'push' || steps.recovery.outputs.restored != 'true'
+        env:
+          KHOA_SERVICE_KEY: ${{ secrets.KHOA_SERVICE_KEY }}
+        run: node scripts/update-khoa-tides.mjs
+
+      - name: Require validated tide data before any deployment
+        run: node --input-type=module -e "import {readSnapshot,OUTPUT} from './scripts/update-khoa-tides.mjs'; if (!await readSnapshot(OUTPUT)) { console.error('Missing verified tide snapshot. Deployment blocked.'); process.exit(1); }"
 
       - name: Pre-flight Lint, Unit Tests, Production Build & Post-Build SW Integrity Check
         env:
@@ -50,8 +115,12 @@ jobs:
           npm run build
           npm run verify
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Reject superseded source revision
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {data} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
+            if (data.commit.sha !== context.sha) core.setFailed('main advanced during this run. Re-run the latest main revision; no deployment was started.');
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -61,3 +130,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Preserve successfully deployed tide snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: khoa-tides-${{ github.run_id }}-${{ github.run_attempt }}
+          path: public/data/tides/latest.json
+          if-no-files-found: error
+          retention-days: 90

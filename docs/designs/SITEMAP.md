@@ -62,6 +62,9 @@
 
 ## 2. Core Domain Services (`src/services`)
 
+- [`src/services/khoaTideSchema.ts`](../../src/services/khoaTideSchema.ts): `validTideSnapshot()`, `tideFreshness()` — 통영·고현항 32일 묶음과 가변 고저조 사건 검증. 예측 시간대·기준면은 미확정이며 생성 시각은 UTC
+- [`src/services/khoaTideService.ts`](../../src/services/khoaTideService.ts): `fetchKhoaTides()` — BASE_URL 기준 정적 조석 JSON과 신선도 조회. 달력 UI와 기존 날씨·물때 계산에 미연결
+
 - [`src/services/pwaInstallation.ts`](../../src/services/pwaInstallation.ts): `installationInstructions()` — 조타실에서 iPhone·iPad·Android·PC의 홈 화면 추가 방법 안내. 설치 가능 여부는 기존 `beforeinstallprompt` 이벤트를 사용하며 인증·사용자 저장소를 변경하지 않음
 
 - [`src/services/calendarRepository.ts`](../../src/services/calendarRepository.ts): `createCalendarRepository()`, `monthCells()`, `setVoyageStatus()`, `setCalendarMemo()` — 기존 선박별 로컬 일정 호환. 공유 화면은 원본 저장 함수를 호출하지 않고 선박 선택 기능만 재사용
