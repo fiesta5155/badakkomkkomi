@@ -287,3 +287,13 @@ main과 origin https://github.com/fiesta5155/badakkomkkomi.git를 확인했고 �
 ### 향후 주의사항
 
 Firebase 무료 요금제 및 수동 삭제 정책을 유지한다. Pages 배포와 Firebase 운영 설정 변경은 분리하며 운영 설정 재적용은 별도 승인이 있어야 한다. 실제 직원의 추가 등록/수정/삭제 시험은 운영 데이터 변경 승인을 받은 경우에만 수행한다. 좌표계 미확인 자료를 WGS84로 추정하지 않는다. KHOA 예측 시간대/기준면은 미검증 상태를 유지하고 예보 범위 밖 값을 만들지 않는다. 물리 모바일 기기와 실제 로그인 세션의 실사용 범위는 자동 테스트와 구분한다.
+
+
+### 2026-11-19 기능 반영 및 실제 배포 결과 확정
+
+- 기능 커밋: ea4536e3427356052a083b6897134e5de6cdf28b (feat: add shared permit management and calendar investigations). main에 일반 Push 성공. 강제 Push는 사용하지 않았다.
+- 기존 Pages 워크플로 실행 [44479310335](https://github.com/fiesta5155/badakkomkkomi/actions/runs/44479310335): completed/success. npm ci, lint/test/build/verify, 정상 조석 자료 복구·검증, Pages 업로드·배포, 조석 백업 보존 단계 모두 성공했다. Push에서는 기존 정상 JSON을 승계하여 KHOA 수집 단계가 생략됐다.
+- 실제 배포 주소: [바다꼼꼬미](https://fiesta5155.github.io/badakkomkkomi/). 2026-11-19 16:26 KST 기준 HTML·진입 JS·CalendarScreen JS·sw.js·data/tides/latest.json 모두 HTTP 200. 배포 번들에서 행위허가, 행위허가 조사, 조석정보, 접기 기능을 확인했다. 조석 JSON 스키마 검증 통과, 통영 DT_0014·고현항 SO_0552 각각 32일 자료가 제공된다.
+- 실제 Pages의 새 브라우저 문맥에서 390/1280px 바다수첩 진입, 행위허가 버튼, 비로그인 인증 안내, 달력 진입을 확인했다. 가로 넘침과 pageerror가 없었다. 서비스워커·사용자 캐시를 초기화하지 않았으며 운영 데이터는 생성·수정·삭제하지 않았다. 실제 직원 계정의 운영 CRUD는 이 점검에서 새로 수행하지 않았고, 앞서 사용자의 정상 작동 확인과 구분한다.
+- 민감정보가 없는 운영 원문 회귀 테스트용 백업만 소스와 함께 포함했다. 개인 설정·에이전트 디렉터리·생성 조석 JSON·사용자 데이터·미참조 이미지·운영 API 실행 로그/영수증은 Git에 포함하지 않았다. .env 및 KHOA/Firebase 인증 토큰은 커밋하지 않았다.
+- 이 배포 결과와 현재 Pages URL을 문서 전용 후속 커밋으로 보존한다. 후속 문서 Push도 기존 워크플로를 그대로 거치며 앱 동작·Firebase 운영 설정을 추가 변경하지 않는다. 이후 최종 실행 상태는 GitHub Actions와 최종 응답에서 확인한다.

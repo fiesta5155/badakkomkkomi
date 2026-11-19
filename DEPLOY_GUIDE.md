@@ -66,7 +66,7 @@ KHOA 조석예보 자동 갱신 기반의 실행·Secret 준비·정상 JSON 복
      http://127.0.0.1:5173
      https://<운영자GitHub아이디>.github.io
      ```
-     *(현재 기본 배포 기준: `https://gunnysis.github.io`)*
+     *(현재 기본 배포 기준: `https://fiesta5155.github.io`)*
 3. **Step 3. GitHub Actions Secret (`KAKAO_MAP_API_KEY`) 및 로컬 `.env` 등록**:
    - **GitHub 저장소**: `Settings > Secrets and variables > Actions > New repository secret` 클릭 ➔ **Name**: `KAKAO_MAP_API_KEY` / **Secret**: 복사한 카카오 **`JavaScript 키`** 입력 후 저장.
    - **로컬 PC (`.env`)**: 프로젝트 루트의 [`.env.example`](./.env.example)을 참고해 `.env` 파일을 만들고 아래 1줄을 입력합니다:
@@ -93,7 +93,7 @@ Python, Docker, Android SDK 등 불필요한 도구 없이 Windows 11 PC에 아�
 
 ## [Part 2] 배포 주소 및 스마트폰 · 태블릿 PWA 앱 설치 방법
 
-- **현재 운영 배포 주소**: `https://gunnysis.github.io/bada-kkomkkomi/` (신규 운영자 계정 배포 시: `https://<운영자GitHub아이디>.github.io/<저장소명>/`)
+- **현재 운영 배포 주소**: `https://fiesta5155.github.io/badakkomkkomi/` (신규 운영자 계정 배포 시: `https://<운영자GitHub아이디>.github.io/<저장소명>/`)
 - **이관 시 단말기 재설치 안내**: PWA 앱은 설치 시점의 도메인(Origin)에 귀속됩니다. 운영자 계정이 변경되어 배포 주소가 바뀌면 기존 스마트폰에 설치된 앱은 구 주소를 바라보게 되므로, 새 배포 주소로 접속해 1회 재설치해야 합니다.
 
 ### 1. 상단 헤더 `앱 설치` 버튼 활용

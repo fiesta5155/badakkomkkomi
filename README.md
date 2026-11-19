@@ -3,7 +3,7 @@
 국립공원공단 해양국립공원(한려해상·통영·거제) 직원의 해상·도서 현장업무 지원을 위한 오프라인 우선(Offline-First) PWA 웹 애플리케이션입니다.
 백엔드 서버나 외부 유료 DB 없이 **순수 정적 데이터(`GeoJSON`, `JSON`, 로컬 이미지) + 인앱 공간정보 운영 저장소(`IndexedDB` / GitHub 자동 커밋)만으로 무상(Zero-cost) 운영 및 자동 배포**되도록 설계되었습니다.
 
-- **라이브 배포 URL (GitHub Pages)**: https://gunnysis.github.io/bada-kkomkkomi/
+- **라이브 배포 URL (GitHub Pages)**: https://fiesta5155.github.io/badakkomkkomi/
 - **GitHub 저장소**: https://github.com/gunnysis/bada-kkomkkomi
 - **EGM 아키텍처 블루프린트 (Elephant-Goldfish Model `Hay`)**: [`AGENTS.md`](./AGENTS.md)
 - **EGM 서브시스템 계약 인덱스 (`Peanuts`)**: [`docs/designs/SITEMAP.md`](./docs/designs/SITEMAP.md)
