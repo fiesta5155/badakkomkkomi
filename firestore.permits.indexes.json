@@ -1,0 +1,6 @@
+{
+  "indexes": [
+    {"collectionGroup":"permitInvestigations","queryScope":"COLLECTION","fields":[{"fieldPath":"vessel","order":"ASCENDING"},{"fieldPath":"date","order":"ASCENDING"}]}
+  ],
+  "fieldOverrides": []
+}

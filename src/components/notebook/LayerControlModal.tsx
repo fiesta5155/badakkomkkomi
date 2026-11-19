@@ -56,6 +56,8 @@ import {
 import { resolveLayerProvenance } from '../../config/dataSources';
 
 interface LayerControlModalProps {
+  permitVisible?: boolean;
+  onTogglePermits?: () => void;
   isOpen: boolean;
   onClose: () => void;
   layers: MapLayerConfig[];
@@ -153,6 +155,8 @@ function getFeatureCenterLatLng(feature: SpatialFeature): [number, number] | nul
 }
 
 export function LayerControlModal({
+  permitVisible = true,
+  onTogglePermits,
   isOpen,
   onClose,
   layers,
@@ -1329,6 +1333,7 @@ export function LayerControlModal({
                 );
               })}
 
+              {onTogglePermits && <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-2xl border border-yellow-400 bg-yellow-50 p-3.5"><input type="checkbox" checked={permitVisible} onChange={onTogglePermits} className="h-5 w-5 accent-yellow-600" /><span className="text-sm font-extrabold text-[#003360]">행위허가</span></label>}
               {/* 개인 상괭이 관찰 표식 레이어 */}
               <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#00a79d]/50 bg-teal-50/70 p-3.5 transition hover:border-[#00a79d]">
                 <input

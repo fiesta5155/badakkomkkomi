@@ -1,6 +1,8 @@
 # 바다꼼꼬미 (Bada-Kkomkkomi) 외부 데이터 · API · 지도 · 기술 출처 명세서 (`DATA_AND_TECH_SOURCES.md`)
 
-KHOA 조석예보(고·저조)는 [공식 API](https://www.data.go.kr/data/15156018/openapi.do)를 Actions에서 조회해 정적 JSON으로 배포하는 기반을 추가했습니다. 통영·고현항, KST 기준 조회일 32일, 조위 단위 cm이며 예측 시각의 시간대·조위 기준면은 미검증입니다. [운영 계약](KHOA_TIDES_OPERATIONS.md)을 참고하세요. 현재 달력 UI에는 연결하지 않았습니다.
+날짜 상세 카드의 12:00 날씨는 ECMWF IFS, 파고는 ECMWF WAM을 사용합니다. 강수량은 해당 시각 직전 1시간(11:00–12:00 KST) 합계이며 강수확률은 IFS 결정론적 강수량과 구분되는 ECMWF IFS 0.25° 앙상블 기반입니다. [Open-Meteo 변수 정의](https://open-meteo.com/en/docs/ecmwf-api#hourly-parameter-definition)를 따르며 15일 요청의 실제 결측은 그대로 유지합니다. 월간 달력 예보 및 해상 기상 안전등급 서비스와 별도로 조회·캐시합니다.
+
+KHOA 조석예보(고·저조)는 [공식 API](https://www.data.go.kr/data/15156018/openapi.do)를 Actions에서 조회해 정적 JSON으로 배포합니다. 통영·고현항, KST 기준 조회일 32일, 조위 단위 cm이며 예측 시각의 시간대·조위 기준면은 미검증입니다. [운영 계약](KHOA_TIDES_OPERATIONS.md)을 참고하세요. 날짜 상세 카드에서 재사용하며 월간 물때 명칭 계산은 유지합니다.
 
 - **문서 버전**: `v2.4` (기준일: `2026-11-11`, Asia/Seoul · 앱 버전 `v2.4` / `2.4.0` 정합)
 - **코드 단일 정본(SSOT)**: [`src/config/dataSources.ts`](../src/config/dataSources.ts) · [`src/config/appVersion.ts`](../src/config/appVersion.ts)

@@ -62,8 +62,17 @@
 
 ## 2. Core Domain Services (`src/services`)
 
+- [`src/services/porpoiseLocationPicker.ts`](../../src/services/porpoiseLocationPicker.ts): `createPorpoiseLocationPicker()` — 첫 클릭 수동 선택, 활성 버튼 재클릭마다 캐시 없는 GPS 조회. 중복·실패·시간 초과·수동 선택·종료 후 늦은 응답을 제어하며 저장은 기존 관찰 모달에 위임
+- [`src/hooks/usePorpoiseLocationPicker.ts`](../../src/hooks/usePorpoiseLocationPicker.ts): 상괭이 선택 모드와 버튼 상태 구독. 화면 이탈·popstate·모드 종료·언마운트 시 요청 무효화. GPS 실패 알림 없음
+- [`src/hooks/useActivityPermits.ts`](../../src/hooks/useActivityPermits.ts): UID 범위 직원 공유 허가구역 구독, 기존 관리자 조회, KST 기간 판정.
+- [`src/services/activityPermitModel.ts`](../../src/services/activityPermitModel.ts): 확인된 WGS84 DMS 변환, 다각형 검증, 노란 특별보호구역 스타일 파생 및 내부 라벨, 기존 expiresAt 호환 메타데이터. TTL 없이 작성자·관리자가 수동 삭제.
+- [`src/services/activityPermitService.ts`](../../src/services/activityPermitService.ts): 작성자·리비전 트랜잭션과 독립 조사 일정 스냅샷. [운영 준비 사항](../ACTIVITY_PERMITS_OPERATIONS.md).
+
+- [`src/services/calendarDayConditions.ts`](../../src/services/calendarDayConditions.ts): `parseNoonWeather()`, `createCalendarDayStore()` — 상세 전용 정오 IFS/WAM 자료를 KST 날짜로 결합. 강수량은 11–12시 합계, 강수확률은 ECMWF IFS 0.25° 앙상블 기반. 지역별 3시간 재사용·실패 5분 재시도, 부분 결측은 항목별 미확인
+- [`src/hooks/useCalendarDayConditions.ts`](../../src/hooks/useCalendarDayConditions.ts): 날짜 상세 화면 구독. KHOA는 하루 한 번 조회해 두 지역·날짜별 재사용하며 기존 PWA 정상 자료 보존을 사용. 월간 달력·날씨콕콕·공유 일정은 변경하지 않음
+
 - [`src/services/khoaTideSchema.ts`](../../src/services/khoaTideSchema.ts): `validTideSnapshot()`, `tideFreshness()` — 통영·고현항 32일 묶음과 가변 고저조 사건 검증. 예측 시간대·기준면은 미확정이며 생성 시각은 UTC
-- [`src/services/khoaTideService.ts`](../../src/services/khoaTideService.ts): `fetchKhoaTides()` — BASE_URL 기준 정적 조석 JSON과 신선도 조회. 달력 UI와 기존 날씨·물때 계산에 미연결
+- [`src/services/khoaTideService.ts`](../../src/services/khoaTideService.ts): `fetchKhoaTides()` — BASE_URL 기준 정적 조석 JSON과 신선도 조회. 날짜 상세 카드에서 재사용하며 기존 물때 계산과 분리
 
 - [`src/services/pwaInstallation.ts`](../../src/services/pwaInstallation.ts): `installationInstructions()` — 조타실에서 iPhone·iPad·Android·PC의 홈 화면 추가 방법 안내. 설치 가능 여부는 기존 `beforeinstallprompt` 이벤트를 사용하며 인증·사용자 저장소를 변경하지 않음
 

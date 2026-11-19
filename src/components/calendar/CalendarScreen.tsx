@@ -10,6 +10,9 @@ import { deleteSharedEntry, saveSharedEntry } from '../../services/calendarFires
 import { calendarErrorMessage, entriesForDay, koreaToday, legacyBackup } from '../../services/sharedCalendarModel';
 import type { SharedEntry } from '../../services/sharedCalendarModel';
 import { AccountPanel } from '../auth/AccountPanel';
+import { CalendarDetailConditions } from './CalendarDayConditions';
+import { PermitInvestigationSection } from './PermitInvestigationSection';
+import type { PermitSnapshot } from '../../services/activityPermitModel';
 
 type CalendarView = 'month' | 'detail' | 'editor';
 type EntryKind = VoyageKind | 'memo';
@@ -25,7 +28,8 @@ function fullDateLabel(value: string): string {
     .format(new Date(`${value}T12:00:00+09:00`));
 }
 
-export function CalendarScreen({ onBackHome }: { onBackHome: () => void }) {
+type CalendarProps = { onBackHome: () => void; onOpenPermit: (id: string, snapshot: PermitSnapshot) => void };
+export function CalendarScreen({ onBackHome, onOpenPermit }: CalendarProps) {
   const auth = useFirebaseAuth();
   if (auth.status !== 'ready' || !auth.user || !auth.profile) return (
     <div className="h-dvh overflow-y-auto bg-white p-4" style={{ paddingTop: 'var(--safe-top)' }}>
@@ -36,7 +40,7 @@ export function CalendarScreen({ onBackHome }: { onBackHome: () => void }) {
       <LegacyCalendarBackup />
     </div>
   );
-  return <SharedCalendarScreen key={auth.user.uid} onBackHome={onBackHome} />;
+  return <SharedCalendarScreen key={auth.user.uid} onBackHome={onBackHome} onOpenPermit={onOpenPermit} />;
 }
 
 function LegacyCalendarBackup() {
@@ -62,7 +66,7 @@ function LegacyCalendarBackup() {
   </aside>;
 }
 
-function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
+function SharedCalendarScreen({ onBackHome, onOpenPermit }: CalendarProps) {
   const auth = useFirebaseAuth();
   const profile = auth.profile!;
   const repository = useMemo(() => createCalendarRepository(window.localStorage), []);
@@ -239,19 +243,17 @@ function SharedCalendarScreen({ onBackHome }: { onBackHome: () => void }) {
 
         {view === 'detail' && (
           <section className="space-y-3" aria-label="날짜별 일정 상세">
-            <div className="rounded-2xl border border-sky-200 bg-sky-50 p-3">
-              <h2 className="text-lg font-black">{fullDateLabel(selectedDate)}</h2>
-              <p className="text-sm font-bold text-sky-800">{vessel}호</p>
-            </div>
+            <CalendarDetailConditions region={region} date={selectedDate} dateLabel={fullDateLabel(selectedDate)} vessel={vessel} />
             <div className="rounded-2xl border border-sky-200 bg-white p-3">
               <h3 className="mb-2 text-sm font-black">운항 상태</h3>
               {day.status ? <div className="flex items-start gap-2">
-                <Ship className={`mt-0.5 h-5 w-5 shrink-0 ${day.status.kind === 'planned' ? 'text-[#0066b3]' : 'text-red-600'}`} fill="currentColor" />
+                <Ship className={`mt-0.5 h-4 w-4 shrink-0 ${day.status.kind === 'planned' ? 'text-[#0066b3]' : 'text-red-600'}`} fill="none" aria-hidden="true" />
                 <div className="min-w-0 flex-1"><strong className="text-sm">{entryLabels[day.status.kind]}</strong><p className="text-xs">{day.status.authorName}</p><p className="mt-1 whitespace-pre-wrap break-words text-sm">{day.status.content}</p></div>
                 {canEdit(day.status) && <button type="button" disabled={busy || !ready} onClick={editStatus} aria-label="운항 상태 수정" className="rounded-lg p-1.5 text-sky-700"><Pencil className="h-4 w-4" /></button>}
                 {canDelete(day.status) && <button type="button" disabled={busy || !ready} onClick={deleteStatus} aria-label="운항 상태 삭제" className="rounded-lg p-1.5 text-red-600"><Trash2 className="h-4 w-4" /></button>}
               </div> : null}
             </div>
+            <PermitInvestigationSection date={selectedDate} vessel={vessel} isAdmin={shared.isAdmin} onOpenPermit={onOpenPermit} />
             <div className="rounded-2xl border border-sky-200 bg-white p-3">
               <h3 className="mb-2 text-sm font-black">메모 {day.memos.length > 0 ? day.memos.length : ''}</h3>
               {day.memos.length > 0 && <ul className="space-y-2">

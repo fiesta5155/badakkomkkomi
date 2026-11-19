@@ -138,6 +138,9 @@ bada-kkomkkomi/
 │   ├── data/
 │   │   └── coastlinePolygons.ts       # 한려해상(통영·거제·고성·창원) 378개 실측 해안선·도서 폴리곤(12,794정점) 정본
 │   ├── hooks/
+│   │   ├── usePorpoiseLocationPicker.ts # 상괭이 활성 버튼 재클릭 GPS·수동 위치 선택·늦은 응답 차단
+│   │   ├── useActivityPermits.ts     # 직원 공유 허가구역·관리자 구독 및 KST 기간 판정
+│   │   ├── useCalendarDayConditions.ts # 날짜 상세 전용 조석·정오 날씨 구독 (월간 달력과 분리)
 │   │   ├── useFirebaseAuth.ts         # Google 로그인·본인 실명 프로필 상태 및 계정 동작
 │   │   ├── useSharedCalendar.ts       # 선박·월·계정별 Firestore 구독 및 정리
 │   │   ├── useCalendarWeather.ts      # 캐시 우선 날씨 표시·한국 날짜/3시간 갱신·재진입 구독
@@ -149,8 +152,12 @@ bada-kkomkkomi/
 │   ├── utils/
 │   │   └── geojsonMeta.ts             # 초기 부팅용 무의존성 WGS84 GeoJSON 메타데이터·BBox 정규화 유틸리티
 │   ├── services/
+│   │   ├── porpoiseLocationPicker.ts  # GPS 중복 요청·타임아웃·선택 세대 제어 (관찰 저장과 분리)
+│   │   ├── calendarDayConditions.ts   # KHOA 재사용·IFS/WAM 정오 결합·ENS 강수확률·요청 병합
+│   │   ├── activityPermitModel.ts     # 원본 DMS·WGS84·다각형 검증·월 단위 만료·지도 레이어
+│   │   ├── activityPermitService.ts   # 작성자 트랜잭션·별도 조사 일정 및 구역 스냅샷
 │   │   ├── khoaTideSchema.ts          # KHOA 32일 묶음 검증·갱신 시각·신선도
-│   │   ├── khoaTideService.ts         # 정적 조석 JSON 조회 (달력 UI 미연결)
+│   │   ├── khoaTideService.ts         # 날짜 상세 카드용 정적 조석 JSON 검증·조회
 │   │   ├── firebaseClient.ts          # VITE_FIREBASE_* 기반 SDK 초기화 (설정 누락 시 기존 기능 유지)
 │   │   ├── userProfileService.ts      # UID별 실명 프로필 서버 조회·저장 및 한글 두 글자 검증
 │   │   ├── pwaInstallation.ts         # 조타실의 기기별 홈 화면 추가 안내 (실제 설치 가능 여부는 브라우저 이벤트 기준)

@@ -12,6 +12,7 @@ import {
 } from 'react-leaflet';
 import type { DockingFeature, MarkerColor } from '../../types/docking';
 import type { PorpoiseRecord } from '../../types/porpoise';
+import { PERMIT_LAYER_ID, type PermitMapFocus } from '../../services/activityPermitModel';
 import type { MarinePort } from '../../types/port';
 import type { RouteLeg, RouteWaypoint } from '../../types/route';
 import type { MapLayerConfig } from '../../types/config';
@@ -28,6 +29,8 @@ import {
 } from './mapMarkerTemplates';
 
 export interface LegacyLeafletCanvasProps {
+  permitFocus?: PermitMapFocus | null;
+  onSelectPermit?: (id: string) => void;
   baseMapType: KakaoBaseMapType;
   overlayMapTypes: KakaoOverlayMapType[];
   activeMainTab: 'notebook' | 'navigation';
@@ -324,27 +327,16 @@ function MapEventsAndCameraController({
     }
   }, [zoomStepTrigger, map]);
 
-  const lastFittedTriggerRef = useRef<number>(-1);
-  const wasInRouteNavRef = useRef<boolean>(false);
+  // Only an explicit fit request may change the route viewport.
+  const lastFittedTriggerRef = useRef(fitRouteBoundsTrigger ?? 0);
 
   useEffect(() => {
-    const isRouteNav = activeMainTab === 'navigation' && navSubTab === 'route';
-    if (!isRouteNav) {
-      wasInRouteNavRef.current = false;
-      return;
-    }
-    if (!routeBoundsPositions || routeBoundsPositions.length < 2) {
-      return;
-    }
     const triggerVal = fitRouteBoundsTrigger ?? 0;
-    const enteredRouteNav = !wasInRouteNavRef.current;
-    const manualTriggered =
-      triggerVal > 0 && triggerVal !== lastFittedTriggerRef.current;
-
-    if (!enteredRouteNav && !manualTriggered) return;
-
-    wasInRouteNavRef.current = true;
+    if (triggerVal === lastFittedTriggerRef.current) return;
     lastFittedTriggerRef.current = triggerVal;
+
+    const isRouteNav = activeMainTab === 'navigation' && navSubTab === 'route';
+    if (!isRouteNav || triggerVal <= 0 || !routeBoundsPositions || routeBoundsPositions.length < 2) return;
 
     try {
       const bounds = L.latLngBounds(routeBoundsPositions);
@@ -364,7 +356,20 @@ function MapEventsAndCameraController({
   return null;
 }
 
+function PermitBoundsEffect({ target }: { target?: PermitMapFocus | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!target) return;
+    const height = map.getSize().y;
+    map.fitBounds(target.vertices.map(p => [p.lat, p.lng] as [number, number]), {
+      paddingTopLeft: [24, Math.min(160, height * .2)], paddingBottomRight: [24, Math.min(260, height * .35)], maxZoom: 17, animate: false,
+    });
+  }, [target, map]);
+  return null;
+}
 export function LegacyLeafletCanvas({
+  permitFocus,
+  onSelectPermit,
   baseMapType,
   overlayMapTypes,
   activeMainTab,
@@ -493,6 +498,7 @@ export function LegacyLeafletCanvas({
         routeBoundsPositions={polylinePositions}
       />
 
+      <PermitBoundsEffect target={activeMainTab === 'notebook' ? permitFocus : null} />
       {/* 1. QGIS 공간정보 레이어 (Polygon, LineString, Point 및 동적 스타일/라벨) */}
       {layers.map((layer) => {
         const fc = geoJsonLayersData[layer.id];
@@ -525,7 +531,7 @@ export function LegacyLeafletCanvas({
 
         return (
           <GeoJSON
-            key={versionKey}
+            key={layer.id === PERMIT_LAYER_ID ? `${versionKey}:${JSON.stringify(fc)}` : versionKey}
             data={fc}
             style={() => ({
               color: strokeColor,
@@ -545,15 +551,23 @@ export function LegacyLeafletCanvas({
               })
             }
             onEachFeature={(feature, leafletLayer) => {
+              const permit = layer.id === PERMIT_LAYER_ID;
+              if (permit) leafletLayer.on('click', (event: L.LeafletMouseEvent) => {
+                if (!isMapFocused && !isPorpoiseAddMode && !isReportPickMode) { L.DomEvent.stopPropagation(event.originalEvent); onSelectPermit?.(feature.properties?.permitId); }
+              });
               if (!showLabels) return;
               const props = feature?.properties ?? {};
               const lbl =
                 props[labelField] ?? props.name ?? props.명칭 ?? props.이름 ?? '';
               if (lbl) {
-                leafletLayer.bindTooltip(String(lbl), {
-                  permanent: false,
-                  direction: 'top',
+                const content = permit ? document.createElement('span') : String(lbl);
+                if (typeof content !== 'string') content.textContent = String(lbl);
+                leafletLayer.bindTooltip(content, {
+                  permanent: permit,
+                  direction: permit ? 'center' : 'top',
                 });
+                const anchor = props.labelPoint;
+                if (permit && anchor) leafletLayer.openTooltip(L.latLng(anchor.lat, anchor.lng));
               }
             }}
           />

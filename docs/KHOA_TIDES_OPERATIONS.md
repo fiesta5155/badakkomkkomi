@@ -1,6 +1,6 @@
 # KHOA 조석예보 정적 갱신
 
-구현 기반은 [수집기](../scripts/update-khoa-tides.mjs), [복구기](../scripts/prepare-khoa-tides.mjs), [워크플로](../.github/workflows/deploy-pages.yml), [스키마](../src/services/khoaTideSchema.ts)입니다. 앱 UI는 연결하지 않습니다. 예측 시각은 `HH:mm` 원문이며 시간대·조위 기준면은 공식 근거 확보 전까지 기록하지 않습니다. 생성 시각만 UTC ISO 8601입니다.
+구현 기반은 [수집기](../scripts/update-khoa-tides.mjs), [복구기](../scripts/prepare-khoa-tides.mjs), [워크플로](../.github/workflows/deploy-pages.yml), [스키마](../src/services/khoaTideSchema.ts)입니다. 날짜 상세 카드는 정적 JSON을 재사용합니다. 예측 시각은 `HH:mm` 원문이며 시간대·조위 기준면은 공식 근거 확보 전까지 기록하지 않습니다. 생성 시각만 UTC ISO 8601입니다.
 
 ## 실행과 호출량
 
@@ -11,7 +11,7 @@
 
 ## 배포 전 준비
 
-아직 GitHub 실행·배포는 하지 않았습니다. 사용자가 이후 승인한 경우에만 Settings → Secrets and variables → Actions에 `KHOA_SERVICE_KEY`를 등록합니다. Secret은 수집 단계에만 전달하며 `VITE_` 공개 변수로 만들지 않습니다. 현재 키의 유효기간·운영 승인 상태·승인 호출량도 확인합니다.
+정적 JSON 갱신 기반은 배포되어 있으며 날짜 상세 카드가 이 자료를 조회합니다. 새 운영 환경의 Secret은 승인 후 Settings → Secrets and variables → Actions에 `KHOA_SERVICE_KEY`로 등록합니다. Secret은 수집 단계에만 전달하며 `VITE_` 공개 변수로 만들지 않습니다. 현재 키의 유효기간·운영 승인 상태·승인 호출량도 확인합니다.
 
 ## 정상 자료 승계와 실패
 

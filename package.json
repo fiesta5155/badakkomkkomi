@@ -11,7 +11,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "node --test src/tests/*.test.ts",
-    "test:rules": "npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project demo-bada-profile \"node --test --test-concurrency=1 src/tests/firebaseProfile.rules.mjs src/tests/firebaseCalendar.rules.mjs src/tests/firebaseAnnouncements.rules.mjs\"",
+    "test:rules": "npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project demo-bada-profile \"node --test --test-concurrency=1 src/tests/firebaseProfile.rules.mjs src/tests/firebaseCalendar.rules.mjs src/tests/firebaseAnnouncements.rules.mjs src/tests/firebasePermits.rules.mjs src/tests/firebaseProductionMerge.rules.mjs\"",
     "verify": "node scripts/verify-integrity.mjs",
     "preview": "vite preview"
   },

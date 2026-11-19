@@ -135,6 +135,82 @@ service cloud.firestore {
       allow delete: if calendarUser() && announcementAdmin();
     }
 
+    // 행위허가: 기존 calendarUser/calendarAdmin을 재사용하며 기존 경로는 변경하지 않는다.
+    function monthDays(y, m) {
+      return m == 2 ? ((y % 400 == 0 || (y % 4 == 0 && y % 100 != 0)) ? 29 : 28) : (m in [4,6,9,11] ? 30 : 31);
+    }
+    function permitExpiry(date) {
+      let p = date.split('-');
+      let y = int(p[0]) + (int(p[1]) == 12 ? 1 : 0);
+      let m = int(p[1]) == 12 ? 1 : int(p[1]) + 1;
+      let d = int(p[2]) <= monthDays(y, m) ? int(p[2]) : monthDays(y, m);
+      return timestamp.date(y, m, d) - duration.value(9, 'h');
+    }
+    function validPermitVertices(v) {
+      // Firestore 규칙은 반복문이 없으므로 크기를 제한한다.
+      // 각 좌표의 DMS·범위·일치·다각형 교차 검사는 클라이언트 저장 및 읽기에서 검사한다.
+      return v is list && v.size() >= 4 && v.size() <= 20;
+    }
+    function validPermitSnapshot(p) {
+      return p is map && p.keys().hasAll(['permitNumber','target','sourceCrs','vertices','startDate','endDate'])
+
+        && p.permitNumber is string && p.permitNumber.size() > 0 && p.permitNumber.size() <= 120
+        && p.target is string && p.target.size() > 0 && p.target.size() <= 80
+        && p.sourceCrs == 'EPSG:4326' && validPermitVertices(p.vertices)
+        && validCalendarDate(p.startDate) && validCalendarDate(p.endDate) && p.startDate <= p.endDate;
+    }
+    function snapshotOf(p) {
+      return {'permitNumber':p.permitNumber,'target':p.target,'sourceCrs':p.sourceCrs,'vertices':p.vertices,'startDate':p.startDate,'endDate':p.endDate};
+    }
+    function validPermit() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['schemaVersion','permitNumber','target','sourceCrs','vertices','startDate','endDate','notes','expiresAt','authorUid','authorName','createdAt','updatedAt','revision'])
+        && d.keys().hasOnly(['schemaVersion','permitNumber','target','sourceCrs','vertices','startDate','endDate','notes','expiresAt','authorUid','authorName','createdAt','updatedAt','revision'])
+        && d.schemaVersion == 1 && validPermitSnapshot(d)
+        && d.notes is string && d.notes.size() <= 2000
+        && d.expiresAt is timestamp && d.expiresAt == permitExpiry(d.endDate)
+        && d.createdAt is timestamp && d.updatedAt == request.time
+        && d.authorUid is string && d.authorName is string && d.authorName.matches('^[가-힣]{2}$')
+        && d.revision is int && d.revision >= 1;
+    }
+    match /activityPermits/{id} {
+      allow read: if calendarUser();
+      allow create: if calendarUser() && validPermit()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+        && request.resource.data.createdAt == request.time && request.resource.data.revision == 1;
+      allow update: if calendarUser() && resource.data.authorUid == request.auth.uid && validPermit()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['permitNumber','target','sourceCrs','vertices','startDate','endDate','notes','expiresAt','updatedAt','revision'])
+        && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if calendarUser() && (resource.data.authorUid == request.auth.uid || calendarAdmin());
+    }
+    function validInvestigation() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['schemaVersion','permitId','permitSnapshot','date','vessel','status','authorUid','authorName','createdAt','updatedAt','revision'])
+        && d.keys().hasOnly(['schemaVersion','permitId','permitSnapshot','date','vessel','status','authorUid','authorName','createdAt','updatedAt','revision'])
+        && d.schemaVersion == 1 && d.permitId is string && d.permitId.size() > 0 && d.permitId.size() <= 128
+        && d.vessel in ['101','103'] && d.status in ['planned','completed']
+        && validCalendarDate(d.date)
+        && d.date >= d.permitSnapshot.startDate && d.date <= d.permitSnapshot.endDate
+        && d.authorUid is string && d.authorName is string && d.authorName.matches('^[가-힣]{2}$')
+        && d.createdAt is timestamp && d.updatedAt == request.time && d.revision is int && d.revision >= 1;
+    }
+    function currentPermitSnapshot(d) {
+      return exists(/databases/$(database)/documents/activityPermits/$(d.permitId))
+        && d.permitSnapshot == snapshotOf(get(/databases/$(database)/documents/activityPermits/$(d.permitId)).data);
+    }
+    match /permitInvestigations/{id} {
+      allow read: if calendarUser();
+      allow create: if calendarUser() && validInvestigation() && currentPermitSnapshot(request.resource.data)
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+        && request.resource.data.createdAt == request.time && request.resource.data.revision == 1;
+      allow update: if calendarUser() && resource.data.authorUid == request.auth.uid && validInvestigation()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['date','vessel','status','permitSnapshot','updatedAt','revision'])
+        && request.resource.data.revision == resource.data.revision + 1
+        && (request.resource.data.permitSnapshot == resource.data.permitSnapshot || currentPermitSnapshot(request.resource.data));
+      allow delete: if calendarUser() && (resource.data.authorUid == request.auth.uid || calendarAdmin());
+    }
     // 명시적으로 허용하지 않은 경로는 기본 거부한다.
     match /{document=**} {
       allow read, write: if false;

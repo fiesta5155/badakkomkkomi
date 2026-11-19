@@ -1,0 +1,3 @@
+# Keep the deployed rules and byte-exact regression backup stable on Windows/Linux.
+firestore.rules text eol=lf
+docs/backups/firestore.production-before-permits.rules text eol=lf

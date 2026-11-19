@@ -6,7 +6,9 @@ import {
   Check,
   ChevronDown,
   ChevronLeft,
+  ClipboardList,
   Layers,
+  LoaderCircle,
   Mail,
   Navigation,
   Search,
@@ -89,6 +91,10 @@ import type { RoadviewTargetLocation } from './types/kakao';
 import { useAppConfig } from './hooks/useAppConfig';
 import { useAppRoute, type NavPanelType } from './hooks/useAppRoute';
 import { usePorpoiseStorage } from './hooks/usePorpoiseStorage';
+import { usePorpoiseLocationPicker } from './hooks/usePorpoiseLocationPicker';
+import { useActivityPermits } from './hooks/useActivityPermits';
+import { ActivityPermitPanel } from './components/notebook/ActivityPermitPanel';
+import { PERMIT_LAYER_ID, permitFeatureCollection, permitLayer, permitStatus, type PermitMapFocus, type PermitSnapshot } from './services/activityPermitModel';
 import { useMarineWeather } from './hooks/useMarineWeather';
 import {
   calculateRouteSummary,
@@ -227,11 +233,32 @@ export function App() {
   const [isReportPickMode, setIsReportPickMode] = useState(false);
 
   const [showPorpoiseLayer, setShowPorpoiseLayer] = useState(true);
-  const [isPorpoiseAddMode, setIsPorpoiseAddMode] = useState(false);
+  const permitWorkspace = useActivityPermits();
+  const [permitVisible, setPermitVisible] = useState(true);
+  const [permitPanel, setPermitPanel] = useState<'list' | 'detail' | null>(null);
+  const [selectedPermit, setSelectedPermit] = useState<(PermitSnapshot & { id: string }) | null>(null);
+  const [permitFocus, setPermitFocus] = useState<PermitMapFocus | null>(null);
+  useEffect(() => { if (route.screen !== 'notebook') { setPermitPanel(null); setSelectedPermit(null); setPermitFocus(null); } }, [route.screen]);
+  useEffect(() => { setSelectedPermit(null); setPermitPanel(current => current === 'detail' ? null : current); }, [permitWorkspace.profile?.uid]);
+  const permitMapRecords = useMemo(() => {
+    const rows: (PermitSnapshot & { id: string })[] = permitWorkspace.records.filter(p => permitStatus(p, permitWorkspace.today) === '조사 가능');
+    if (selectedPermit && !rows.some(p => p.id === selectedPermit.id)) rows.push(selectedPermit);
+    return rows;
+  }, [permitWorkspace.records, permitWorkspace.today, selectedPermit]);
+  const permitMapLayers = useMemo(() => [...layers, permitLayer(layers.find(l => l.id === 'protected_area'), permitVisible && route.screen === 'notebook')], [layers, permitVisible, route.screen]);
+  const permitMapData = useMemo(() => ({ ...geoJsonLayersData, [PERMIT_LAYER_ID]: permitFeatureCollection(permitMapRecords) }), [geoJsonLayersData, permitMapRecords]);
   const [porpoiseModalCoords, setPorpoiseModalCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPorpoise, setSelectedPorpoise] = useState<PorpoiseRecord | null>(null);
 
   const [isMapFocused, setIsMapFocused] = useState(false);
+  const {
+    active: isPorpoiseAddMode, pending: isPorpoiseGpsPending,
+    setActive: setIsPorpoiseAddMode, press: handlePorpoisePress, select: handleMapClickForPorpoise,
+  } = usePorpoiseLocationPicker({
+    enabled: route.screen === 'notebook' && !isMapFocused,
+    onPick: (lat, lng) => { setPorpoiseModalCoords({ lat, lng }); setSelectedPorpoise(null); },
+    onGpsPick: (lat, lng) => { setFlyTarget({ lat, lng, zoom: 14, nonce: Date.now() }); },
+  });
   useEffect(() => { if (isHomeScreen || isCalendarScreen) setIsMapFocused(false); }, [isHomeScreen, isCalendarScreen]);
 
   const [isWeatherSettingsOpen, setIsWeatherSettingsOpen] = useState(false);
@@ -288,7 +315,7 @@ export function App() {
         workspaceHeadingRef.current?.focus({ preventScroll: true });
       }, 60);
     },
-    [navigateToScreen],
+    [navigateToScreen, setIsPorpoiseAddMode],
   );
 
   // 인트로 허브에서 '바닷길 콕콕' 세부 탭(시간계산 / 해상기상 판정)으로 직행
@@ -304,7 +331,7 @@ export function App() {
         workspaceHeadingRef.current?.focus({ preventScroll: true });
       }, 60);
     },
-    [navigateToScreen],
+    [navigateToScreen, setIsPorpoiseAddMode],
   );
 
   const handleReturnToHome = useCallback(() => {
@@ -318,7 +345,7 @@ export function App() {
     setExternalRoadviewTarget(null);
     setPortSelectorTarget(null);
     navigateHome(navSubTab);
-  }, [navigateHome, navSubTab]);
+  }, [navigateHome, navSubTab, setIsPorpoiseAddMode]);
 
   // 4. GPS, 온라인 상태 및 PWA 설치 프롬프트
   const [userLocation, setUserLocation] = useState<UserGpsState | null>(null);
@@ -716,6 +743,19 @@ export function App() {
   const handleFlyToPoint = useCallback((lat: number, lng: number, zoom = 14) => {
     setFlyTarget({ lat, lng, zoom, nonce: Date.now() });
   }, []);
+  const handleFocusPermit = useCallback((p: PermitSnapshot & { id: string }) => {
+    setIsPorpoiseAddMode(false); setIsReportPickMode(false); setSelectedFeature(null);
+    setSelectedPermit(p); setPermitVisible(true); setPermitPanel('detail');
+    setPermitFocus({ vertices: p.vertices, nonce: Date.now() });
+    setHasEnteredWorkspace(true); navigateToScreen('notebook', 'route');
+  }, [navigateToScreen, setIsPorpoiseAddMode]);
+  const handleSelectPermit = useCallback((id: string) => {
+    const p = permitWorkspace.records.find(item => item.id === id) ?? (selectedPermit?.id === id ? selectedPermit : null);
+    if (p) handleFocusPermit(p);
+  }, [permitWorkspace.records, selectedPermit, handleFocusPermit]);
+  const handleCalendarPermit = useCallback((id: string, snapshot: PermitSnapshot) => {
+    handleFocusPermit(permitWorkspace.records.find(p => p.id === id) ?? { ...snapshot, id });
+  }, [permitWorkspace.records, handleFocusPermit]);
 
   // PWA 앱 설치 핸들러
   const handleInstallClick = async () => {
@@ -784,10 +824,8 @@ export function App() {
       }
 
       if (nextWaypoints.length === 1) {
-        handleFlyToPoint(port.lat, port.lng, 13);
         showToast(notice ?? `출발지: ${port.name}`);
       } else if (nextWaypoints.length >= 2) {
-        setFitRouteBoundsTrigger((n) => n + 1);
         if (result.addedRole === 'removed_waypoint') {
           showToast(notice ?? `경유지 해제됨: ${port.name} ([실행취소]로 복구 가능)`);
         } else {
@@ -807,7 +845,6 @@ export function App() {
       isRouteDrawing,
       routeMapTapMode,
       commitRouteWaypoints,
-      handleFlyToPoint,
       showToast,
     ],
   );
@@ -842,7 +879,6 @@ export function App() {
     commitRouteWaypoints((prev) => sanitizeCommittedRouteWaypoints(prev).waypoints);
     setIsRouteDrawing(false);
     setRouteMapTapMode('pan_only');
-    setFitRouteBoundsTrigger((n) => n + 1);
     showToast('✅ 항로 설정이 완료되어 지도가 [이동만] 모드로 잠겼습니다.');
   }, [routeWaypoints.length, commitRouteWaypoints, showToast]);
 
@@ -994,10 +1030,8 @@ export function App() {
     setPortSelectorTarget(null);
 
     if (nextWaypoints.length === 1) {
-      handleFlyToPoint(gpsCandidate.lat, gpsCandidate.lng, 13);
       showToast(notice ?? `출발지: ${gpsCandidate.name}`);
     } else if (nextWaypoints.length >= 2) {
-      setFitRouteBoundsTrigger((n) => n + 1);
       showToast(notice ?? `${portSelectorTarget?.label ?? '지점'} 설정: ${gpsCandidate.name}`);
     }
   }, [
@@ -1007,7 +1041,6 @@ export function App() {
     snapRadiusMeters,
     routeWaypoints,
     commitRouteWaypoints,
-    handleFlyToPoint,
     showToast,
   ]);
 
@@ -1073,7 +1106,6 @@ export function App() {
             step2.waypoints,
           );
           commitRouteWaypoints(() => nextWaypoints);
-          setFitRouteBoundsTrigger((n) => n + 1);
           showToast(`출발(현재 위치) ➔ 도착(${destCandidate.name}) 항로가 연결되었습니다.`);
           return;
         }
@@ -1088,7 +1120,6 @@ export function App() {
       );
       if (result.error) {
         showToast(result.error);
-        handleFlyToPoint(lat, lng, 13);
         return;
       }
       const { waypoints: nextWaypoints } = sanitizeCommittedRouteWaypoints(
@@ -1096,10 +1127,8 @@ export function App() {
       );
       commitRouteWaypoints(() => nextWaypoints);
       if (nextWaypoints.length >= 2) {
-        setFitRouteBoundsTrigger((n) => n + 1);
         showToast(`도착지 설정: ${destCandidate.name}`);
       } else {
-        handleFlyToPoint(destCandidate.lat, destCandidate.lng, 13);
         showToast(`출발지 설정: ${destCandidate.name} — 지도에서 도착지를 탭하세요.`);
       }
     },
@@ -1111,8 +1140,8 @@ export function App() {
       updateWeatherCoordinates,
       switchWorkspaceScreen,
       commitRouteWaypoints,
-      handleFlyToPoint,
       showToast,
+      setIsPorpoiseAddMode,
     ],
   );
 
@@ -1144,11 +1173,6 @@ export function App() {
       result.waypoints,
     );
     commitRouteWaypoints(() => nextWaypoints);
-    if (nextWaypoints.length >= 2) {
-      setFitRouteBoundsTrigger((n) => n + 1);
-    } else {
-      handleFlyToPoint(resolved.lat, resolved.lng, 13);
-    }
     showToast(notice ?? `기상 조회 해역이 항로에 반영되었습니다: ${resolved.name}`);
   }, [
     marineWeather.lat,
@@ -1158,7 +1182,6 @@ export function App() {
     routeWaypoints,
     replaceNavPanel,
     commitRouteWaypoints,
-    handleFlyToPoint,
     showToast,
   ]);
 
@@ -1174,14 +1197,9 @@ export function App() {
   );
 
   const handleSelectPorpoiseOnMap = useCallback((record: PorpoiseRecord) => {
-    setSelectedPorpoise(record);
-  }, []);
-
-  const handleMapClickForPorpoise = useCallback((lat: number, lng: number) => {
-    setPorpoiseModalCoords({ lat, lng });
-    setSelectedPorpoise(null);
     setIsPorpoiseAddMode(false);
-  }, []);
+    setSelectedPorpoise(record);
+  }, [setIsPorpoiseAddMode]);
 
   const handleMapClickForReport = useCallback((lat: number, lng: number) => {
     setCustomReportCoords({ lat, lng });
@@ -1272,7 +1290,7 @@ export function App() {
 
       {isCalendarScreen && (
         <Suspense fallback={<div className="h-dvh bg-white" />}>
-          <CalendarScreen onBackHome={() => navigateHome(navSubTab)} />
+          <CalendarScreen onBackHome={() => navigateHome(navSubTab)} onOpenPermit={handleCalendarPermit} />
         </Suspense>
       )}
 
@@ -1377,8 +1395,8 @@ export function App() {
             className="pointer-events-auto relative mx-auto flex w-full max-w-3xl flex-col gap-1.5"
           >
             <div className="flex w-full items-center justify-start gap-2">
-              {/* 좌측 유틸리티 버튼 3종 */}
-              <div className="flex min-w-0 items-center gap-2">
+              {/* 기능 버튼은 고유 폭을 유지하고 공간이 부족하면 다음 줄로 확장 */}
+              <div className="flex w-full min-w-0 flex-wrap items-center gap-2" role="group" aria-label="바다수첩 기능">
                 <button
                   type="button"
                   onClick={() => {
@@ -1410,31 +1428,41 @@ export function App() {
                   type="button"
                   onClick={() => {
                     setIsColorFilterOpen(false);
-                    const next = !isPorpoiseAddMode;
-                    setIsPorpoiseAddMode(next);
                     setIsReportPickMode(false);
-                    if (next) {
+                    if (!isPorpoiseAddMode) {
                       showToast('지도에서 상괭이를 목격한 위치를 탭하세요.');
                     }
+                    handlePorpoisePress();
                   }}
+                  disabled={isPorpoiseGpsPending}
+                  aria-pressed={isPorpoiseAddMode}
+                  aria-busy={isPorpoiseGpsPending}
                   className={`flex min-h-11 shrink-0 items-center gap-1 rounded-xl border-2 px-2 text-[11px] font-black shadow-md active:scale-95 sm:min-h-11 sm:px-3 sm:text-xs ${
                     isPorpoiseAddMode
                       ? 'border-[#00846c] bg-[#00a79d] text-white animate-pulse'
                       : 'border-[#00a79d] bg-white/96 text-[#003360] hover:bg-teal-50'
                   }`}
                 >
-                  <img
+                  {isPorpoiseGpsPending ? <LoaderCircle className="h-4 w-4 shrink-0 motion-safe:animate-spin" aria-hidden="true" /> : <img
                     src={`${import.meta.env.BASE_URL}images/brand/icon_porpoise.png`}
                     alt=""
                     aria-hidden="true"
                     className="h-4 w-4 shrink-0 rounded bg-sky-50 object-contain p-0.5"
-                  />
+                  />}
                   <span className="sm:hidden">
                     {isPorpoiseAddMode ? '탭대기' : '상괭이'}
                   </span>
                   <span className="hidden sm:inline">
                     {isPorpoiseAddMode ? '위치 탭 대기중' : '상괭이 관찰'}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPermitPanel('list')}
+                  className="flex min-h-11 shrink-0 items-center gap-1 rounded-xl border-2 border-[#0066b3] bg-white/96 px-2 text-[11px] font-black text-[#0066b3] shadow-md sm:min-h-11 sm:px-3 sm:text-xs"
+                >
+                  <ClipboardList className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>행위허가</span>
                 </button>
               </div>
 
@@ -1545,8 +1573,10 @@ export function App() {
           features={activeMainTab === 'notebook' ? notebookVisibleFeatures : filteredFeatures}
           selectedFeature={selectedFeature}
           onSelectFeature={handleSelectFeatureOnMap}
-          layers={layers}
-          geoJsonLayersData={geoJsonLayersData}
+          layers={permitMapLayers}
+          geoJsonLayersData={permitMapData}
+          permitFocus={permitFocus}
+          onSelectPermit={handleSelectPermit}
           layerLoadErrorIds={layerLoadErrorIds}
           onRetryGeoJsonLayers={retryFailedGeoJsonLayers}
           showPorpoiseLayer={showPorpoiseLayer}
@@ -1754,6 +1784,8 @@ export function App() {
       {!isMapFocused && isLayerModalOpen && (
         <Suspense fallback={null}>
           <LayerControlModal
+            permitVisible={permitVisible}
+            onTogglePermits={() => setPermitVisible(v => !v)}
             key="layer-modal-open"
             isOpen={isLayerModalOpen}
             onClose={() => setIsLayerModalOpen(false)}
@@ -2110,6 +2142,8 @@ export function App() {
         </Suspense>
       )}
 
+      {permitPanel && !isHomeScreen && !isCalendarScreen && <ActivityPermitPanel key={permitWorkspace.profile?.uid ?? 'guest'} workspace={permitWorkspace} mode={permitPanel}
+        selected={selectedPermit} onFocus={handleFocusPermit} onClose={() => { setPermitPanel(null); setSelectedPermit(null); setPermitFocus(null); }} />}
       {/* 모달 4: 상괭이 관찰기록 */}
       {!isMapFocused && (porpoiseModalCoords || selectedPorpoise) && (
         <Suspense fallback={null}>

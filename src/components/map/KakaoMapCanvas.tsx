@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DockingFeature } from '../../types/docking';
 import type { PorpoiseRecord } from '../../types/porpoise';
+import { PERMIT_LAYER_ID, type PermitMapFocus } from '../../services/activityPermitModel';
 import type { MarinePort } from '../../types/port';
 import type { RouteLeg, RouteWaypoint } from '../../types/route';
 import type { MapLayerConfig } from '../../types/config';
@@ -35,6 +36,8 @@ import {
 } from './mapMarkerTemplates';
 
 export interface KakaoMapCanvasProps {
+  permitFocus?: PermitMapFocus | null;
+  onSelectPermit?: (id: string) => void;
   kakaoMaps: KakaoMapsNamespace;
   baseMapType: KakaoBaseMapType;
   overlayMapTypes: KakaoOverlayMapType[];
@@ -297,7 +300,7 @@ function attachDraggableToCustomOverlay(
 }
 
 interface ParsedKakaoLayerPrimitives {
-  polygons: { rings: KakaoLatLng[][]; label?: string; center?: KakaoLatLng }[];
+  polygons: { rings: KakaoLatLng[][]; label?: string; center?: KakaoLatLng; permitId?: string }[];
   polylines: { path: KakaoLatLng[]; label?: string; center?: KakaoLatLng }[];
   points: { position: KakaoLatLng; label: string }[];
 }
@@ -310,6 +313,7 @@ function parseGeoJsonToKakaoPrimitives(
   kakaoMaps: KakaoMapsNamespace,
   geojson: any,
   labelField = 'name',
+  permit = false,
 ): ParsedKakaoLayerPrimitives {
   const result: ParsedKakaoLayerPrimitives = {
     polygons: [],
@@ -348,7 +352,8 @@ function parseGeoJsonToKakaoPrimitives(
         result.polygons.push({
           rings,
           label: labelStr,
-          center: computeCenter(rings[0]),
+          center: permit && props.labelPoint ? new kakaoMaps.LatLng(props.labelPoint.lat, props.labelPoint.lng) : computeCenter(rings[0]),
+          permitId: permit ? props.permitId : undefined,
         });
       }
     } else if (geom.type === 'MultiPolygon' && Array.isArray(geom.coordinates)) {
@@ -408,6 +413,8 @@ function parseGeoJsonToKakaoPrimitives(
 }
 
 export function KakaoMapCanvas({
+  permitFocus,
+  onSelectPermit,
   kakaoMaps,
   baseMapType,
   overlayMapTypes,
@@ -687,6 +694,14 @@ export function KakaoMapCanvas({
     map.setLevel(nextLevel, { animate: true });
   }, [zoomStepTrigger]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !permitFocus || activeMainTab !== 'notebook') return;
+    const bounds = new kakaoMaps.LatLngBounds();
+    permitFocus.vertices.forEach(p => bounds.extend(new kakaoMaps.LatLng(p.lat, p.lng)));
+    const height = containerRef.current?.clientHeight ?? 640;
+    map.setBounds(bounds, Math.min(160, height * .2), 24, Math.min(260, height * .35), 24);
+  }, [kakaoMaps, permitFocus, activeMainTab]);
   const showSpatialLabels = currentLeafletZoom >= 11 && activeMainTab !== 'navigation';
   const showPortLabels = currentLeafletZoom >= 13;
 
@@ -702,6 +717,7 @@ export function KakaoMapCanvas({
         kakaoMaps,
         rawGeoJson,
         labelField,
+        layer.id === PERMIT_LAYER_ID,
       );
     }
     return mapById;
@@ -762,6 +778,7 @@ export function KakaoMapCanvas({
         });
 
         const onPolyClick = (mouseEvent: KakaoMouseEvent) => {
+          if (polyItem.permitId && onSelectPermit && !clickContextRef.current.isPorpoiseAddMode && !clickContextRef.current.isReportPickMode) { onSelectPermit(polyItem.permitId); return; }
           if (!mouseEvent?.latLng) return;
           handleCoordinateClick(mouseEvent.latLng.getLat(), mouseEvent.latLng.getLng());
         };
@@ -770,9 +787,13 @@ export function KakaoMapCanvas({
 
         createdPolygons.push(polygon);
 
-        if (showLabels && polyItem.label && polyItem.center && showSpatialLabels) {
+        if (showLabels && polyItem.label && polyItem.center && (showSpatialLabels || polyItem.permitId)) {
           const lblSpec = buildSpatialLayerLabelSpec(strokeColor, polyItem.label);
-          const lblEl = createOverlayElement(kakaoMaps, lblSpec);
+          const lblEl = createOverlayElement(kakaoMaps, lblSpec, polyItem.permitId ? () => {
+            if (clickContextRef.current.isPorpoiseAddMode || clickContextRef.current.isReportPickMode) {
+              handleCoordinateClick(polyItem.center!.getLat(), polyItem.center!.getLng());
+            } else onSelectPermit?.(polyItem.permitId!);
+          } : undefined);
           createdOverlays.push(
             new kakaoMaps.CustomOverlay({
               map,
@@ -781,7 +802,7 @@ export function KakaoMapCanvas({
               xAnchor: lblSpec.xAnchorRatio,
               yAnchor: lblSpec.yAnchorRatio,
               zIndex: zIndex + 5,
-              clickable: false,
+              clickable: Boolean(polyItem.permitId),
             }),
           );
         }
@@ -861,6 +882,7 @@ export function KakaoMapCanvas({
     parsedSpatialPrimitivesById,
     showSpatialLabels,
     handleCoordinateClick,
+    onSelectPermit,
   ]);
 
   // 6. [3.1 꼬미의 바다수첩] 55개 갯바위 접안 및 소규모 선착장 5색 마커
@@ -1013,27 +1035,18 @@ export function KakaoMapCanvas({
     return routeWaypoints.map((wp) => [wp.lat, wp.lng] as [number, number]);
   }, [routeLegs, routeWaypoints]);
 
-  // 8-B. [전체항로 보기 (Fit Bounds)] 초기 바닷길 시간계산 진입 시 1회 자동 프레이밍 + 수동 트리거 반영 (하단 계산기 패널 여백 320px 확보)
-  const lastFittedTriggerRef = useRef<number>(-1);
-  const wasInRouteNavRef = useRef<boolean>(false);
+  // 8-B. Fit the route only on an explicit request (320px bottom panel padding).
+  // Only an explicit fit request may change the route viewport.
+  const lastFittedTriggerRef = useRef(fitRouteBoundsTrigger ?? 0);
 
   useEffect(() => {
     const map = mapRef.current;
+    const triggerVal = fitRouteBoundsTrigger ?? 0;
+    if (triggerVal === lastFittedTriggerRef.current) return;
+    lastFittedTriggerRef.current = triggerVal;
+
     const isRouteNav = activeMainTab === 'navigation' && navSubTab === 'route';
-    if (!isRouteNav) {
-      wasInRouteNavRef.current = false;
-      return;
-    }
-    if (!map || polylinePositions.length < 2) return;
-
-    const enteredRouteNav = !wasInRouteNavRef.current;
-    const manualTriggered =
-      fitRouteBoundsTrigger > 0 && fitRouteBoundsTrigger !== lastFittedTriggerRef.current;
-
-    if (!enteredRouteNav && !manualTriggered) return;
-
-    wasInRouteNavRef.current = true;
-    lastFittedTriggerRef.current = fitRouteBoundsTrigger;
+    if (!isRouteNav || triggerVal <= 0 || !map || !polylinePositions || polylinePositions.length < 2) return;
 
     try {
       const bounds = new kakaoMaps.LatLngBounds();

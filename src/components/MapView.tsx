@@ -71,6 +71,8 @@ interface UserGpsLocation {
 }
 
 export interface MapViewProps {
+  permitFocus?: import('../services/activityPermitModel').PermitMapFocus | null;
+  onSelectPermit?: (id: string) => void;
   isMapFocused: boolean;
   onMapFocusChange: (focused: boolean) => void;
   activeMainTab: 'notebook' | 'navigation';
@@ -126,6 +128,8 @@ export interface MapViewProps {
 }
 
 export function MapView({
+  permitFocus,
+  onSelectPermit,
   isMapFocused,
   onMapFocusChange,
   activeMainTab,
@@ -364,6 +368,8 @@ export function MapView({
       {/* 1. 메인 지도 캔버스 (Kakao Map Primary vs Legacy Leaflet Fallback) */}
       {activeEngine === 'kakao' && kakaoNamespace ? (
         <KakaoMapCanvas
+          permitFocus={permitFocus}
+          onSelectPermit={isMapFocused ? undefined : onSelectPermit}
           kakaoMaps={kakaoNamespace}
           baseMapType={baseMapType}
           overlayMapTypes={overlayMapTypes}
@@ -418,6 +424,8 @@ export function MapView({
           }
         >
           <LegacyLeafletCanvas
+            permitFocus={permitFocus}
+            onSelectPermit={isMapFocused ? undefined : onSelectPermit}
             baseMapType={baseMapType}
             overlayMapTypes={overlayMapTypes}
             activeMainTab={activeMainTab}
