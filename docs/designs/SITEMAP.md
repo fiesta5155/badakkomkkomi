@@ -39,6 +39,7 @@
 - [`src/components/notebook/LayerControlModal.tsx`](../../src/components/notebook/LayerControlModal.tsx): `LayerControlModal(props)`
 - [`src/components/notebook/FieldReportModal.tsx`](../../src/components/notebook/FieldReportModal.tsx): `FieldReportModal(props)`
 - [`src/components/notebook/PorpoiseObservationModal.tsx`](../../src/components/notebook/PorpoiseObservationModal.tsx): `PorpoiseObservationModal(props)`
+- [`src/components/notebook/PorpoiseExportButton.tsx`](../../src/components/notebook/PorpoiseExportButton.tsx): 레이어 관리의 관찰기록 내보내기 버튼. 로그인 실명 확인 후 기기 전체 기록 공유·다운로드, 빈 기록·오류 안내 및 공유 취소 처리
 - [`src/components/calendar/CalendarScreen.tsx`](../../src/components/calendar/CalendarScreen.tsx): `CalendarScreen(props)` — 인증된 사용자용 공유 달력, 날짜 상세·작성·권한별 수정/삭제, 기존 로컬 원본 JSON 백업. 물때/날씨/운항/메모 고정 2×2 배치 유지
 - [`src/components/navigation/RouteTimeCalculator.tsx`](../../src/components/navigation/RouteTimeCalculator.tsx): `RouteTimeCalculator(props)`
 - [`src/components/navigation/PortSelectModal.tsx`](../../src/components/navigation/PortSelectModal.tsx): `PortSelectModal(props)`
@@ -63,6 +64,7 @@
 ## 2. Core Domain Services (`src/services`)
 
 - [`src/services/porpoiseLocationPicker.ts`](../../src/services/porpoiseLocationPicker.ts): `createPorpoiseLocationPicker()` — 첫 클릭 수동 선택, 활성 버튼 재클릭마다 캐시 없는 GPS 조회. 중복·실패·시간 초과·수동 선택·종료 후 늦은 응답을 제어하며 저장은 기존 관찰 모달에 위임
+- [`src/services/porpoiseExportService.ts`](../../src/services/porpoiseExportService.ts): `buildPorpoiseCsv()`, `createPorpoiseCsvFile()`, `sharePorpoiseCsv()`, `downloadPorpoiseCsv()` — 현지 관찰일시 보존·오름차순 정렬·14열 CSV·UTF-8 BOM, 현재 로그인 실명 적용. `bada_finless_porpoise_records_v1` 읽기·쓰기를 수행하지 않으며 전달받은 기록을 변경하지 않음
 - [`src/hooks/usePorpoiseLocationPicker.ts`](../../src/hooks/usePorpoiseLocationPicker.ts): 상괭이 선택 모드와 버튼 상태 구독. 화면 이탈·popstate·모드 종료·언마운트 시 요청 무효화. GPS 실패 알림 없음
 - [`src/hooks/useActivityPermits.ts`](../../src/hooks/useActivityPermits.ts): UID 범위 직원 공유 허가구역 구독, 기존 관리자 조회, KST 기간 판정.
 - [`src/services/activityPermitModel.ts`](../../src/services/activityPermitModel.ts): 확인된 WGS84 DMS 변환, 다각형 검증, 노란 특별보호구역 스타일 파생 및 내부 라벨, 기존 expiresAt 호환 메타데이터. TTL 없이 작성자·관리자가 수동 삭제.
@@ -109,7 +111,7 @@ UI 프레임워크에 의존하지 않는 순수 비즈니스 로직 및 외부 
 
 ### Side Effects
 - `layerStorageService.ts` 및 `workspaceDraftRepository.ts`는 `IndexedDB`와 `localStorage`를 읽고 씁니다.
-- `kakaoMapLoader.ts`는 `<script>` 태그를 주입하며, `githubLayerSyncService.ts`는 GitHub REST API를 호출합니다. `firebaseClient.ts`와 `userProfileService.ts`는 설정된 Firebase 프로젝트에서 인증 상태와 본인 프로필을 처리합니다. 나머지 서비스 모듈은 부수효과 없는 순수 함수입니다.
+- `kakaoMapLoader.ts`는 `<script>` 태그를 주입하며, `githubLayerSyncService.ts`는 GitHub REST API를 호출합니다. `firebaseClient.ts`와 `userProfileService.ts`는 설정된 Firebase 프로젝트에서 인증 상태와 본인 프로필을 처리합니다. `porpoiseExportService.ts`는 사용자 클릭에 따른 기본 파일 공유창 또는 CSV 다운로드를 실행하며 저장소·서버에는 쓰지 않습니다. 나머지 서비스 모듈은 부수효과 없는 순수 함수입니다.
 
 ### Verification
 - Run: `npm test`

@@ -51,6 +51,7 @@
   - 접안 포인트 상세창 또는 독립 제보 버튼(**`지도에서 위치 선택`** 지원)을 통해 위경도 좌표·현장 사진·자유 메모를 입력합니다.
   - 운영자 수신 이메일(`admin.report_recipient_email`, 앱 내에서도 즉시 변경·저장 가능)로 규격화된 제보 메일(`mailto:`)을 발송하거나 클립보드에 전문을 복사합니다.
 - **D. 개인 상괭이 관찰 기록 (`PorpoiseObservationModal` + `usePorpoiseStorage`)**:
+  - 레이어 관리의 **관찰기록 내보내기**에서 현재 기기의 전체 기록을 관찰일시 순으로 UTF-8 BOM CSV(현지 조사표 14열)로 내보냅니다. 실명 등록이 완료된 로그인 프로필의 `realName`을 조사자로 사용하며, 저장된 현지 관찰일시와 기존 저장 키·구조는 그대로 유지합니다. 파일 공유 지원 기기에서는 기본 공유창을, 미지원 환경에서는 다운로드를 사용합니다.
   - 지도에서 상괭이 목격 위치를 탭하면 현재 일시와 기본 개체수(`1마리`)가 자동 입력되며, 기기 내부(`localStorage`)에 저장되어 전용 상괭이 표식으로 렌더링됩니다. (기획 명세에 따라 사진·메모·통계 기능 제외, 개별 조회·수정·삭제 및 레이어 표시/숨김 지원)
 
 ### 2.2. 바닷길 콕콕 (`3.2`)
@@ -126,7 +127,8 @@ bada-kkomkkomi/
 │   │   ├── notebook/
 │   │   │   ├── LayerControlModal.tsx        # 직원용 QGIS 멀티포맷 공간정보 레이어 운영 관리 워크스페이스
 │   │   │   ├── FieldReportModal.tsx         # 현장정보 이메일 제보 & 지도 위치 선택 모달
-│   │   │   └── PorpoiseObservationModal.tsx # 개인 상괭이 관찰 기록 추가/수정/삭제 모달
+│   │   │   ├── PorpoiseObservationModal.tsx # 개인 상괭이 관찰 기록 추가/수정/삭제 모달
+│   │   │   └── PorpoiseExportButton.tsx # 로그인 실명 확인 및 전체 관찰기록 CSV 공유·다운로드
 │   │   └── navigation/
 │   │       ├── RouteTimeCalculator.tsx      # 바닷길 시간계산기 패널 (예상시간·이동경로·구간거리·되돌리기)
 │   │       ├── PortSelectModal.tsx          # 136개 항구·선착장 초성/별칭/섬/GPS 거리순 검색 모달
@@ -153,6 +155,7 @@ bada-kkomkkomi/
 │   │   └── geojsonMeta.ts             # 초기 부팅용 무의존성 WGS84 GeoJSON 메타데이터·BBox 정규화 유틸리티
 │   ├── services/
 │   │   ├── porpoiseLocationPicker.ts  # GPS 중복 요청·타임아웃·선택 세대 제어 (관찰 저장과 분리)
+│   │   ├── porpoiseExportService.ts   # 현지 조사표 14열 CSV·UTF-8 BOM·기본 파일 공유·다운로드 (저장소 쓰기 없음)
 │   │   ├── calendarDayConditions.ts   # KHOA 재사용·IFS/WAM 정오 결합·ENS 강수확률·요청 병합
 │   │   ├── activityPermitModel.ts     # 원본 DMS·WGS84·다각형 검증·월 단위 만료·지도 레이어
 │   │   ├── activityPermitService.ts   # 작성자 트랜잭션·별도 조사 일정 및 구역 스냅샷

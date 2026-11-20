@@ -54,6 +54,8 @@ import {
   saveGitHubSyncConfig,
 } from '../../services/githubLayerSyncService';
 import { resolveLayerProvenance } from '../../config/dataSources';
+import type { PorpoiseRecord } from '../../types/porpoise';
+import { PorpoiseExportButton } from './PorpoiseExportButton';
 
 interface LayerControlModalProps {
   permitVisible?: boolean;
@@ -87,6 +89,7 @@ interface LayerControlModalProps {
   showPorpoiseLayer: boolean;
   onTogglePorpoiseLayer: () => void;
   porpoiseCount: number;
+  porpoiseRecords: readonly PorpoiseRecord[];
 }
 
 type ModalWorkspaceTab = 'list' | 'import' | 'features' | 'history';
@@ -178,6 +181,7 @@ export function LayerControlModal({
   showPorpoiseLayer,
   onTogglePorpoiseLayer,
   porpoiseCount,
+  porpoiseRecords,
 }: LayerControlModalProps) {
   const [activeTab, setActiveTab] = useState<ModalWorkspaceTab>('list');
 
@@ -1335,28 +1339,31 @@ export function LayerControlModal({
 
               {onTogglePermits && <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-2xl border border-yellow-400 bg-yellow-50 p-3.5"><input type="checkbox" checked={permitVisible} onChange={onTogglePermits} className="h-5 w-5 accent-yellow-600" /><span className="text-sm font-extrabold text-[#003360]">행위허가</span></label>}
               {/* 개인 상괭이 관찰 표식 레이어 */}
-              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#00a79d]/50 bg-teal-50/70 p-3.5 transition hover:border-[#00a79d]">
-                <input
-                  type="checkbox"
-                  checked={showPorpoiseLayer}
-                  onChange={onTogglePorpoiseLayer}
-                  className="mt-1 h-5 w-5 rounded border-slate-400 bg-white accent-[#00846c]"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[#00a79d]" />
-                    <span className="text-sm font-extrabold text-[#003360]">
-                      개인 상괭이 관찰 표식
-                    </span>
-                    <span className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-black text-[#00846c]">
-                      {porpoiseCount}건
-                    </span>
+              <div className="rounded-2xl border border-[#00a79d]/50 bg-teal-50/70 p-3.5 transition hover:border-[#00a79d]">
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={showPorpoiseLayer}
+                    onChange={onTogglePorpoiseLayer}
+                    className="mt-1 h-5 w-5 rounded border-slate-400 bg-white accent-[#00846c]"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[#00a79d]" />
+                      <span className="text-sm font-extrabold text-[#003360]">
+                        개인 상괭이 관찰 표식
+                      </span>
+                      <span className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-black text-[#00846c]">
+                        {porpoiseCount}건
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs font-semibold text-[#484843]">
+                      기기에 저장된 상괭이 목격 위치 핀 표시
+                    </p>
                   </div>
-                  <p className="mt-0.5 text-xs font-semibold text-[#484843]">
-                    기기에 저장된 상괭이 목격 위치 핀 표시
-                  </p>
-                </div>
-              </label>
+                </label>
+                <PorpoiseExportButton records={porpoiseRecords} />
+              </div>
             </div>
           )}
 

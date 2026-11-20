@@ -2112,6 +2112,7 @@ export function App() {
             showPorpoiseLayer={showPorpoiseLayer}
             onTogglePorpoiseLayer={() => setShowPorpoiseLayer(!showPorpoiseLayer)}
             porpoiseCount={porpoiseRecords.length}
+            porpoiseRecords={porpoiseRecords}
           />
         </Suspense>
       )}
