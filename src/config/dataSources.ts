@@ -53,7 +53,7 @@ export interface OfflineCapabilityRow {
  */
 export const OFFLINE_CAPABILITY_MATRIX: readonly OfflineCapabilityRow[] = [
   {
-    featureName: '55개 접안지 · 136개 항포구 · 공원경계',
+    featureName: '항·포구 명칭 154곳 · 접안지 · 공원경계',
     isOfflineGuaranteed: true,
     statusBadge: '🟢 100% 오프라인',
     detail: '앱 설치 시 정적 데이터·모식도가 기기에 내장되어 통신 없이 즉시 열람',
@@ -93,17 +93,17 @@ export const DATA_SOURCE_REGISTRY: readonly DataSourceItem[] = [
     badgeLabel: '항포구 · 접안지 · 공원경계',
     governanceLabel: '공공 고시 · 현장 실측',
     governanceType: 'public_official',
-    title: '통영·거제 136개 항포구 · 55개 접안지 · 국립공원 구역',
-    providerSummary: '국립해양조사원(KHOA) · 지자체 어항고시 · 환경부/국립공원공단(KNPS)',
+    title: '통영·거제 항·포구 명칭 154곳 · 55개 접안지 · 국립공원 구역',
+    providerSummary: '해양수산부 어촌어항관리시스템 · 국립해양조사원(KHOA) · 지자체 어항고시 · 환경부/국립공원공단(KNPS)',
     operationMode: 'offline_embedded',
     operationModeLabel: '🟢 앱 내장 (100% 오프라인)',
     keyPoints: [
-      '⚓ 136개 항포구 · 55개 접안지',
+      '⚓ 항·포구 명칭 154곳 · 55개 접안지',
       '📐 자체 제작 SVG 수심 모식도',
       '📴 바다 위 100% 오프라인 열람',
     ],
     plainExplanation:
-      '해상 통신이 끊겨도 즉시 확인할 수 있도록 어항(81곳)·소규모 선착장(50곳)·조사선 거점(5곳)과 공원 경계를 앱에 내장했습니다.',
+      '항·포구 명칭은 해양수산부 어촌어항관리시스템의 통영 57곳과 거제 97곳을 사용합니다. 위치 일치 확인 83곳과 검증 보류 71곳을 포함하며, 해상 통신 없이도 지명을 확인할 수 있습니다.',
     faqQuestion: '상세창에 실제 사진 대신 컴퓨터 그림(SVG)이 있는 이유는?',
     faqAnswer:
       '오프라인 즉시 열람과 만조·간조 수심·암초 위치를 한눈에 보여주려 자체 제작한 "현장 모식도"이며, 실사 사진(.jpg/.png) 등록 시 즉시 교체됩니다.',

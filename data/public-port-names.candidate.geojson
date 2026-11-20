@@ -1,0 +1,3684 @@
+{
+  "type": "FeatureCollection",
+  "datasetDate": "2026-11-20",
+  "status": "review-candidate",
+  "coordinateReferenceSystem": "EPSG:4326",
+  "coordinateUse": "place-name-reference",
+  "sources": [
+    {
+      "id": "naraport-CP",
+      "provider": "해양수산부",
+      "url": "https://naraport.mof.go.kr/info/port.do",
+      "retrievedOn": "2026-11-20",
+      "referenceYear": null
+    },
+    {
+      "id": "naraport-NP",
+      "provider": "해양수산부",
+      "url": "https://naraport.mof.go.kr/info/port.do",
+      "retrievedOn": "2026-11-20",
+      "referenceYear": null
+    },
+    {
+      "id": "naraport-FP",
+      "provider": "해양수산부",
+      "url": "https://naraport.mof.go.kr/info/port.do",
+      "retrievedOn": "2026-11-20",
+      "referenceYear": null
+    }
+  ],
+  "features": [
+    {
+      "type": "Feature",
+      "id": "naraport:FP000097",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.383806,
+          34.79568
+        ]
+      },
+      "properties": {
+        "name": "당포항",
+        "address": "경상남도 통영시 산양읍 삼덕리 372-10",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000087",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.71766,
+          34.939788
+        ]
+      },
+      "properties": {
+        "name": "외포항",
+        "address": "경상남도 거제시 장목면 외포리 57-2",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000100",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.266375,
+          34.631355
+        ]
+      },
+      "properties": {
+        "name": "욕지항",
+        "address": "경상남도 통영시 욕지면 동항리 544-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000089",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.705388,
+          34.829898
+        ]
+      },
+      "properties": {
+        "name": "지세포항",
+        "address": "경상남도 거제시 일운면 지세포리 929-112",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000098",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.502613,
+          34.739181
+        ]
+      },
+      "properties": {
+        "name": "호두항",
+        "address": "경상남도 통영시 한산면 용호리 354",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000090",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.695391,
+          34.804403
+        ]
+      },
+      "properties": {
+        "name": "구조라항",
+        "address": "경상남도 거제시 일운면 구조라리 42-17",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000099",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.239065,
+          34.808762
+        ]
+      },
+      "properties": {
+        "name": "능양항",
+        "address": "경상남도 통영시 사량면 양지리 187-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000088",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.73971,
+          34.88467
+        ]
+      },
+      "properties": {
+        "name": "능포항",
+        "address": "경상남도 거제시 능포동 753-20",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000091",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.628312,
+          34.732245
+        ]
+      },
+      "properties": {
+        "name": "다대다포항",
+        "address": "경상남도 거제시 남부면 다대리 458-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000092",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.586058,
+          34.715075
+        ]
+      },
+      "properties": {
+        "name": "대포근포항",
+        "address": "경상남도 거제시 남부면 저구리 637-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000101",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.575429,
+          34.64779
+        ]
+      },
+      "properties": {
+        "name": "매물도항",
+        "address": "경상남도 통영시 한산면 매죽리 35-23",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP001968",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.681515,
+          34.990425
+        ]
+      },
+      "properties": {
+        "name": "장목항",
+        "address": "경상남도 거제시 장목면 장목리 319-28",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "CP",
+        "sourceId": "naraport-CP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000375",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.39621,
+          34.857276
+        ]
+      },
+      "properties": {
+        "name": "평림항",
+        "address": "경상남도 통영시 평림동 471-3",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000334",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.647176,
+          34.959619
+        ]
+      },
+      "properties": {
+        "name": "하청항",
+        "address": "경상남도 거제시 하청면 하청리 1213-2",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000379",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.476373,
+          34.761277
+        ]
+      },
+      "properties": {
+        "name": "하포항",
+        "address": "경상남도 통영시 한산면 하소리 782-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000372",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.407247,
+          34.747986
+        ]
+      },
+      "properties": {
+        "name": "학림항",
+        "address": "경상남도 통영시 산양읍 저림리 32-23",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000324",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.608456,
+          34.924257
+        ]
+      },
+      "properties": {
+        "name": "한내항",
+        "address": "경상남도 거제시 연초면 한내리 24-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000331",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.675313,
+          35.019937
+        ]
+      },
+      "properties": {
+        "name": "황포항",
+        "address": "경상남도 거제시 장목면 구영리 1173-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000367",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.369639,
+          34.782734
+        ]
+      },
+      "properties": {
+        "name": "곤리항",
+        "address": "경상남도 통영시 산양읍 곤리리 206-7",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000325",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.697721,
+          34.99028
+        ]
+      },
+      "properties": {
+        "name": "관포항",
+        "address": "경상남도 거제시 장목면 관포리 60-13",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000377",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.46119,
+          34.73113
+        ]
+      },
+      "properties": {
+        "name": "내항항",
+        "address": "경상남도 통영시 한산면 비진리 144",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000326",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.708855,
+          35.009613
+        ]
+      },
+      "properties": {
+        "name": "농소항",
+        "address": "경상남도 거제시 장목면 농소리 51-25",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000317",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.662731,
+          34.741589
+        ]
+      },
+      "properties": {
+        "name": "도장포항",
+        "address": "경상남도 거제시 남부면 갈곶리 292-6",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000321",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.568888,
+          34.784891
+        ]
+      },
+      "properties": {
+        "name": "가배항",
+        "address": "경상남도 거제시 동부면 가배리 247-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000315",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.584885,
+          34.849404
+        ]
+      },
+      "properties": {
+        "name": "거제항",
+        "address": "경상남도 거제시 거제면 서정리 771-15",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000374",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.472305,
+          34.889063
+        ]
+      },
+      "properties": {
+        "name": "견유항",
+        "address": "경상남도 통영시 용남면 장평리 95-13",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000366",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.180275,
+          34.837742
+        ]
+      },
+      "properties": {
+        "name": "돈지항",
+        "address": "경상남도 통영시 사량면 돈지리 554-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000368",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.421581,
+          34.765153
+        ]
+      },
+      "properties": {
+        "name": "마동항",
+        "address": "경상남도 통영시 산양읍 미남리 1035-8",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000333",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.648591,
+          35.001754
+        ]
+      },
+      "properties": {
+        "name": "물안항",
+        "address": "경상남도 거제시 하청면 어온리 148-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000323",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.52895,
+          34.959394
+        ]
+      },
+      "properties": {
+        "name": "유교항",
+        "address": "경상남도 거제시 사등면 창호리 596",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000329",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.714639,
+          35.027294
+        ]
+      },
+      "properties": {
+        "name": "유호항",
+        "address": "경상남도 거제시 장목면 유호리 447",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000328",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.725613,
+          34.968717
+        ]
+      },
+      "properties": {
+        "name": "이수도항",
+        "address": "경상남도 거제시 장목면 시방리 170-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000376",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.473836,
+          34.772219
+        ]
+      },
+      "properties": {
+        "name": "장작지항",
+        "address": "경상남도 통영시 한산면 두억리 599-6",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000316",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.580441,
+          34.84074
+        ]
+      },
+      "properties": {
+        "name": "죽림항",
+        "address": "경상남도 거제시 거제면 오수리 885-14",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000363",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.426232,
+          34.939147
+        ]
+      },
+      "properties": {
+        "name": "예포항",
+        "address": "경상남도 통영시 광도면 안정리 47-12",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000322",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.52439,
+          34.920791
+        ]
+      },
+      "properties": {
+        "name": "성포항",
+        "address": "경상남도 거제시 사등면 성포리 350-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000332",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.64038,
+          35.013033
+        ]
+      },
+      "properties": {
+        "name": "송포항",
+        "address": "경상남도 거제시 하청면 대곡리 80-6",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000364",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.328288,
+          34.883197
+        ]
+      },
+      "properties": {
+        "name": "수월항",
+        "address": "경상남도 통영시 도산면 수월리 744-3",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000327",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.710623,
+          34.964464
+        ]
+      },
+      "properties": {
+        "name": "시방항",
+        "address": "경상남도 거제시 장목면 시방리 196-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000318",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.58455,
+          34.763496
+        ]
+      },
+      "properties": {
+        "name": "쌍근항",
+        "address": "경상남도 거제시 남부면 탑포리 520",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000369",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.393951,
+          34.736514
+        ]
+      },
+      "properties": {
+        "name": "연대항",
+        "address": "경상남도 통영시 산양읍 연곡리 92-7",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000370",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.39725,
+          34.778031
+        ]
+      },
+      "properties": {
+        "name": "연명항",
+        "address": "경상남도 통영시 산양읍 연화리 256-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000373",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.351905,
+          34.649698
+        ]
+      },
+      "properties": {
+        "name": "연화항",
+        "address": "경상남도 통영시 욕지면 연화리 146-13",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000371",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.434082,
+          34.799398
+        ]
+      },
+      "properties": {
+        "name": "영운(이운)항",
+        "address": "경상남도 통영시 산양읍 영운리 269-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP000497",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.553485,
+          34.753515
+        ]
+      },
+      "properties": {
+        "name": "곡용포항",
+        "address": "경상남도 통영시 한산면 추봉리 34-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "NP",
+        "sourceId": "naraport-NP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002221",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.390885,
+          34.78811
+        ]
+      },
+      "properties": {
+        "name": "중화항",
+        "address": "경상남도 통영시 산양읍   연화리 880-2",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002222",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.381736,
+          34.810857
+        ]
+      },
+      "properties": {
+        "name": "궁항항",
+        "address": "경상남도 통영시 궁항길 46-8",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002223",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.35907,
+          34.826504
+        ]
+      },
+      "properties": {
+        "name": "모상항",
+        "address": "경상남도 통영시 산양읍   풍화리 753-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002224",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.344403,
+          34.824041
+        ]
+      },
+      "properties": {
+        "name": "수월항",
+        "address": "경상남도 통영시 풍화일주로 541-13",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002225",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.343768,
+          34.831775
+        ]
+      },
+      "properties": {
+        "name": "고다골항",
+        "address": "경상남도 통영시 풍화일주로 772",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002228",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.288709,
+          34.758155
+        ]
+      },
+      "properties": {
+        "name": "미조항",
+        "address": "경상남도 통영시 산양읍 추도리 514-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002230",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.454863,
+          34.869942
+        ]
+      },
+      "properties": {
+        "name": "오촌항",
+        "address": "경상남도 통영시 용남면 동달리 33-3",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002231",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.46692,
+          34.873324
+        ]
+      },
+      "properties": {
+        "name": "연기항",
+        "address": "경상남도 통영시 용남면 장평리 996-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002232",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.459934,
+          34.8988
+        ]
+      },
+      "properties": {
+        "name": "적촌항",
+        "address": "경상남도 통영시 원평길 302",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002233",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.453621,
+          34.900644
+        ]
+      },
+      "properties": {
+        "name": "내포항",
+        "address": "경상남도 통영시 원평길 479",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002234",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.444315,
+          34.892949
+        ]
+      },
+      "properties": {
+        "name": "대방포항",
+        "address": "경상남도 통영시 대방길 63-39",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002235",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.443932,
+          34.890189
+        ]
+      },
+      "properties": {
+        "name": "삼화항",
+        "address": "경상남도 통영시 삼화양촌길 99",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002236",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.434621,
+          34.886667
+        ]
+      },
+      "properties": {
+        "name": "신리항",
+        "address": "경상남도 통영시 용남면 장문리 117-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002237",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.432886,
+          34.879532
+        ]
+      },
+      "properties": {
+        "name": "대안항",
+        "address": "경상남도 통영시 용남면 장문리 525",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002238",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.424618,
+          34.872101
+        ]
+      },
+      "properties": {
+        "name": "기호항",
+        "address": "경상남도 통영시 용남면 장문리 1055-3",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002239",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.485782,
+          34.962359
+        ]
+      },
+      "properties": {
+        "name": "어의항",
+        "address": "경상남도 통영시 용남면 어의리 산117-7",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002240",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.489614,
+          34.934482
+        ]
+      },
+      "properties": {
+        "name": "수도항",
+        "address": "경상남도 통영시 수도길 98",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002241",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.472184,
+          34.915888
+        ]
+      },
+      "properties": {
+        "name": "동부항",
+        "address": "경상남도 통영시 용남면 지도리 374-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002242",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.477188,
+          34.90956
+        ]
+      },
+      "properties": {
+        "name": "거망항",
+        "address": "경상남도 통영시 용남면 지도리 25-6",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002243",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.465649,
+          34.907802
+        ]
+      },
+      "properties": {
+        "name": "서부항",
+        "address": "경상남도 통영시 서부길 54-23",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002244",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.435672,
+          34.965303
+        ]
+      },
+      "properties": {
+        "name": "내촌항",
+        "address": "경상남도 통영시 광도면  황리 365-6",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002245",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.427438,
+          34.916544
+        ]
+      },
+      "properties": {
+        "name": "구집항",
+        "address": "경상남도 통영시 덕포로 408",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002246",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.420659,
+          34.912133
+        ]
+      },
+      "properties": {
+        "name": "창포항",
+        "address": "경상남도 통영시 덕포로 290-63",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002247",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.418238,
+          34.907466
+        ]
+      },
+      "properties": {
+        "name": "손덕항",
+        "address": "경상남도 통영시 덕포로 258",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002248",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.418804,
+          34.889323
+        ]
+      },
+      "properties": {
+        "name": "조암항",
+        "address": "경상남도 통영시 광도면  죽림리 1564",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002249",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.246253,
+          34.669696
+        ]
+      },
+      "properties": {
+        "name": "상리항",
+        "address": "경상남도 통영시 상리길 38",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002250",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.480994,
+          34.745077
+        ]
+      },
+      "properties": {
+        "name": "용초항",
+        "address": "경상남도 통영시 한산면 용호리 969-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002251",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.509874,
+          34.759101
+        ]
+      },
+      "properties": {
+        "name": "봉암항",
+        "address": "경상남도 통영시 한산면 추봉리 911-4",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002252",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.489796,
+          34.796446
+        ]
+      },
+      "properties": {
+        "name": "소고포항",
+        "address": "경상남도 통영시 세작목길 40",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002254",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.468093,
+          34.81452
+        ]
+      },
+      "properties": {
+        "name": "관암항",
+        "address": "경상남도 통영시 한산면 하소리 626-6",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002255",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.507884,
+          34.800396
+        ]
+      },
+      "properties": {
+        "name": "동좌항",
+        "address": "경상남도 통영시 한산면 창좌리 1-3",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002256",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.496763,
+          34.794852
+        ]
+      },
+      "properties": {
+        "name": "서좌항",
+        "address": "경상남도 통영시 한산면 창좌리 340-5",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002257",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.300288,
+          34.757915
+        ]
+      },
+      "properties": {
+        "name": "대항항(사량도)",
+        "address": "경상남도 통영시 사량면 금평리 산66-8",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002259",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.181391,
+          34.855137
+        ]
+      },
+      "properties": {
+        "name": "내지항",
+        "address": "경상남도 통영시 사량면 돈지리 237",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002260",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.199574,
+          34.859362
+        ]
+      },
+      "properties": {
+        "name": "답포항",
+        "address": "경상남도 통영시 사량면 돈지리 75-2",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002261",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.137749,
+          34.833296
+        ]
+      },
+      "properties": {
+        "name": "수우항",
+        "address": "경상남도 통영시 사량면 돈지리 산273",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002262",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.239381,
+          34.832789
+        ]
+      },
+      "properties": {
+        "name": "먹방항",
+        "address": "경상남도 통영시 사량면 읍덕리 57-2",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002263",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.212006,
+          34.824243
+        ]
+      },
+      "properties": {
+        "name": "읍포항",
+        "address": "경상남도 통영시 사량면 읍덕리 368-8",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002264",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.216781,
+          34.837574
+        ]
+      },
+      "properties": {
+        "name": "덕동항",
+        "address": "경상남도 통영시 사량면 읍덕리 202-11",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002265",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.216325,
+          34.812312
+        ]
+      },
+      "properties": {
+        "name": "외지항",
+        "address": "경상남도 통영시 사량면 양지리 678-3",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002266",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.383799,
+          34.844217
+        ]
+      },
+      "properties": {
+        "name": "민양항",
+        "address": "경상남도 통영시 인평동 932-2",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002267",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.405397,
+          34.861161
+        ]
+      },
+      "properties": {
+        "name": "소포항",
+        "address": "경상남도 통영시 명정동 106",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002268",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.417121,
+          34.838967
+        ]
+      },
+      "properties": {
+        "name": "당동항",
+        "address": "경상남도 통영시 도천동 51-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002269",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.397816,
+          34.826561
+        ]
+      },
+      "properties": {
+        "name": "미수항",
+        "address": "경상남도 통영시 미수동 943-1",
+        "region": "통영",
+        "cityCode": "48220",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002310",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.56244,
+          34.84149
+        ]
+      },
+      "properties": {
+        "name": "내간항",
+        "address": "경상남도 거제시 거제면 내간리 981-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002311",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.523746,
+          34.832593
+        ]
+      },
+      "properties": {
+        "name": "고당항",
+        "address": "경상남도 거제시 거제면 법동리 603-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002312",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.519423,
+          34.821496
+        ]
+      },
+      "properties": {
+        "name": "법동항",
+        "address": "경상남도 거제시 거제면 법동리 507-7",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002313",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.53245,
+          34.816216
+        ]
+      },
+      "properties": {
+        "name": "산전항",
+        "address": "경상남도 거제시 거제면 법동리 286-31",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002314",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.546058,
+          34.82278
+        ]
+      },
+      "properties": {
+        "name": "산후항",
+        "address": "경상남도 거제시 거제면 법동리 9-43",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002315",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.540216,
+          34.807352
+        ]
+      },
+      "properties": {
+        "name": "실리항",
+        "address": "경상남도 거제시 거제면 법동리 84-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002316",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.55582,
+          34.833207
+        ]
+      },
+      "properties": {
+        "name": "소랑항",
+        "address": "경상남도 거제시 거제면 소랑리 25-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002317",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.588627,
+          34.830813
+        ]
+      },
+      "properties": {
+        "name": "오수항",
+        "address": "경상남도 거제시 거제면 오수리 836-4",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002318",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.601429,
+          34.726347
+        ]
+      },
+      "properties": {
+        "name": "명사항",
+        "address": "경상남도 거제시 남부면 저구리 248-15",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002319",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.672826,
+          34.738326
+        ]
+      },
+      "properties": {
+        "name": "갈곶항",
+        "address": "경상남도 거제시 남부면 갈곶리 84-4",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002321",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.60719,
+          34.730808
+        ]
+      },
+      "properties": {
+        "name": "저구항",
+        "address": "경상남도 거제시 남부면 저구리 216-12",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002322",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.597732,
+          34.762733
+        ]
+      },
+      "properties": {
+        "name": "탑포항",
+        "address": "경상남도 거제시 남부면 탑포리 391-9",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002323",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.543841,
+          34.782776
+        ]
+      },
+      "properties": {
+        "name": "쪽박항",
+        "address": "경상남도 거제시 동부면 가배리 873-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002324",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.544233,
+          34.77677
+        ]
+      },
+      "properties": {
+        "name": "함박항",
+        "address": "경상남도 거제시 동부면 가배리 818-4",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002325",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.584493,
+          34.804703
+        ]
+      },
+      "properties": {
+        "name": "양지말항",
+        "address": "경상남도 거제시 동부면 오송리 430-6",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002326",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.584353,
+          34.799085
+        ]
+      },
+      "properties": {
+        "name": "영북항",
+        "address": "경상남도 거제시 동부면 오송리 438-4",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002327",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.576456,
+          34.793706
+        ]
+      },
+      "properties": {
+        "name": "영월항",
+        "address": "경상남도 거제시 동부면 오송리 818-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002328",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.587262,
+          34.820152
+        ]
+      },
+      "properties": {
+        "name": "오송항",
+        "address": "경상남도 거제시 동부면 오송리 284-35",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002329",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.652682,
+          34.777919
+        ]
+      },
+      "properties": {
+        "name": "수산항",
+        "address": "경상남도 거제시 동부면 학동리 150-2",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002330",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.639818,
+          34.772614
+        ]
+      },
+      "properties": {
+        "name": "학동항",
+        "address": "경상남도 거제시 동부면 학동리 303-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002331",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.494788,
+          34.83475
+        ]
+      },
+      "properties": {
+        "name": "녹산항",
+        "address": "경상남도 거제시 둔덕면 술역리 108-56",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002332",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.477504,
+          34.850576
+        ]
+      },
+      "properties": {
+        "name": "내평항",
+        "address": "경상남도 거제시 둔덕면 술역리 750-12",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002333",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.478267,
+          34.846997
+        ]
+      },
+      "properties": {
+        "name": "술역항",
+        "address": "경상남도 거제시 둔덕면 술역리 789-8",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002334",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.490644,
+          34.837967
+        ]
+      },
+      "properties": {
+        "name": "호곡항",
+        "address": "경상남도 거제시 둔덕면 술역리 389-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002335",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.471924,
+          34.830202
+        ]
+      },
+      "properties": {
+        "name": "면포항",
+        "address": "경상남도 거제시 둔덕면 술역리 807-12",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002336",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.464436,
+          34.830331
+        ]
+      },
+      "properties": {
+        "name": "미포항",
+        "address": "경상남도 거제시 둔덕면 술역리 864-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002337",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.472245,
+          34.82459
+        ]
+      },
+      "properties": {
+        "name": "발포항",
+        "address": "경상남도 거제시 둔덕면 술역리 952-16",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002339",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.475816,
+          34.826131
+        ]
+      },
+      "properties": {
+        "name": "염막포항",
+        "address": "경상남도 거제시 둔덕면 술역리 943-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002340",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.465608,
+          34.827603
+        ]
+      },
+      "properties": {
+        "name": "왜선포항",
+        "address": "경상남도 거제시 둔덕면 술역리 880-16",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002341",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.505872,
+          34.820713
+        ]
+      },
+      "properties": {
+        "name": "어구항",
+        "address": "경상남도 거제시 둔덕면 어구리 142-10",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002342",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.475811,
+          34.863489
+        ]
+      },
+      "properties": {
+        "name": "아사항",
+        "address": "경상남도 거제시 둔덕면 학산리 521-16",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002343",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.476719,
+          34.85678
+        ]
+      },
+      "properties": {
+        "name": "학산항",
+        "address": "경상남도 거제시 둔덕면 학산리 107-6",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002344",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.480108,
+          34.885693
+        ]
+      },
+      "properties": {
+        "name": "견내량항",
+        "address": "경상남도 거제시 사등면 덕호리 87-27",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002345",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.473718,
+          34.87791
+        ]
+      },
+      "properties": {
+        "name": "광리항",
+        "address": "경상남도 거제시 사등면 덕호리 288-94",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002346",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.483909,
+          34.895654
+        ]
+      },
+      "properties": {
+        "name": "고개도항",
+        "address": "경상남도 거제시 사등면 오량리 1325-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002347",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.575749,
+          34.904985
+        ]
+      },
+      "properties": {
+        "name": "사곡항",
+        "address": "경상남도 거제시 사등면 사곡리 62-12",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002348",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.542727,
+          34.912454
+        ]
+      },
+      "properties": {
+        "name": "금포항",
+        "address": "경상남도 거제시 사등면 사등리 1996-6",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002349",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.555452,
+          34.904127
+        ]
+      },
+      "properties": {
+        "name": "성내항",
+        "address": "경상남도 거제시 사등면 사등리 478-17",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002350",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.531805,
+          34.920128
+        ]
+      },
+      "properties": {
+        "name": "항도항",
+        "address": "경상남도 거제시 사등면 성포리 16-19",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002351",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.491044,
+          34.895764
+        ]
+      },
+      "properties": {
+        "name": "후포항",
+        "address": "경상남도 거제시 사등면 오량리 619-15",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002352",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.515445,
+          34.909077
+        ]
+      },
+      "properties": {
+        "name": "지석항",
+        "address": "경상남도 거제시 사등면 지석리 903-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002353",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.517875,
+          34.974606
+        ]
+      },
+      "properties": {
+        "name": "계도항",
+        "address": "경상남도 거제시 사등면 창호리 1070-18",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002354",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.517327,
+          34.97289
+        ]
+      },
+      "properties": {
+        "name": "군령포항",
+        "address": "경상남도 거제시 사등면 창호리 1080-7",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002355",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.534558,
+          34.963872
+        ]
+      },
+      "properties": {
+        "name": "신교항",
+        "address": "경상남도 거제시 사등면 창호리 78-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002356",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.517763,
+          34.935414
+        ]
+      },
+      "properties": {
+        "name": "신전항",
+        "address": "경상남도 거제시 사등면 창호리 2657-10",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002357",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.523888,
+          34.95785
+        ]
+      },
+      "properties": {
+        "name": "실전항",
+        "address": "경상남도 거제시 사등면 창호리 108-14",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002358",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.527009,
+          34.928899
+        ]
+      },
+      "properties": {
+        "name": "진두항",
+        "address": "경상남도 거제시 사등면 창호리 2057-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002359",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.527211,
+          34.930767
+        ]
+      },
+      "properties": {
+        "name": "창외항",
+        "address": "경상남도 거제시 사등면 창호리 1984-7",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002360",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.518586,
+          34.957504
+        ]
+      },
+      "properties": {
+        "name": "창촌항",
+        "address": "경상남도 거제시 사등면 창호리 1363-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002361",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.507258,
+          34.904829
+        ]
+      },
+      "properties": {
+        "name": "청곡항",
+        "address": "경상남도 거제시 사등면 청곡리 495-8",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002362",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.50065,
+          34.899641
+        ]
+      },
+      "properties": {
+        "name": "청포항",
+        "address": "경상남도 거제시 사등면 청곡리 619-16",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002363",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.711782,
+          34.912509
+        ]
+      },
+      "properties": {
+        "name": "덕포항",
+        "address": "경상남도 거제시 덕포동 81-6",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002364",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.666581,
+          34.811709
+        ]
+      },
+      "properties": {
+        "name": "망치항",
+        "address": "경상남도 거제시 일운면 망치리 434-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002366",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.720807,
+          34.849179
+        ]
+      },
+      "properties": {
+        "name": "옥림항",
+        "address": "경상남도 거제시 일운면 옥림리 587-3",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002367",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.715648,
+          34.801498
+        ]
+      },
+      "properties": {
+        "name": "예구항",
+        "address": "경상남도 거제시 일운면 와현리 630-12",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002368",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.704811,
+          34.812016
+        ]
+      },
+      "properties": {
+        "name": "와현항",
+        "address": "경상남도 거제시 일운면 와현리 619-9",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002369",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.713874,
+          34.789213
+        ]
+      },
+      "properties": {
+        "name": "내도항",
+        "address": "경상남도 거제시 일운면 와현리 15-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002370",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.748244,
+          34.81769
+        ]
+      },
+      "properties": {
+        "name": "지심도항",
+        "address": "경상남도 거제시 일운면 옥림리 56-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002371",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.694672,
+          34.980458
+        ]
+      },
+      "properties": {
+        "name": "두모항",
+        "address": "경상남도 거제시 장목면 관포리 109-2",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002372",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.696012,
+          35.03016
+        ]
+      },
+      "properties": {
+        "name": "구영항",
+        "address": "경상남도 거제시 장목면 구영리 329-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002373",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.700297,
+          34.970544
+        ]
+      },
+      "properties": {
+        "name": "대금항",
+        "address": "경상남도 거제시 장목면 대금리 328-10",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002374",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.703728,
+          35.000749
+        ]
+      },
+      "properties": {
+        "name": "궁농항",
+        "address": "경상남도 거제시 장목면 송진포리 121-11",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002375",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.68224,
+          35.007293
+        ]
+      },
+      "properties": {
+        "name": "송진포항",
+        "address": "경상남도 거제시 장목면 송진포리 678-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002376",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.714758,
+          34.95939
+        ]
+      },
+      "properties": {
+        "name": "흥남항",
+        "address": "경상남도 거제시 장목면 시방리 280-13",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002377",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.71631,
+          34.930811
+        ]
+      },
+      "properties": {
+        "name": "대계항",
+        "address": "경상남도 거제시 장목면 외포리 1228-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002378",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.714776,
+          34.936646
+        ]
+      },
+      "properties": {
+        "name": "소계항",
+        "address": "경상남도 거제시 장목면 외포리 1218-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002379",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.622159,
+          34.985657
+        ]
+      },
+      "properties": {
+        "name": "곡촌항",
+        "address": "경상남도 거제시 하청면 연구리 805-8",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002380",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.632576,
+          34.998577
+        ]
+      },
+      "properties": {
+        "name": "대곡항",
+        "address": "경상남도 거제시 하청면 대곡리 318-9",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002381",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.62875,
+          35.006424
+        ]
+      },
+      "properties": {
+        "name": "황덕항",
+        "address": "경상남도 거제시 하청면 대곡리 810-1",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002382",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.618126,
+          34.961792
+        ]
+      },
+      "properties": {
+        "name": "덕곡항",
+        "address": "경상남도 거제시 하청면 덕곡리 594-47",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002383",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.591728,
+          34.95066
+        ]
+      },
+      "properties": {
+        "name": "석포항",
+        "address": "경상남도 거제시 하청면 석포리 358-8",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002384",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.64596,
+          34.990845
+        ]
+      },
+      "properties": {
+        "name": "어온항",
+        "address": "경상남도 거제시 하청면 어온리 359-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002385",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.644222,
+          34.979867
+        ]
+      },
+      "properties": {
+        "name": "장곶항",
+        "address": "경상남도 거제시 하청면 어온리 620-5",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002386",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.624685,
+          34.982625
+        ]
+      },
+      "properties": {
+        "name": "금곡항",
+        "address": "경상남도 거제시 하청면 연구리 429-4",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002387",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.625417,
+          34.995512
+        ]
+      },
+      "properties": {
+        "name": "연구항",
+        "address": "경상남도 거제시 하청면 연구리 552-7",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002388",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.630154,
+          34.978546
+        ]
+      },
+      "properties": {
+        "name": "옥계항",
+        "address": "경상남도 거제시 하청면 연구리 414-13",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "naraport:FP002389",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.630282,
+          34.961517
+        ]
+      },
+      "properties": {
+        "name": "유계항",
+        "address": "경상남도 거제시 하청면 유계리 1054-7",
+        "region": "거제",
+        "cityCode": "48310",
+        "kind": "FP",
+        "sourceId": "naraport-FP",
+        "referenceYear": null,
+        "coordinateUse": "fishing-port-map-point",
+        "verification": "source-map-point"
+      }
+    }
+  ]
+}

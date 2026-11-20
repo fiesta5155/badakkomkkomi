@@ -22,6 +22,8 @@ EGM artifact directory: .dev/docs
 - **Always-Fresh PWA 및 단일 레이어 SSOT 불변식**: `useAppConfig.ts`는 앱 전체 공간레이어의 유일한 SSOT로서 공식 기준 레이어(`national_park`, `protected_area`, `docking`)에 대해 항상 최신 정적 GeoJSON을 우선 로드하며, 구버전 가짜 직사각형 더미 피처(`NP-TY-01`, `NP-GJ-02`, `SPA-01`, `SPA-02`)는 영구 차단합니다.
 - **버전·출처·문서 무드리프트(Zero-Drift) 불변식**: `src/config/appVersion.ts`의 버전(`APP_VERSION`, `APP_VERSION_DISPLAY`)은 `package.json`, `package-lock.json`, `vite.config.ts`, `index.html`, `README.md`, `DEPLOY_GUIDE.md`, `docs/DATA_AND_TECH_SOURCES.md`와 100% 일치해야 하며, 모든 마크다운 상대 경로 링크는 실제 파일로 해석되어야 합니다.
 
+항·포구 명칭 운영 레이어는 [공식 지도 좌표 154곳](./data/public-port-names.final-candidate.geojson)을 지명 참고용으로 표시한다. 출처와 검증 판정을 보존하며 기존 접안·경로 계산 좌표와 분리한다. [전환 전 81곳의 좌표 이력](./docs/PLACE_NAME_COORDINATES.md)을 보존한다.
+
 ## Global Side Effects
 - **브라우저 내부 저장소**: `IndexedDB`(`bada_kkomkkomi_spatial_db`) 및 `localStorage`(`bada_operational_*`, `bada_workspace_draft_v1`, `bada_porpoise_records_v1`, `bada_weather_thresholds_v1`, `bada_last_reporter_name_v1`)에 사용자 레이어 스냅샷, 완성된 항로 드래프트(`waypoints.length === 0 || waypoints.length >= 2`), 상괭이 관찰 기록, 기상 임계치를 저장합니다.
 - **외부 네트워크 통신**: Open-Meteo Forecast/Marine API(실시간 기상 읽기 전용), Kakao Maps SDK v3 및 OpenStreetMap 타일 서버(지도 렌더링), GitHub REST API(`githubLayerSyncService.ts`, 운영자가 직접 토큰을 입력하고 저장을 실행한 경우에만 호출)와 통신합니다.

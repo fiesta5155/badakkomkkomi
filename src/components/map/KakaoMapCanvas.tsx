@@ -1,3 +1,5 @@
+import { buildPortNamePointSpec } from './mapMarkerTemplates';
+import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../../data/portNameMapPoints';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DockingFeature } from '../../types/docking';
 import type { PorpoiseRecord } from '../../types/porpoise';
@@ -45,6 +47,7 @@ export interface KakaoMapCanvasProps {
   navSubTab: 'route' | 'weather';
 
   // 3.1 꼬미의 바다수첩
+  portNamePoints?: readonly ReferenceMapPoint[];
   features: DockingFeature[];
   selectedFeature: DockingFeature | null;
   onSelectFeature: (feature: DockingFeature) => void;
@@ -421,6 +424,7 @@ export function KakaoMapCanvas({
   activeMainTab,
   navSubTab,
   features,
+  portNamePoints = EMPTY_REFERENCE_POINTS,
   selectedFeature,
   onSelectFeature,
   layers,
@@ -884,6 +888,20 @@ export function KakaoMapCanvas({
     handleCoordinateClick,
     onSelectPermit,
   ]);
+
+  const [selectedPortNameId, setSelectedPortNameId] = useState<string | null>(null);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || activeMainTab !== 'notebook') return;
+    const labels = referenceLabelIds(portNamePoints, currentLeafletZoom);
+    const overlays = portNamePoints.map(point => {
+      const key = point.id;
+      const spec = buildPortNamePointSpec(point.name, labels.has(point.id) || selectedPortNameId === key);
+      const content = createOverlayElement(kakaoMaps, spec, () => setSelectedPortNameId(current => current === key ? null : key));
+      return new kakaoMaps.CustomOverlay({ map, position: new kakaoMaps.LatLng(point.lat, point.lng), content, xAnchor: spec.xAnchorRatio, yAnchor: spec.yAnchorRatio, zIndex: 140, clickable: true });
+    });
+    return () => overlays.forEach(overlay => overlay.setMap(null));
+  }, [kakaoMaps, activeMainTab, portNamePoints, currentLeafletZoom, selectedPortNameId]);
 
   // 6. [3.1 꼬미의 바다수첩] 55개 갯바위 접안 및 소규모 선착장 5색 마커
   useEffect(() => {

@@ -1,3 +1,5 @@
+import operationalPortNamesGeoJson from '../data/public-port-names.final-candidate.geojson?raw';
+import { EMPTY_REFERENCE_POINTS, portNamePointsFromGeoJson } from './data/portNameMapPoints';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
@@ -125,6 +127,17 @@ interface UserGpsState {
   isSimulated?: boolean;
 }
 
+const portNamePoints = portNamePointsFromGeoJson(JSON.parse(operationalPortNamesGeoJson));
+const MAP_INFORMATION_VISIBILITY_KEY = 'bada_map_information_visibility_v1';
+
+function readPortNamesVisible(): boolean {
+  try {
+    return JSON.parse(window.localStorage.getItem(MAP_INFORMATION_VISIBILITY_KEY) ?? '{}')?.port_names !== false;
+  } catch {
+    return true;
+  }
+}
+
 export function App() {
   const {
     config,
@@ -219,6 +232,17 @@ export function App() {
     () => initialWorkspaceDraft.lastReporterName ?? '',
   );
   const [dockingSearchQuery, setDockingSearchQuery] = useState<string>('');
+  const [portNamesVisible, setPortNamesVisible] = useState(readPortNamesVisible);
+  function togglePortNames() {
+    const visible = !portNamesVisible;
+    setPortNamesVisible(visible);
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(MAP_INFORMATION_VISIBILITY_KEY) ?? '{}');
+      window.localStorage.setItem(MAP_INFORMATION_VISIBILITY_KEY, JSON.stringify({ ...saved, port_names: visible }));
+    } catch {
+      // The switch still works for this session if storage is unavailable.
+    }
+  }
   const [showHazardInformation, setShowHazardInformation] = useState(true);
   const [isHazardListExpanded, setIsHazardListExpanded] = useState(false);
   const [isColorFilterOpen, setIsColorFilterOpen] = useState<boolean>(false);
@@ -1567,6 +1591,7 @@ export function App() {
         }
       >
         <MapView
+          portNamePoints={activeMainTab === 'notebook' && portNamesVisible ? portNamePoints : EMPTY_REFERENCE_POINTS}
           isMapFocused={isMapFocused}
           onMapFocusChange={setIsMapFocused}
           activeMainTab={activeMainTab}
@@ -1792,6 +1817,9 @@ export function App() {
             onClose={() => setIsLayerModalOpen(false)}
             layers={layers}
             geoJsonLayersData={geoJsonLayersData}
+            portNamesVisible={portNamesVisible}
+            portNamesCount={portNamePoints.length}
+            onTogglePortNames={togglePortNames}
             showHazardInformation={showHazardInformation}
             onToggleHazardInformation={() => setShowHazardInformation((visible) => !visible)}
             dockingCount={totalDockingCount}

@@ -1,3 +1,5 @@
+import { buildPortNamePointSpec } from './mapMarkerTemplates';
+import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../../data/portNameMapPoints';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import {
@@ -37,6 +39,7 @@ export interface LegacyLeafletCanvasProps {
   navSubTab: 'route' | 'weather';
 
   // 3.1 꼬미의 바다수첩
+  portNamePoints?: readonly ReferenceMapPoint[];
   features: DockingFeature[];
   selectedFeature: DockingFeature | null;
   onSelectFeature: (feature: DockingFeature) => void;
@@ -375,6 +378,7 @@ export function LegacyLeafletCanvas({
   activeMainTab,
   navSubTab,
   features,
+  portNamePoints = EMPTY_REFERENCE_POINTS,
   selectedFeature,
   onSelectFeature,
   layers,
@@ -413,7 +417,9 @@ export function LegacyLeafletCanvas({
   isMapFocused,
 }: LegacyLeafletCanvasProps) {
   const gpsPulseIcon = useMemo(() => getGpsPulseIcon(), []);
+  const [selectedPortNameId, setSelectedPortNameId] = useState<string | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(viewport.zoom || DEFAULT_ZOOM);
+  const referenceLabels = useMemo(() => referenceLabelIds(portNamePoints, currentZoom), [portNamePoints, currentZoom]);
   const initialCenter = useMemo<[number, number]>(
     () => [viewport.lat, viewport.lng],
     // 초기 마운트 시점의 viewport로만 MapContainer 초기화
@@ -572,6 +578,13 @@ export function LegacyLeafletCanvas({
             }}
           />
         );
+      })}
+
+      {activeMainTab === 'notebook' && portNamePoints.map(point => {
+        const key = point.id;
+        const spec = buildPortNamePointSpec(point.name, referenceLabels.has(point.id) || selectedPortNameId === key);
+        return <Marker key={key} position={[point.lat, point.lng]} icon={L.divIcon({ className: 'reference-map-point', html: spec.html, iconSize: [spec.width, spec.height], iconAnchor: [spec.anchorX, spec.anchorY] })}
+          zIndexOffset={140} eventHandlers={{ click: event => { L.DomEvent.stopPropagation(event.originalEvent); setSelectedPortNameId(current => current === key ? null : key); } }} />;
       })}
 
       {/* 2. [3.1 꼬미의 바다수첩] 갯바위 접안 및 소규모 선착장 마커 */}

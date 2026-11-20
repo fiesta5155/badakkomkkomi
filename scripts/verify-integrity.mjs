@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -76,6 +77,8 @@ assert(
       cfg.weather_defaults?.wave_threshold_meter?.moderate,
   'Invalid app_config.json: wave_threshold_meter must satisfy 0 < good < moderate',
 );
+
+execFileSync(process.execPath, ['scripts/build-port-names-final-candidate.mjs', '--check'], { stdio: 'inherit' });
 
 // 3. docking_points.geojson (55개소) 및 ports.json (136개소 + 300개 변침점) + coastlinePolygons.ts (378개 실측 해안선 폴리곤) 무결성 검증
 assert(

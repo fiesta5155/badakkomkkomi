@@ -1,3 +1,4 @@
+import { EMPTY_REFERENCE_POINTS, type ReferenceMapPoint } from '../data/portNameMapPoints';
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Compass,
@@ -79,6 +80,7 @@ export interface MapViewProps {
   navSubTab: 'route' | 'weather';
 
   // 3.1 꼬미의 바다수첩
+  portNamePoints?: readonly ReferenceMapPoint[];
   features: DockingFeature[];
   selectedFeature: DockingFeature | null;
   onSelectFeature: (feature: DockingFeature) => void;
@@ -134,6 +136,7 @@ export function MapView({
   onMapFocusChange,
   activeMainTab,
   navSubTab,
+  portNamePoints = EMPTY_REFERENCE_POINTS,
   features,
   selectedFeature,
   onSelectFeature,
@@ -375,6 +378,7 @@ export function MapView({
           overlayMapTypes={overlayMapTypes}
           activeMainTab={activeMainTab}
           navSubTab={navSubTab}
+          portNamePoints={portNamePoints}
           features={features}
           selectedFeature={selectedFeature}
           onSelectFeature={mapActions.onSelectFeature}
@@ -430,6 +434,7 @@ export function MapView({
             overlayMapTypes={overlayMapTypes}
             activeMainTab={activeMainTab}
             navSubTab={navSubTab}
+            portNamePoints={portNamePoints}
             features={features}
             selectedFeature={selectedFeature}
             onSelectFeature={mapActions.onSelectFeature}

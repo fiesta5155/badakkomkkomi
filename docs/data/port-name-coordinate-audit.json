@@ -1,0 +1,2458 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-11-20",
+  "crs": "EPSG:4326",
+  "coordinateNotation": "named lat/lng in decimal degrees",
+  "archive": "public/data/ports.json",
+  "corrections": "src/data/portNameLocations.ts",
+  "records": [
+    {
+      "id": "KR-GN-TY-0001",
+      "name": "통영항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.83906,
+        "lng": 128.42041
+      },
+      "displayPosition": {
+        "lat": 34.83906,
+        "lng": 128.42041
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8394,
+            "lng": 128.4203
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.83906,
+            "lng": 128.42041
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0002",
+      "name": "삼덕항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7895,
+        "lng": 128.3888
+      },
+      "displayPosition": {
+        "lat": 34.7895,
+        "lng": 128.3888
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7895,
+            "lng": 128.3888
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0003",
+      "name": "욕지항",
+      "islandName": "욕지도",
+      "archivedPosition": {
+        "lat": 34.63473,
+        "lng": 128.26987
+      },
+      "displayPosition": {
+        "lat": 34.63473,
+        "lng": 128.26987
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6368,
+            "lng": 128.2672
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.63473,
+            "lng": 128.26987
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0004",
+      "name": "학림항",
+      "islandName": "학림도",
+      "archivedPosition": {
+        "lat": 34.7528,
+        "lng": 128.4095
+      },
+      "displayPosition": {
+        "lat": 34.747986,
+        "lng": 128.407247
+      },
+      "status": "approved",
+      "reason": "공식 지도 LA/LO 대조 후 사용자 승인",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7492,
+            "lng": 128.3965
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.7528,
+            "lng": 128.4095
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": [
+        {
+          "portId": "KR-GN-TY-0004",
+          "name": "학림항",
+          "previous": {
+            "lat": 34.7528,
+            "lng": 128.4095
+          },
+          "position": {
+            "lat": 34.747986,
+            "lng": 128.407247
+          },
+          "source": {
+            "kind": "official-map",
+            "reference": "https://naraport.mof.go.kr/",
+            "detail": "FP000372; gisPortListJson.do fst_knd=NP/appn_at=Y, LA/LO; 2026-11-20 조회 및 사용자 승인"
+          },
+          "approvedOn": "2026-11-20"
+        }
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0005",
+      "name": "달아항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7615,
+        "lng": 128.4042
+      },
+      "displayPosition": {
+        "lat": 34.7615,
+        "lng": 128.4042
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7615,
+            "lng": 128.4042
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0006",
+      "name": "연명항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.78536,
+        "lng": 128.4297
+      },
+      "displayPosition": {
+        "lat": 34.78536,
+        "lng": 128.4297
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7825,
+            "lng": 128.4275
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.78536,
+            "lng": 128.4297
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0007",
+      "name": "영운항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8012,
+        "lng": 128.4362
+      },
+      "displayPosition": {
+        "lat": 34.8012,
+        "lng": 128.4362
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8012,
+            "lng": 128.4362
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0008",
+      "name": "중화항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.77124,
+        "lng": 128.42557
+      },
+      "displayPosition": {
+        "lat": 34.77124,
+        "lng": 128.42557
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7738,
+            "lng": 128.4235
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.77124,
+            "lng": 128.42557
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0009",
+      "name": "궁항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.79862,
+        "lng": 128.3727
+      },
+      "displayPosition": {
+        "lat": 34.79862,
+        "lng": 128.3727
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7975,
+            "lng": 128.3742
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.79862,
+            "lng": 128.3727
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0010",
+      "name": "세포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.81523,
+        "lng": 128.38761
+      },
+      "displayPosition": {
+        "lat": 34.81523,
+        "lng": 128.38761
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.812,
+            "lng": 128.3935
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.81523,
+            "lng": 128.38761
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0011",
+      "name": "가오치항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8785,
+        "lng": 128.2772
+      },
+      "displayPosition": {
+        "lat": 34.8785,
+        "lng": 128.2772
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8785,
+            "lng": 128.2772
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0012",
+      "name": "도산 저산항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.876,
+        "lng": 128.3295
+      },
+      "displayPosition": {
+        "lat": 34.876,
+        "lng": 128.3295
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.876,
+            "lng": 128.3295
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0013",
+      "name": "수월항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8645,
+        "lng": 128.352
+      },
+      "displayPosition": {
+        "lat": 34.8645,
+        "lng": 128.352
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8645,
+            "lng": 128.352
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0014",
+      "name": "광도 예포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.9362,
+        "lng": 128.431
+      },
+      "displayPosition": {
+        "lat": 34.9362,
+        "lng": 128.431
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9362,
+            "lng": 128.431
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0015",
+      "name": "죽림항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.88634,
+        "lng": 128.42205
+      },
+      "displayPosition": {
+        "lat": 34.88634,
+        "lng": 128.42205
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8852,
+            "lng": 128.4198
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.88634,
+            "lng": 128.42205
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0016",
+      "name": "용남 화삼항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8685,
+        "lng": 128.4635
+      },
+      "displayPosition": {
+        "lat": 34.8685,
+        "lng": 128.4635
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8685,
+            "lng": 128.4635
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0017",
+      "name": "원평항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.89292,
+        "lng": 128.4652
+      },
+      "displayPosition": {
+        "lat": 34.89292,
+        "lng": 128.4652
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8895,
+            "lng": 128.4585
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.89292,
+            "lng": 128.4652
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0018",
+      "name": "어의항",
+      "islandName": "어의도",
+      "archivedPosition": {
+        "lat": 34.8415,
+        "lng": 128.481
+      },
+      "displayPosition": {
+        "lat": 34.8415,
+        "lng": 128.481
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8415,
+            "lng": 128.481
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0019",
+      "name": "한산 제승당항",
+      "islandName": "한산도",
+      "archivedPosition": {
+        "lat": 34.79386,
+        "lng": 128.4736
+      },
+      "displayPosition": {
+        "lat": 34.79386,
+        "lng": 128.4736
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7918,
+            "lng": 128.4745
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.79386,
+            "lng": 128.4736
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0020",
+      "name": "진두항",
+      "islandName": "한산도",
+      "archivedPosition": {
+        "lat": 34.76649,
+        "lng": 128.50516
+      },
+      "displayPosition": {
+        "lat": 34.76649,
+        "lng": 128.50516
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7705,
+            "lng": 128.5042
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.76649,
+            "lng": 128.50516
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0021",
+      "name": "창좌항",
+      "islandName": "한산도",
+      "archivedPosition": {
+        "lat": 34.7795,
+        "lng": 128.5085
+      },
+      "displayPosition": {
+        "lat": 34.7795,
+        "lng": 128.5085
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7795,
+            "lng": 128.5085
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0022",
+      "name": "비진항",
+      "islandName": "비진도",
+      "archivedPosition": {
+        "lat": 34.7182,
+        "lng": 128.4665
+      },
+      "displayPosition": {
+        "lat": 34.7182,
+        "lng": 128.4665
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7182,
+            "lng": 128.4665
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0023",
+      "name": "사량 진촌항",
+      "islandName": "사량도",
+      "archivedPosition": {
+        "lat": 34.8285,
+        "lng": 128.2512
+      },
+      "displayPosition": {
+        "lat": 34.8285,
+        "lng": 128.2512
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8285,
+            "lng": 128.2512
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0024",
+      "name": "사량 내지항",
+      "islandName": "사량도",
+      "archivedPosition": {
+        "lat": 34.84309,
+        "lng": 128.2122
+      },
+      "displayPosition": {
+        "lat": 34.84309,
+        "lng": 128.2122
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8465,
+            "lng": 128.2115
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.84309,
+            "lng": 128.2122
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0025",
+      "name": "사량 대항",
+      "islandName": "사량도",
+      "archivedPosition": {
+        "lat": 34.8425,
+        "lng": 128.2485
+      },
+      "displayPosition": {
+        "lat": 34.8425,
+        "lng": 128.2485
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8425,
+            "lng": 128.2485
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0026",
+      "name": "사량 외지항",
+      "islandName": "사량도",
+      "archivedPosition": {
+        "lat": 34.7985,
+        "lng": 128.2155
+      },
+      "displayPosition": {
+        "lat": 34.7985,
+        "lng": 128.2155
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7985,
+            "lng": 128.2155
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0027",
+      "name": "사량 백학항",
+      "islandName": "사량도",
+      "archivedPosition": {
+        "lat": 34.82265,
+        "lng": 128.25534
+      },
+      "displayPosition": {
+        "lat": 34.82265,
+        "lng": 128.25534
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.819,
+            "lng": 128.252
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.82265,
+            "lng": 128.25534
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0028",
+      "name": "욕지 도동항",
+      "islandName": "욕지도",
+      "archivedPosition": {
+        "lat": 34.6525,
+        "lng": 128.2595
+      },
+      "displayPosition": {
+        "lat": 34.6525,
+        "lng": 128.2595
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6525,
+            "lng": 128.2595
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0029",
+      "name": "욕지 유동항",
+      "islandName": "욕지도",
+      "archivedPosition": {
+        "lat": 34.6145,
+        "lng": 128.2665
+      },
+      "displayPosition": {
+        "lat": 34.6145,
+        "lng": 128.2665
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6145,
+            "lng": 128.2665
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0030",
+      "name": "욕지 노대항",
+      "islandName": "노대도",
+      "archivedPosition": {
+        "lat": 34.6695,
+        "lng": 128.2345
+      },
+      "displayPosition": {
+        "lat": 34.6695,
+        "lng": 128.2345
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6695,
+            "lng": 128.2345
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0031",
+      "name": "연화항",
+      "islandName": "연화도",
+      "archivedPosition": {
+        "lat": 34.64743,
+        "lng": 128.36063
+      },
+      "displayPosition": {
+        "lat": 34.64743,
+        "lng": 128.36063
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6462,
+            "lng": 128.3615
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.64743,
+            "lng": 128.36063
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0032",
+      "name": "우도항",
+      "islandName": "우도",
+      "archivedPosition": {
+        "lat": 34.652,
+        "lng": 128.342
+      },
+      "displayPosition": {
+        "lat": 34.652,
+        "lng": 128.342
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.652,
+            "lng": 128.342
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0033",
+      "name": "매물도 당금항",
+      "islandName": "대매물도",
+      "archivedPosition": {
+        "lat": 34.64239,
+        "lng": 128.57141
+      },
+      "displayPosition": {
+        "lat": 34.64239,
+        "lng": 128.57141
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6415,
+            "lng": 128.5735
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.64239,
+            "lng": 128.57141
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0034",
+      "name": "매물도 대항",
+      "islandName": "대매물도",
+      "archivedPosition": {
+        "lat": 34.63853,
+        "lng": 128.56518
+      },
+      "displayPosition": {
+        "lat": 34.63853,
+        "lng": 128.56518
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6365,
+            "lng": 128.5665
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.63853,
+            "lng": 128.56518
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0035",
+      "name": "소매물도항",
+      "islandName": "소매물도",
+      "archivedPosition": {
+        "lat": 34.6246,
+        "lng": 128.54756
+      },
+      "displayPosition": {
+        "lat": 34.6246,
+        "lng": 128.54756
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.6242,
+            "lng": 128.5485
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.6246,
+            "lng": 128.54756
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0036",
+      "name": "추도 대항",
+      "islandName": "추도",
+      "archivedPosition": {
+        "lat": 34.75722,
+        "lng": 128.28877
+      },
+      "displayPosition": {
+        "lat": 34.75722,
+        "lng": 128.28877
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7565,
+            "lng": 128.2915
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.75722,
+            "lng": 128.28877
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0037",
+      "name": "추도 미조항",
+      "islandName": "추도",
+      "archivedPosition": {
+        "lat": 34.7495,
+        "lng": 128.2825
+      },
+      "displayPosition": {
+        "lat": 34.7495,
+        "lng": 128.2825
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7495,
+            "lng": 128.2825
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0038",
+      "name": "연대항",
+      "islandName": "연대도",
+      "archivedPosition": {
+        "lat": 34.7295,
+        "lng": 128.3975
+      },
+      "displayPosition": {
+        "lat": 34.736514,
+        "lng": 128.393951
+      },
+      "status": "approved",
+      "reason": "공식 지도 LA/LO 대조 후 사용자 승인",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7295,
+            "lng": 128.3975
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": [
+        {
+          "portId": "KR-GN-TY-0038",
+          "name": "연대항",
+          "previous": {
+            "lat": 34.7295,
+            "lng": 128.3975
+          },
+          "position": {
+            "lat": 34.736514,
+            "lng": 128.393951
+          },
+          "source": {
+            "kind": "official-map",
+            "reference": "https://naraport.mof.go.kr/",
+            "detail": "FP000369; gisPortListJson.do fst_knd=NP/appn_at=Y, LA/LO; 2026-11-20 조회 및 사용자 승인"
+          },
+          "approvedOn": "2026-11-20"
+        }
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0039",
+      "name": "만지항",
+      "islandName": "만지도",
+      "archivedPosition": {
+        "lat": 34.7318,
+        "lng": 128.3902
+      },
+      "displayPosition": {
+        "lat": 34.7318,
+        "lng": 128.3902
+      },
+      "status": "review-required",
+      "reason": "최초부터 동일. 해상 위치 문제 제보; 정확한 명칭 기준점 미확인",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7318,
+            "lng": 128.3902
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-TY-0040",
+      "name": "좌이도선착장",
+      "islandName": "좌이도",
+      "archivedPosition": {
+        "lat": 34.772,
+        "lng": 128.442
+      },
+      "displayPosition": {
+        "lat": 34.772,
+        "lng": 128.442
+      },
+      "status": "review-required",
+      "reason": "최초부터 동일. 좌도 경계 밖 해상이며 동좌/서좌 대상 미확정",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.772,
+            "lng": 128.442
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0001",
+      "name": "장승포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8655,
+        "lng": 128.7265
+      },
+      "displayPosition": {
+        "lat": 34.8655,
+        "lng": 128.7265
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8655,
+            "lng": 128.7265
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0002",
+      "name": "옥포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.89094,
+        "lng": 128.6984
+      },
+      "displayPosition": {
+        "lat": 34.89094,
+        "lng": 128.6984
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8942,
+            "lng": 128.6985
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.89094,
+            "lng": 128.6984
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0003",
+      "name": "고현항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.89573,
+        "lng": 128.62381
+      },
+      "displayPosition": {
+        "lat": 34.89573,
+        "lng": 128.62381
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8955,
+            "lng": 128.6215
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.89573,
+            "lng": 128.62381
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0004",
+      "name": "능포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.87803,
+        "lng": 128.73883
+      },
+      "displayPosition": {
+        "lat": 34.87803,
+        "lng": 128.73883
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8785,
+            "lng": 128.7365
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.87803,
+            "lng": 128.73883
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0005",
+      "name": "지세포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.82954,
+        "lng": 128.70672
+      },
+      "displayPosition": {
+        "lat": 34.82954,
+        "lng": 128.70672
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8285,
+            "lng": 128.7055
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.82954,
+            "lng": 128.70672
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0006",
+      "name": "다대다포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.73465,
+        "lng": 128.63766
+      },
+      "displayPosition": {
+        "lat": 34.73465,
+        "lng": 128.63766
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7375,
+            "lng": 128.6345
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.73465,
+            "lng": 128.63766
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0007",
+      "name": "외포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.94963,
+        "lng": 128.72078
+      },
+      "displayPosition": {
+        "lat": 34.94963,
+        "lng": 128.72078
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9465,
+            "lng": 128.7185
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.94963,
+            "lng": 128.72078
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0008",
+      "name": "구조라항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8055,
+        "lng": 128.6905
+      },
+      "displayPosition": {
+        "lat": 34.8055,
+        "lng": 128.6905
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8055,
+            "lng": 128.6905
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0009",
+      "name": "와현항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8075,
+        "lng": 128.7085
+      },
+      "displayPosition": {
+        "lat": 34.8075,
+        "lng": 128.7085
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8075,
+            "lng": 128.7085
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0010",
+      "name": "학동항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7725,
+        "lng": 128.6425
+      },
+      "displayPosition": {
+        "lat": 34.7725,
+        "lng": 128.6425
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7725,
+            "lng": 128.6425
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0011",
+      "name": "도장포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7465,
+        "lng": 128.6635
+      },
+      "displayPosition": {
+        "lat": 34.7465,
+        "lng": 128.6635
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7465,
+            "lng": 128.6635
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0012",
+      "name": "해금강항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.73867,
+        "lng": 128.67175
+      },
+      "displayPosition": {
+        "lat": 34.73867,
+        "lng": 128.67175
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7405,
+            "lng": 128.6745
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.73867,
+            "lng": 128.67175
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0013",
+      "name": "저구항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7245,
+        "lng": 128.5875
+      },
+      "displayPosition": {
+        "lat": 34.7245,
+        "lng": 128.5875
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7245,
+            "lng": 128.5875
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0014",
+      "name": "명사항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.71704,
+        "lng": 128.58798
+      },
+      "displayPosition": {
+        "lat": 34.71704,
+        "lng": 128.58798
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7165,
+            "lng": 128.5925
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.71704,
+            "lng": 128.58798
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0015",
+      "name": "근포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7065,
+        "lng": 128.592
+      },
+      "displayPosition": {
+        "lat": 34.7065,
+        "lng": 128.592
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7065,
+            "lng": 128.592
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0016",
+      "name": "대포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7015,
+        "lng": 128.5845
+      },
+      "displayPosition": {
+        "lat": 34.7015,
+        "lng": 128.5845
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7015,
+            "lng": 128.5845
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0017",
+      "name": "홍포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7125,
+        "lng": 128.5695
+      },
+      "displayPosition": {
+        "lat": 34.7125,
+        "lng": 128.5695
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7125,
+            "lng": 128.5695
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0018",
+      "name": "가배항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7695,
+        "lng": 128.5735
+      },
+      "displayPosition": {
+        "lat": 34.7695,
+        "lng": 128.5735
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7695,
+            "lng": 128.5735
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0019",
+      "name": "구영항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7908,
+        "lng": 128.56276
+      },
+      "displayPosition": {
+        "lat": 34.7908,
+        "lng": 128.56276
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7895,
+            "lng": 128.5625
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.7908,
+            "lng": 128.56276
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0020",
+      "name": "성포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.9185,
+        "lng": 128.5195
+      },
+      "displayPosition": {
+        "lat": 34.9185,
+        "lng": 128.5195
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9185,
+            "lng": 128.5195
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0021",
+      "name": "가조도 창호항",
+      "islandName": "가조도",
+      "archivedPosition": {
+        "lat": 34.9285,
+        "lng": 128.4685
+      },
+      "displayPosition": {
+        "lat": 34.9285,
+        "lng": 128.4685
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9285,
+            "lng": 128.4685
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0022",
+      "name": "가조도 계도항",
+      "islandName": "가조도",
+      "archivedPosition": {
+        "lat": 34.9615,
+        "lng": 128.4915
+      },
+      "displayPosition": {
+        "lat": 34.9615,
+        "lng": 128.4915
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9615,
+            "lng": 128.4915
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0023",
+      "name": "가조도 유교항",
+      "islandName": "가조도",
+      "archivedPosition": {
+        "lat": 34.9485,
+        "lng": 128.4745
+      },
+      "displayPosition": {
+        "lat": 34.9485,
+        "lng": 128.4745
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9485,
+            "lng": 128.4745
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0024",
+      "name": "둔덕 학산항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.85536,
+        "lng": 128.48115
+      },
+      "displayPosition": {
+        "lat": 34.85536,
+        "lng": 128.48115
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8545,
+            "lng": 128.4985
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.85536,
+            "lng": 128.48115
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0025",
+      "name": "둔덕 시목항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.83219,
+        "lng": 128.524
+      },
+      "displayPosition": {
+        "lat": 34.83219,
+        "lng": 128.524
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8385,
+            "lng": 128.5165
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.83219,
+            "lng": 128.524
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0026",
+      "name": "거제 법동항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8198,
+        "lng": 128.54757
+      },
+      "displayPosition": {
+        "lat": 34.8198,
+        "lng": 128.54757
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8195,
+            "lng": 128.5455
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.8198,
+            "lng": 128.54757
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0027",
+      "name": "거제 외간항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.8325,
+        "lng": 128.5685
+      },
+      "displayPosition": {
+        "lat": 34.8325,
+        "lng": 128.5685
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8325,
+            "lng": 128.5685
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0028",
+      "name": "하청 유계항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 35.0015,
+        "lng": 128.6545
+      },
+      "displayPosition": {
+        "lat": 35.0015,
+        "lng": 128.6545
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 35.0015,
+            "lng": 128.6545
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0029",
+      "name": "칠천도 어온항",
+      "islandName": "칠천도",
+      "archivedPosition": {
+        "lat": 34.9765,
+        "lng": 128.5965
+      },
+      "displayPosition": {
+        "lat": 34.9765,
+        "lng": 128.5965
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9765,
+            "lng": 128.5965
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0030",
+      "name": "칠천도 연구항",
+      "islandName": "칠천도",
+      "archivedPosition": {
+        "lat": 35.0106,
+        "lng": 128.6336
+      },
+      "displayPosition": {
+        "lat": 35.0106,
+        "lng": 128.6336
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 35.0085,
+            "lng": 128.6345
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 35.0106,
+            "lng": 128.6336
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0031",
+      "name": "칠천도 송포항",
+      "islandName": "칠천도",
+      "archivedPosition": {
+        "lat": 34.9655,
+        "lng": 128.5945
+      },
+      "displayPosition": {
+        "lat": 34.9655,
+        "lng": 128.5945
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9655,
+            "lng": 128.5945
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0032",
+      "name": "장목항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 35.0025,
+        "lng": 128.6785
+      },
+      "displayPosition": {
+        "lat": 35.0025,
+        "lng": 128.6785
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 35.0025,
+            "lng": 128.6785
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0033",
+      "name": "장목 궁농항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 35.00813,
+        "lng": 128.70468
+      },
+      "displayPosition": {
+        "lat": 35.00813,
+        "lng": 128.70468
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 35.0165,
+            "lng": 128.6985
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 35.00813,
+            "lng": 128.70468
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0034",
+      "name": "장목 대금항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.9785,
+        "lng": 128.7125
+      },
+      "displayPosition": {
+        "lat": 34.9785,
+        "lng": 128.7125
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9785,
+            "lng": 128.7125
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0035",
+      "name": "장목 이수도항",
+      "islandName": "이수도",
+      "archivedPosition": {
+        "lat": 34.96674,
+        "lng": 128.72673
+      },
+      "displayPosition": {
+        "lat": 34.96674,
+        "lng": 128.72673
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9685,
+            "lng": 128.7275
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.96674,
+            "lng": 128.72673
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0036",
+      "name": "지심도항",
+      "islandName": "지심도",
+      "archivedPosition": {
+        "lat": 34.81969,
+        "lng": 128.74766
+      },
+      "displayPosition": {
+        "lat": 34.81969,
+        "lng": 128.74766
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8195,
+            "lng": 128.7485
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.81969,
+            "lng": 128.74766
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0037",
+      "name": "내도항",
+      "islandName": "내도",
+      "archivedPosition": {
+        "lat": 34.7862,
+        "lng": 128.71629
+      },
+      "displayPosition": {
+        "lat": 34.7862,
+        "lng": 128.71629
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7865,
+            "lng": 128.7145
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.7862,
+            "lng": 128.71629
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0038",
+      "name": "외도선착장",
+      "islandName": "외도",
+      "archivedPosition": {
+        "lat": 34.77023,
+        "lng": 128.70962
+      },
+      "displayPosition": {
+        "lat": 34.77023,
+        "lng": 128.70962
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7695,
+            "lng": 128.7115
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.77023,
+            "lng": 128.70962
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0039",
+      "name": "덕포항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.91067,
+        "lng": 128.71087
+      },
+      "displayPosition": {
+        "lat": 34.91067,
+        "lng": 128.71087
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.9095,
+            "lng": 128.7095
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.91067,
+            "lng": 128.71087
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0040",
+      "name": "수양항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.7625,
+        "lng": 128.6595
+      },
+      "displayPosition": {
+        "lat": 34.7625,
+        "lng": 128.6595
+      },
+      "status": "unverified",
+      "reason": "위치 정밀 검수 미완료; 기존 좌표 유지",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.7625,
+            "lng": 128.6595
+          },
+          "meaning": "initial-registration-unverified"
+        }
+      ],
+      "correctionHistory": []
+    },
+    {
+      "id": "KR-GN-GJ-0041",
+      "name": "아주항",
+      "islandName": null,
+      "archivedPosition": {
+        "lat": 34.87598,
+        "lng": 128.69818
+      },
+      "displayPosition": {
+        "lat": 34.87598,
+        "lng": 128.69818
+      },
+      "status": "review-required",
+      "reason": "해상 경로 엔진 커밋에서 기본 좌표 이동; 명칭 위치 재검토 필요",
+      "history": [
+        {
+          "commit": "42d7672",
+          "position": {
+            "lat": 34.8765,
+            "lng": 128.6965
+          },
+          "meaning": "initial-registration-unverified"
+        },
+        {
+          "commit": "dacba3c",
+          "position": {
+            "lat": 34.87598,
+            "lng": 128.69818
+          },
+          "meaning": "routing-engine-adjustment-unverified"
+        }
+      ],
+      "correctionHistory": []
+    }
+  ]
+}

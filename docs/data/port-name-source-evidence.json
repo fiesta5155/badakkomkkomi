@@ -1,0 +1,87 @@
+{
+  "retrievedOn": "2026-11-20",
+  "endpoint": "https://naraport.mof.go.kr/json/gisPortListJson.do",
+  "method": "POST",
+  "approved": {
+    "parameters": {
+      "fst_knd": "NP",
+      "appn_at": "Y"
+    },
+    "records": [
+      {
+        "REGISTER": "webmaster",
+        "APPN_AT": "Y",
+        "LO": 128.407247,
+        "REPRT_LA": 34.75,
+        "ADRES": "경상남도 통영시 산양읍 저림리 32-23",
+        "FST_KND": "NP",
+        "GUGUN_CD": "48220",
+        "LA": 34.747986,
+        "CTPRVN_CD": "48",
+        "RGSDE": 1601469522000,
+        "ADRES2": "경상남도 고성군 삼산면 삼봉1길 294-77",
+        "FST_NM": "학림항",
+        "RM": "학림항",
+        "REPRT_LO": 128.41,
+        "FST_SN": "FP000372"
+      },
+      {
+        "REGISTER": "webmaster",
+        "APPN_AT": "Y",
+        "LO": 128.393951,
+        "REPRT_LA": 34.74,
+        "ADRES": "경상남도 통영시 산양읍 연곡리 92-7",
+        "FST_KND": "NP",
+        "GUGUN_CD": "48220",
+        "LA": 34.736514,
+        "CTPRVN_CD": "48",
+        "RGSDE": 1601469515000,
+        "ADRES2": "경상남도 통영시 한산면 곡룡포길 48",
+        "FST_NM": "연대항",
+        "RM": "연대항",
+        "REPRT_LO": 128.39,
+        "FST_SN": "FP000369"
+      }
+    ]
+  },
+  "candidatesNotApproved": {
+    "parameters": {
+      "fst_knd": "FP",
+      "appn_at": "Y"
+    },
+    "records": [
+      {
+        "REGISTER": "LSJ",
+        "APPN_AT": "Y",
+        "LO": 128.507884,
+        "REPRT_LA": 34.8004,
+        "ADRES": "경상남도 통영시 한산면 창좌리 1-3",
+        "FST_KND": "FP",
+        "GUGUN_CD": "48220",
+        "LA": 34.800396,
+        "CTPRVN_CD": "48",
+        "RGSDE": 1629730800000,
+        "ADRES2": "경상남도 통영시 한산면 동좌리길 97",
+        "FST_NM": "동좌항",
+        "REPRT_LO": 128.50788,
+        "FST_SN": "FP002255"
+      },
+      {
+        "REGISTER": "LSJ",
+        "APPN_AT": "Y",
+        "LO": 128.496763,
+        "REPRT_LA": 34.79485,
+        "ADRES": "경상남도 통영시 한산면 창좌리 340-5",
+        "FST_KND": "FP",
+        "GUGUN_CD": "48220",
+        "LA": 34.794852,
+        "CTPRVN_CD": "48",
+        "RGSDE": 1629730800000,
+        "ADRES2": "경상남도 통영시 한산면 서좌리길 2-1",
+        "FST_NM": "서좌항",
+        "REPRT_LO": 128.49676,
+        "FST_SN": "FP002256"
+      }
+    ]
+  }
+}

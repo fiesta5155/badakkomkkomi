@@ -65,6 +65,9 @@ interface LayerControlModalProps {
   layers: MapLayerConfig[];
   geoJsonLayersData: Record<string, SpatialFeatureCollection>;
   onToggleLayer: (layerId: string) => void;
+  portNamesVisible: boolean;
+  portNamesCount: number;
+  onTogglePortNames: () => void;
   showHazardInformation: boolean;
   onToggleHazardInformation: () => void;
   dockingCount: number;
@@ -165,6 +168,9 @@ export function LayerControlModal({
   layers,
   geoJsonLayersData,
   onToggleLayer,
+  portNamesVisible,
+  portNamesCount,
+  onTogglePortNames,
   showHazardInformation,
   onToggleHazardInformation,
   dockingCount,
@@ -991,6 +997,14 @@ export function LayerControlModal({
                       {layer.id === 'protected_area' && <button type="button" onClick={onFitProtectedAreas} className="min-h-11 touch-manipulation rounded-lg px-2 text-xs font-bold text-[#0066b3] active:bg-sky-50">구역맞춤</button>}
                     </div>;
                   })}
+                  <div className="py-1">
+                    <button type="button" role="switch" aria-checked={portNamesVisible} onClick={onTogglePortNames}
+                      className="flex min-h-11 w-full touch-manipulation items-center justify-between gap-2 text-left text-sm">
+                      <span>항·포구 명칭 <span className="text-xs text-slate-500">({portNamesCount})</span></span>
+                      <span className={portNamesVisible ? 'font-bold text-[#00846c]' : 'text-slate-500'}>{portNamesVisible ? 'ON' : 'OFF'}</span>
+                    </button>
+                    <p className="pb-2 text-xs text-slate-600">해양수산부 어촌어항관리시스템 · 위치 일치 확인 83곳 · 검증 보류 71곳</p>
+                  </div>
                   <button type="button" role="switch" aria-checked={showHazardInformation} onClick={onToggleHazardInformation}
                     className="flex min-h-11 w-full touch-manipulation items-center justify-between gap-2 py-2 text-left text-sm">
                     <span>위험정보 <span className="text-xs text-slate-500">({hazardCount})</span></span>

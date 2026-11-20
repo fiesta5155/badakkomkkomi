@@ -1,0 +1,68 @@
+[
+  {
+    "id": "15148195",
+    "file": "data/sources/port-names/2026-11-20/15148195.csv",
+    "url": "https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000003246499&fileDetailSn=1&dataNm=%ED%95%B4%EC%96%91%EC%88%98%EC%82%B0%EB%B6%80_%EC%96%B4%EC%B4%8C%EB%89%B4%EB%94%9C300%EC%82%AC%EC%97%85_%EC%8B%A0%ED%99%9C%EB%A0%A5%EC%A6%9D%EC%A7%84%EC%82%AC%EC%97%85%28%EC%82%AC%EC%97%85%EC%8B%A0%EC%B2%AD+%ED%95%AD+%EC%A0%95%EB%B3%B4%29_20220513",
+    "page": "https://www.data.go.kr/data/15148195/fileData.do",
+    "downloadedAt": "2026-11-20T05:58:23.062Z",
+    "sha256": "4d6ecbf67bd39caa8d0b0cca245cc38a7d44ee6099bce3e6a3a81cd8b9318e18",
+    "bytes": 108931,
+    "dataName": "해양수산부_어촌뉴딜300사업_신활력증진사업(사업신청 항 정보)_20220513",
+    "updatedAt": "2025-12-03 19:34:22.000",
+    "contentDisposition": "attachment; filename=\"í´ììì°ë¶_ì´ì´ë´ë300ì¬ì_ì íë ¥ì¦ì§ì¬ì(ì¬ìì ì²­ í­ ì ë³´)_20220513.csv\""
+  },
+  {
+    "id": "15061884",
+    "file": "data/sources/port-names/2026-11-20/15061884.csv",
+    "url": "https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000007693434&fileDetailSn=1&dataNm=%ED%96%89%EC%A0%95%EC%95%88%EC%A0%84%EB%B6%80_%EC%9C%A0%EB%8F%84%EC%84%A0+%EC%84%A0%EC%B0%A9%EC%9E%A5_20250201",
+    "page": "https://www.data.go.kr/data/15061884/fileData.do",
+    "downloadedAt": "2026-11-20T05:58:23.239Z",
+    "sha256": "314508f958cb870b4afc6b2afbfa4372f1cf5d6b83a977d3d92a78908af009ae",
+    "bytes": 5996,
+    "dataName": "행정안전부_유도선 선착장_20250201",
+    "updatedAt": "2026-09-23 11:00:11.000",
+    "contentDisposition": "attachment; filename=\"íì ìì ë¶_ì ëì  ì ì°©ì¥_20250201.csv\""
+  },
+  {
+    "id": "naraport-CP",
+    "file": "data/sources/port-names/2026-11-20/naraport-CP.json",
+    "url": "https://naraport.mof.go.kr/json/gisPortListJson.do",
+    "method": "POST",
+    "parameters": {
+      "fst_knd": "CP",
+      "appn_at": "Y"
+    },
+    "page": "https://naraport.mof.go.kr/info/port.do",
+    "downloadedAt": "2026-11-20T05:58:23.729Z",
+    "sha256": "4f77255f2b190d8ed4f1b96322795f66eea22d2565797485bf9193d557df8b58",
+    "bytes": 44246
+  },
+  {
+    "id": "naraport-NP",
+    "file": "data/sources/port-names/2026-11-20/naraport-NP.json",
+    "url": "https://naraport.mof.go.kr/json/gisPortListJson.do",
+    "method": "POST",
+    "parameters": {
+      "fst_knd": "NP",
+      "appn_at": "Y"
+    },
+    "page": "https://naraport.mof.go.kr/info/port.do",
+    "downloadedAt": "2026-11-20T05:58:24.047Z",
+    "sha256": "265b3b89b49cb609aeefb074d09a179bdf4725fe22c632739d7eed4bdcc7f13e",
+    "bytes": 104186
+  },
+  {
+    "id": "naraport-FP",
+    "file": "data/sources/port-names/2026-11-20/naraport-FP.json",
+    "url": "https://naraport.mof.go.kr/json/gisPortListJson.do",
+    "method": "POST",
+    "parameters": {
+      "fst_knd": "FP",
+      "appn_at": "Y"
+    },
+    "page": "https://naraport.mof.go.kr/info/port.do",
+    "downloadedAt": "2026-11-20T05:58:24.627Z",
+    "sha256": "4792d0f4267d5b5089a2949cfdc7a22133cab2c8f89a29a701a200b7f7350ca0",
+    "bytes": 209168
+  }
+]

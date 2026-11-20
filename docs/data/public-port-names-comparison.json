@@ -1,0 +1,4085 @@
+{
+  "datasetDate": "2026-11-20",
+  "largeDifferenceThresholdMeters": 1000,
+  "sources": {
+    "15061884": {
+      "columns": [
+        "번호",
+        "관리기관",
+        "용도구분",
+        "선착장명",
+        "주소"
+      ],
+      "totalRows": 85,
+      "regionalRows": [],
+      "coordinateColumns": false
+    },
+    "15148195": {
+      "columns": [
+        "사업년도",
+        "시도시군구코드",
+        "사업신청번호",
+        "항코드",
+        "위도",
+        "경도",
+        "항명",
+        "항주소",
+        "대상항",
+        "기항지 유무",
+        "도서 유무",
+        "항 선정",
+        "삭제여부",
+        "축조여부",
+        "등록일",
+        "등록아이피",
+        "등록자",
+        "수정일자",
+        "수정자아이디",
+        "수정아이피"
+      ],
+      "totalRows": 714,
+      "regionalRows": [
+        {
+          "sourceId": "15148195",
+          "row": 14,
+          "code": "48220069",
+          "name": "사당개항",
+          "address": "경상남도 통영시 산양읍 오비리 사당개마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 15,
+          "code": "48220063",
+          "name": "봉전항",
+          "address": "경상남도 통영시 산양읍 봉전상촌길 18",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 19,
+          "code": "48310009",
+          "name": "관포항",
+          "address": "경상남도 거제시 장목면 관포길 77",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 20,
+          "code": "48310001",
+          "name": "가배항",
+          "address": "경상남도 거제시 동부면 가배리 247-11",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 21,
+          "code": "48310002",
+          "name": "갈곶항",
+          "address": "경상남도 거제시 남부면 갈곶리 84-4",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 22,
+          "code": "48310044",
+          "name": "성포항",
+          "address": "경상남도 거제시 사등면 성포로 3길 16",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 23,
+          "code": "48310077",
+          "name": "와현항",
+          "address": "경상남도 거제시 일운면 와현리 619-9",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 24,
+          "code": "48310081",
+          "name": "유교항",
+          "address": "경상남도 거제시 사등면 가조로 1212",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 25,
+          "code": "48310101",
+          "name": "학산항",
+          "address": "경상남도 거제시 둔덕면 학산리 107-6",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 26,
+          "code": "48310010",
+          "name": "광리항",
+          "address": "경상남도 거제시 사등면 덕호리 288-94",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 27,
+          "code": "48310026",
+          "name": "덕포항",
+          "address": "경상남도 거제시 덕포동 81-6",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 28,
+          "code": "48310098",
+          "name": "탑포항",
+          "address": "경상남도 거제시 남부면 탑포리 391-9",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 29,
+          "code": "48310066",
+          "name": "여차항",
+          "address": "경상남도 거제시 남부면 다포리 52-5",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 30,
+          "code": "48310074",
+          "name": "옥계항",
+          "address": "경상남도 거제시 하청면 연구리 414-13",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 171,
+          "code": "48220001",
+          "name": "가오치항",
+          "address": "경상남도 통영시 도산면 오륜리 가오치마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 172,
+          "code": "48220071",
+          "name": "산등항",
+          "address": "경상남도 통영시 욕지면 노대리 산등마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 173,
+          "code": "48220073",
+          "name": "상리항",
+          "address": "경상남도 통영시 상리길 38",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 174,
+          "code": "48220154",
+          "name": "하리항",
+          "address": "경상남도 통영시 욕지면 노대리 하노대마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 175,
+          "code": "48220043",
+          "name": "동두항",
+          "address": "경상남도 통영시 욕지면 연화리 동두마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 176,
+          "code": "48220102",
+          "name": "연화항",
+          "address": "경상남도 통영시 욕지면 본촌길 11",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 177,
+          "code": "48220115",
+          "name": "우도항",
+          "address": "경상남도 통영시 욕지면 연화리 우도마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 178,
+          "code": "48220113",
+          "name": "용초항",
+          "address": "경상남도 통영시 한산면 용호리 969-1",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 179,
+          "code": "48220139",
+          "name": "죽도항",
+          "address": "경상남도 통영시 한산면 매죽리 죽도마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 180,
+          "code": "48220144",
+          "name": "진두항",
+          "address": "경상남도 통영시 한산면 하소리 진두마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 181,
+          "code": "48220145",
+          "name": "진촌항",
+          "address": "경상남도 통영시 사량면 진촌1길 102",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 186,
+          "code": "48310084",
+          "name": "이수도항",
+          "address": "경상남도 거제시 장목면 이수도길 21-1",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 187,
+          "code": "48310100",
+          "name": "학동항",
+          "address": "경상남도 거제시 동부면 학동리 303-1",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2019,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 309,
+          "code": "48220133",
+          "name": "저도항",
+          "address": "경상남도 통영시 산양읍 연곡리 저도마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 357,
+          "code": "48220041",
+          "name": "도동항",
+          "address": "경남 통영시 욕지면 도동길 117",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 358,
+          "code": "48220120",
+          "name": "읍포항",
+          "address": "경상남도 통영시 사량면 읍덕리 368-8",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 359,
+          "code": "48220110",
+          "name": "외지항",
+          "address": "경상남도 통영시 사량면 양지리 678-3",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 360,
+          "code": "48220036",
+          "name": "대항항",
+          "address": "경상남도 통영시 추도일주로 6-1",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 361,
+          "code": "48220044",
+          "name": "동부항",
+          "address": "경상남도 통영시 용남면 지도리 374-4",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 362,
+          "code": "48220161",
+          "name": "해란항",
+          "address": "경상남도 통영시 산양읍 풍화일주로 808",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "0",
+            "lng": "0"
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 363,
+          "code": "48220048",
+          "name": "마동항",
+          "address": "경상남도 통영시 산양읍 미남리 1035-8",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2021,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 500,
+          "code": "48220019",
+          "name": "내지항",
+          "address": "경상남도 통영시 사량면 돈지리 237",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 501,
+          "code": "48220026",
+          "name": "달아항",
+          "address": "경상남도 통영시 산양읍 미남리 달아마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 502,
+          "code": "48220062",
+          "name": "봉암항",
+          "address": "경상남도 통영시 한산면 추봉리 911-4",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 503,
+          "code": "48220103",
+          "name": "영운(이운)항",
+          "address": "경상남도 통영시 산양읍 이운길 101",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 504,
+          "code": "48220158",
+          "name": "학림항",
+          "address": "경상남도 통영시 산양읍 학림길 95",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 507,
+          "code": "48310027",
+          "name": "도장포항",
+          "address": "경상남도 거제시 남부면 도장포2길 29-2",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 508,
+          "code": "48310040",
+          "name": "산전항",
+          "address": "경상남도 거제시 거제면 법동리 286-31",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 509,
+          "code": "48310041",
+          "name": "산후항",
+          "address": "경상남도 거제시 거제면 법동리 9-43",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 510,
+          "code": "48310056",
+          "name": "실리항",
+          "address": "경상남도 거제시 거제면 법동리 84-11",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 511,
+          "code": "48310018",
+          "name": "내도항",
+          "address": "경상남도 거제시 일운면 와현리 15-1",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 512,
+          "code": "48310071",
+          "name": "예구항",
+          "address": "경상남도 거제시 일운면 와현리 630-12",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 513,
+          "code": "48310088",
+          "name": "저구항",
+          "address": "경상남도 거제시 남부면 저구리 216-12",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2020,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 626,
+          "code": "48220110",
+          "name": "외지항",
+          "address": "경상남도 통영시 사량면 양지리 678-3",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 627,
+          "code": "48220130",
+          "name": "장월항",
+          "address": "경상남도 통영시 산양읍 풍화리 장월마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 628,
+          "code": "48220074",
+          "name": "상양지항",
+          "address": "경상남도 통영시 도산면 수월리 상양지마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 629,
+          "code": "48220037",
+          "name": "대항항",
+          "address": "경상남도 통영시 사량면 금평리 산66-8",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 630,
+          "code": "48220036",
+          "name": "대항항",
+          "address": "경상남도 통영시 추도일주로 6-1",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 631,
+          "code": "48220116",
+          "name": "유동항",
+          "address": "경상남도 통영시 욕지면 서산리 유동마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 632,
+          "code": "48220093",
+          "name": "신봉항",
+          "address": "경상남도 통영시 산양읍 신전리 신봉마을",
+          "region": "통영",
+          "cityCode": "48220",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 636,
+          "code": "48310009",
+          "name": "관포항",
+          "address": "경상남도 거제시 장목면 관포길 77",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 637,
+          "code": "48310001",
+          "name": "가배항",
+          "address": "경상남도 거제시 동부면 가배리 247-11",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 638,
+          "code": "48310074",
+          "name": "옥계항",
+          "address": "경상남도 거제시 하청면 연구리 414-13",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 639,
+          "code": "48310026",
+          "name": "덕포항",
+          "address": "경상남도 거제시 덕포동 81-6",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 640,
+          "code": "48310010",
+          "name": "광리항",
+          "address": "경상남도 거제시 사등면 덕호리 288-94",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "34",
+            "lng": "128"
+          },
+          "verification": "outside-study-area",
+          "coordinateUse": "project-application-port"
+        },
+        {
+          "sourceId": "15148195",
+          "row": 641,
+          "code": "48310081",
+          "name": "유교항",
+          "address": "경상남도 거제시 사등면 가조로 1212",
+          "region": "거제",
+          "cityCode": "48310",
+          "referenceYear": 2022,
+          "originalCoordinate": {
+            "lat": "",
+            "lng": ""
+          },
+          "verification": "missing-coordinate",
+          "coordinateUse": "project-application-port"
+        }
+      ]
+    },
+    "naraport": {
+      "regionalRows": 174,
+      "excluded": [
+        {
+          "id": "naraport:FP000192",
+          "name": "동호항",
+          "address": "경상남도 거제시 동부면 오송리 390",
+          "region": "거제",
+          "cityCode": "45790",
+          "lat": 34.807585,
+          "lng": 128.585901,
+          "kind": "NP",
+          "sourceId": "naraport-NP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002226",
+          "name": "양화항",
+          "address": "경상남도 거제시 일운면 망치리 744-14",
+          "region": "거제",
+          "cityCode": "48220",
+          "lat": 34.826616,
+          "lng": 128.375131,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002253",
+          "name": "여차항",
+          "address": "경상남도 거제시 남부면 다포리 52-5",
+          "region": "거제",
+          "cityCode": "48220",
+          "lat": 34.758045,
+          "lng": 128.490672,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002258",
+          "name": "옥동항",
+          "address": "경상남도 남해군 설천면 금음리 74-3",
+          "cityCode": "48220",
+          "lat": 34.841754,
+          "lng": 128.202103,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002320",
+          "name": "여차항",
+          "address": "경상남도 통영시 한산면 하소리 460-12",
+          "region": "통영",
+          "cityCode": "48310",
+          "lat": 34.714107,
+          "lng": 128.626943,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002338",
+          "name": "송포항",
+          "address": "경상남도 사천시 송포동 1510-5",
+          "cityCode": "48310",
+          "lat": 34.8336,
+          "lng": 128.468154,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002365",
+          "name": "양화항",
+          "address": "경상남도 통영시 산양읍   풍화리 220-5",
+          "region": "통영",
+          "cityCode": "48310",
+          "lat": 34.792861,
+          "lng": 128.665924,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        },
+        {
+          "id": "naraport:FP002477",
+          "name": "옥동항",
+          "address": "경상남도 통영시 사량면 금평리 833-3",
+          "region": "통영",
+          "cityCode": "48840",
+          "lat": 34.922381,
+          "lng": 127.925662,
+          "kind": "FP",
+          "sourceId": "naraport-FP",
+          "referenceYear": null,
+          "coordinateUse": "fishing-port-map-point",
+          "verification": "city-code-address-conflict"
+        }
+      ]
+    }
+  },
+  "legacy": [
+    {
+      "id": "KR-GN-TY-0001",
+      "name": "통영항",
+      "region": "통영",
+      "locality": "항남동",
+      "archive": {
+        "lat": 34.83906,
+        "lng": 128.42041
+      },
+      "currentDisplay": {
+        "lat": 34.83906,
+        "lng": 128.42041
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0002",
+      "name": "삼덕항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.7895,
+        "lng": 128.3888
+      },
+      "currentDisplay": {
+        "lat": 34.7895,
+        "lng": 128.3888
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP000097",
+          "name": "당포항",
+          "address": "경상남도 통영시 산양읍 삼덕리 372-10",
+          "region": "통영",
+          "lat": 34.79568,
+          "lng": 128.383806
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0003",
+      "name": "욕지항",
+      "region": "통영",
+      "locality": "욕지면",
+      "archive": {
+        "lat": 34.63473,
+        "lng": 128.26987
+      },
+      "currentDisplay": {
+        "lat": 34.63473,
+        "lng": 128.26987
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000100",
+      "distanceFromArchiveMeters": 493,
+      "distanceFromCurrentDisplayMeters": 493,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0004",
+      "name": "학림항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.7528,
+        "lng": 128.4095
+      },
+      "currentDisplay": {
+        "lat": 34.747986,
+        "lng": 128.407247
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000372",
+      "distanceFromArchiveMeters": 574,
+      "distanceFromCurrentDisplayMeters": 0,
+      "alternatives": [],
+      "applicationRows": [
+        504
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0005",
+      "name": "달아항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.7615,
+        "lng": 128.4042
+      },
+      "currentDisplay": {
+        "lat": 34.7615,
+        "lng": 128.4042
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        501
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0006",
+      "name": "연명항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.78536,
+        "lng": 128.4297
+      },
+      "currentDisplay": {
+        "lat": 34.78536,
+        "lng": 128.4297
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000370",
+      "distanceFromArchiveMeters": 3074,
+      "distanceFromCurrentDisplayMeters": 3074,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0007",
+      "name": "영운항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.8012,
+        "lng": 128.4362
+      },
+      "currentDisplay": {
+        "lat": 34.8012,
+        "lng": 128.4362
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000371",
+      "distanceFromArchiveMeters": 278,
+      "distanceFromCurrentDisplayMeters": 278,
+      "alternatives": [],
+      "applicationRows": [
+        503
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0008",
+      "name": "중화항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.77124,
+        "lng": 128.42557
+      },
+      "currentDisplay": {
+        "lat": 34.77124,
+        "lng": 128.42557
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002221",
+      "distanceFromArchiveMeters": 3682,
+      "distanceFromCurrentDisplayMeters": 3682,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0009",
+      "name": "궁항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.79862,
+        "lng": 128.3727
+      },
+      "currentDisplay": {
+        "lat": 34.79862,
+        "lng": 128.3727
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002222",
+          "name": "궁항항",
+          "address": "경상남도 통영시 궁항길 46-8",
+          "region": "통영",
+          "lat": 34.810857,
+          "lng": 128.381736
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0010",
+      "name": "세포항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.81523,
+        "lng": 128.38761
+      },
+      "currentDisplay": {
+        "lat": 34.81523,
+        "lng": 128.38761
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0011",
+      "name": "가오치항",
+      "region": "통영",
+      "locality": "도산면",
+      "archive": {
+        "lat": 34.8785,
+        "lng": 128.2772
+      },
+      "currentDisplay": {
+        "lat": 34.8785,
+        "lng": 128.2772
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        171
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0012",
+      "name": "도산 저산항",
+      "region": "통영",
+      "locality": "도산면",
+      "archive": {
+        "lat": 34.876,
+        "lng": 128.3295
+      },
+      "currentDisplay": {
+        "lat": 34.876,
+        "lng": 128.3295
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0013",
+      "name": "수월항",
+      "region": "통영",
+      "locality": "도산면",
+      "archive": {
+        "lat": 34.8645,
+        "lng": 128.352
+      },
+      "currentDisplay": {
+        "lat": 34.8645,
+        "lng": 128.352
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000364",
+      "distanceFromArchiveMeters": 3000,
+      "distanceFromCurrentDisplayMeters": 3000,
+      "alternatives": [
+        {
+          "id": "naraport:FP002224",
+          "name": "수월항",
+          "address": "경상남도 통영시 풍화일주로 541-13",
+          "region": "통영",
+          "lat": 34.824041,
+          "lng": 128.344403
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0014",
+      "name": "광도 예포항",
+      "region": "통영",
+      "locality": "광도면",
+      "archive": {
+        "lat": 34.9362,
+        "lng": 128.431
+      },
+      "currentDisplay": {
+        "lat": 34.9362,
+        "lng": 128.431
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000363",
+      "distanceFromArchiveMeters": 544,
+      "distanceFromCurrentDisplayMeters": 544,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0015",
+      "name": "죽림항",
+      "region": "통영",
+      "locality": "광도면",
+      "archive": {
+        "lat": 34.88634,
+        "lng": 128.42205
+      },
+      "currentDisplay": {
+        "lat": 34.88634,
+        "lng": 128.42205
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP000316",
+          "name": "죽림항",
+          "address": "경상남도 거제시 거제면 오수리 885-14",
+          "region": "거제",
+          "lat": 34.84074,
+          "lng": 128.580441
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0016",
+      "name": "용남 화삼항",
+      "region": "통영",
+      "locality": "용남면",
+      "archive": {
+        "lat": 34.8685,
+        "lng": 128.4635
+      },
+      "currentDisplay": {
+        "lat": 34.8685,
+        "lng": 128.4635
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002235",
+          "name": "삼화항",
+          "address": "경상남도 통영시 삼화양촌길 99",
+          "region": "통영",
+          "lat": 34.890189,
+          "lng": 128.443932
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0017",
+      "name": "원평항",
+      "region": "통영",
+      "locality": "용남면",
+      "archive": {
+        "lat": 34.89292,
+        "lng": 128.4652
+      },
+      "currentDisplay": {
+        "lat": 34.89292,
+        "lng": 128.4652
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0018",
+      "name": "어의항",
+      "region": "통영",
+      "locality": "용남면",
+      "archive": {
+        "lat": 34.8415,
+        "lng": 128.481
+      },
+      "currentDisplay": {
+        "lat": 34.8415,
+        "lng": 128.481
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002239",
+      "distanceFromArchiveMeters": 13446,
+      "distanceFromCurrentDisplayMeters": 13446,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0019",
+      "name": "한산 제승당항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.79386,
+        "lng": 128.4736
+      },
+      "currentDisplay": {
+        "lat": 34.79386,
+        "lng": 128.4736
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002252",
+          "name": "소고포항",
+          "address": "경상남도 통영시 세작목길 40",
+          "region": "통영",
+          "lat": 34.796446,
+          "lng": 128.489796
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0020",
+      "name": "진두항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.76649,
+        "lng": 128.50516
+      },
+      "currentDisplay": {
+        "lat": 34.76649,
+        "lng": 128.50516
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002358",
+          "name": "진두항",
+          "address": "경상남도 거제시 사등면 창호리 2057-3",
+          "region": "거제",
+          "lat": 34.928899,
+          "lng": 128.527009
+        }
+      ],
+      "applicationRows": [
+        180
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0021",
+      "name": "창좌항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.7795,
+        "lng": 128.5085
+      },
+      "currentDisplay": {
+        "lat": 34.7795,
+        "lng": 128.5085
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0022",
+      "name": "비진항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.7182,
+        "lng": 128.4665
+      },
+      "currentDisplay": {
+        "lat": 34.7182,
+        "lng": 128.4665
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0023",
+      "name": "사량 진촌항",
+      "region": "통영",
+      "locality": "사량면",
+      "archive": {
+        "lat": 34.8285,
+        "lng": 128.2512
+      },
+      "currentDisplay": {
+        "lat": 34.8285,
+        "lng": 128.2512
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        181
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0024",
+      "name": "사량 내지항",
+      "region": "통영",
+      "locality": "사량면",
+      "archive": {
+        "lat": 34.84309,
+        "lng": 128.2122
+      },
+      "currentDisplay": {
+        "lat": 34.84309,
+        "lng": 128.2122
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002259",
+      "distanceFromArchiveMeters": 3114,
+      "distanceFromCurrentDisplayMeters": 3114,
+      "alternatives": [],
+      "applicationRows": [
+        500
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0025",
+      "name": "사량 대항",
+      "region": "통영",
+      "locality": "사량면",
+      "archive": {
+        "lat": 34.8425,
+        "lng": 128.2485
+      },
+      "currentDisplay": {
+        "lat": 34.8425,
+        "lng": 128.2485
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002257",
+      "distanceFromArchiveMeters": 10527,
+      "distanceFromCurrentDisplayMeters": 10527,
+      "alternatives": [],
+      "applicationRows": [
+        360,
+        629,
+        630
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0026",
+      "name": "사량 외지항",
+      "region": "통영",
+      "locality": "사량면",
+      "archive": {
+        "lat": 34.7985,
+        "lng": 128.2155
+      },
+      "currentDisplay": {
+        "lat": 34.7985,
+        "lng": 128.2155
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002265",
+      "distanceFromArchiveMeters": 1538,
+      "distanceFromCurrentDisplayMeters": 1538,
+      "alternatives": [],
+      "applicationRows": [
+        359,
+        626
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0027",
+      "name": "사량 백학항",
+      "region": "통영",
+      "locality": "사량면",
+      "archive": {
+        "lat": 34.82265,
+        "lng": 128.25534
+      },
+      "currentDisplay": {
+        "lat": 34.82265,
+        "lng": 128.25534
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0028",
+      "name": "욕지 도동항",
+      "region": "통영",
+      "locality": "욕지면",
+      "archive": {
+        "lat": 34.6525,
+        "lng": 128.2595
+      },
+      "currentDisplay": {
+        "lat": 34.6525,
+        "lng": 128.2595
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        357
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0029",
+      "name": "욕지 유동항",
+      "region": "통영",
+      "locality": "욕지면",
+      "archive": {
+        "lat": 34.6145,
+        "lng": 128.2665
+      },
+      "currentDisplay": {
+        "lat": 34.6145,
+        "lng": 128.2665
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        631
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0030",
+      "name": "욕지 노대항",
+      "region": "통영",
+      "locality": "욕지면",
+      "archive": {
+        "lat": 34.6695,
+        "lng": 128.2345
+      },
+      "currentDisplay": {
+        "lat": 34.6695,
+        "lng": 128.2345
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        360,
+        629,
+        630
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0031",
+      "name": "연화항",
+      "region": "통영",
+      "locality": "욕지면",
+      "archive": {
+        "lat": 34.64743,
+        "lng": 128.36063
+      },
+      "currentDisplay": {
+        "lat": 34.64743,
+        "lng": 128.36063
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000373",
+      "distanceFromArchiveMeters": 837,
+      "distanceFromCurrentDisplayMeters": 837,
+      "alternatives": [],
+      "applicationRows": [
+        176
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0032",
+      "name": "우도항",
+      "region": "통영",
+      "locality": "욕지면",
+      "archive": {
+        "lat": 34.652,
+        "lng": 128.342
+      },
+      "currentDisplay": {
+        "lat": 34.652,
+        "lng": 128.342
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        177
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0033",
+      "name": "매물도 당금항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.64239,
+        "lng": 128.57141
+      },
+      "currentDisplay": {
+        "lat": 34.64239,
+        "lng": 128.57141
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0034",
+      "name": "매물도 대항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.63853,
+        "lng": 128.56518
+      },
+      "currentDisplay": {
+        "lat": 34.63853,
+        "lng": 128.56518
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        360,
+        629,
+        630
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0035",
+      "name": "소매물도항",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.6246,
+        "lng": 128.54756
+      },
+      "currentDisplay": {
+        "lat": 34.6246,
+        "lng": 128.54756
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0036",
+      "name": "추도 대항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.75722,
+        "lng": 128.28877
+      },
+      "currentDisplay": {
+        "lat": 34.75722,
+        "lng": 128.28877
+      },
+      "status": "official-name-without-position",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": [
+        360,
+        629,
+        630
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0037",
+      "name": "추도 미조항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.7495,
+        "lng": 128.2825
+      },
+      "currentDisplay": {
+        "lat": 34.7495,
+        "lng": 128.2825
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002228",
+      "distanceFromArchiveMeters": 1117,
+      "distanceFromCurrentDisplayMeters": 1117,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0038",
+      "name": "연대항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.7295,
+        "lng": 128.3975
+      },
+      "currentDisplay": {
+        "lat": 34.736514,
+        "lng": 128.393951
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000369",
+      "distanceFromArchiveMeters": 845,
+      "distanceFromCurrentDisplayMeters": 0,
+      "alternatives": [],
+      "applicationRows": [
+        360,
+        629,
+        630
+      ]
+    },
+    {
+      "id": "KR-GN-TY-0039",
+      "name": "만지항",
+      "region": "통영",
+      "locality": "산양읍",
+      "archive": {
+        "lat": 34.7318,
+        "lng": 128.3902
+      },
+      "currentDisplay": {
+        "lat": 34.7318,
+        "lng": 128.3902
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-TY-0040",
+      "name": "좌이도선착장",
+      "region": "통영",
+      "locality": "한산면",
+      "archive": {
+        "lat": 34.772,
+        "lng": 128.442
+      },
+      "currentDisplay": {
+        "lat": 34.772,
+        "lng": 128.442
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002255",
+          "name": "동좌항",
+          "address": "경상남도 통영시 한산면 창좌리 1-3",
+          "region": "통영",
+          "lat": 34.800396,
+          "lng": 128.507884
+        },
+        {
+          "id": "naraport:FP002256",
+          "name": "서좌항",
+          "address": "경상남도 통영시 한산면 창좌리 340-5",
+          "region": "통영",
+          "lat": 34.794852,
+          "lng": 128.496763
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0001",
+      "name": "장승포항",
+      "region": "거제",
+      "locality": "장승포동",
+      "archive": {
+        "lat": 34.8655,
+        "lng": 128.7265
+      },
+      "currentDisplay": {
+        "lat": 34.8655,
+        "lng": 128.7265
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0002",
+      "name": "옥포항",
+      "region": "거제",
+      "locality": "옥포동",
+      "archive": {
+        "lat": 34.89094,
+        "lng": 128.6984
+      },
+      "currentDisplay": {
+        "lat": 34.89094,
+        "lng": 128.6984
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0003",
+      "name": "고현항",
+      "region": "거제",
+      "locality": "고현동",
+      "archive": {
+        "lat": 34.89573,
+        "lng": 128.62381
+      },
+      "currentDisplay": {
+        "lat": 34.89573,
+        "lng": 128.62381
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0004",
+      "name": "능포항",
+      "region": "거제",
+      "locality": "능포동",
+      "archive": {
+        "lat": 34.87803,
+        "lng": 128.73883
+      },
+      "currentDisplay": {
+        "lat": 34.87803,
+        "lng": 128.73883
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000088",
+      "distanceFromArchiveMeters": 743,
+      "distanceFromCurrentDisplayMeters": 743,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0005",
+      "name": "지세포항",
+      "region": "거제",
+      "locality": "일운면",
+      "archive": {
+        "lat": 34.82954,
+        "lng": 128.70672
+      },
+      "currentDisplay": {
+        "lat": 34.82954,
+        "lng": 128.70672
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000089",
+      "distanceFromArchiveMeters": 128,
+      "distanceFromCurrentDisplayMeters": 128,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0006",
+      "name": "다대다포항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.73465,
+        "lng": 128.63766
+      },
+      "currentDisplay": {
+        "lat": 34.73465,
+        "lng": 128.63766
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000091",
+      "distanceFromArchiveMeters": 895,
+      "distanceFromCurrentDisplayMeters": 895,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0007",
+      "name": "외포항",
+      "region": "거제",
+      "locality": "장목면",
+      "archive": {
+        "lat": 34.94963,
+        "lng": 128.72078
+      },
+      "currentDisplay": {
+        "lat": 34.94963,
+        "lng": 128.72078
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000087",
+      "distanceFromArchiveMeters": 1131,
+      "distanceFromCurrentDisplayMeters": 1131,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0008",
+      "name": "구조라항",
+      "region": "거제",
+      "locality": "일운면",
+      "archive": {
+        "lat": 34.8055,
+        "lng": 128.6905
+      },
+      "currentDisplay": {
+        "lat": 34.8055,
+        "lng": 128.6905
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000090",
+      "distanceFromArchiveMeters": 463,
+      "distanceFromCurrentDisplayMeters": 463,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0009",
+      "name": "와현항",
+      "region": "거제",
+      "locality": "일운면",
+      "archive": {
+        "lat": 34.8075,
+        "lng": 128.7085
+      },
+      "currentDisplay": {
+        "lat": 34.8075,
+        "lng": 128.7085
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002368",
+      "distanceFromArchiveMeters": 605,
+      "distanceFromCurrentDisplayMeters": 605,
+      "alternatives": [],
+      "applicationRows": [
+        23
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0010",
+      "name": "학동항",
+      "region": "거제",
+      "locality": "동부면",
+      "archive": {
+        "lat": 34.7725,
+        "lng": 128.6425
+      },
+      "currentDisplay": {
+        "lat": 34.7725,
+        "lng": 128.6425
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002330",
+      "distanceFromArchiveMeters": 245,
+      "distanceFromCurrentDisplayMeters": 245,
+      "alternatives": [],
+      "applicationRows": [
+        187
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0011",
+      "name": "도장포항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.7465,
+        "lng": 128.6635
+      },
+      "currentDisplay": {
+        "lat": 34.7465,
+        "lng": 128.6635
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000317",
+      "distanceFromArchiveMeters": 551,
+      "distanceFromCurrentDisplayMeters": 551,
+      "alternatives": [],
+      "applicationRows": [
+        507
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0012",
+      "name": "해금강항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.73867,
+        "lng": 128.67175
+      },
+      "currentDisplay": {
+        "lat": 34.73867,
+        "lng": 128.67175
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002319",
+          "name": "갈곶항",
+          "address": "경상남도 거제시 남부면 갈곶리 84-4",
+          "region": "거제",
+          "lat": 34.738326,
+          "lng": 128.672826
+        }
+      ],
+      "applicationRows": [
+        21
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0013",
+      "name": "저구항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.7245,
+        "lng": 128.5875
+      },
+      "currentDisplay": {
+        "lat": 34.7245,
+        "lng": 128.5875
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002321",
+      "distanceFromArchiveMeters": 1931,
+      "distanceFromCurrentDisplayMeters": 1931,
+      "alternatives": [],
+      "applicationRows": [
+        513
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0014",
+      "name": "명사항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.71704,
+        "lng": 128.58798
+      },
+      "currentDisplay": {
+        "lat": 34.71704,
+        "lng": 128.58798
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002318",
+      "distanceFromArchiveMeters": 1607,
+      "distanceFromCurrentDisplayMeters": 1607,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0015",
+      "name": "근포항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.7065,
+        "lng": 128.592
+      },
+      "currentDisplay": {
+        "lat": 34.7065,
+        "lng": 128.592
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0016",
+      "name": "대포항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.7015,
+        "lng": 128.5845
+      },
+      "currentDisplay": {
+        "lat": 34.7015,
+        "lng": 128.5845
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0017",
+      "name": "홍포항",
+      "region": "거제",
+      "locality": "남부면",
+      "archive": {
+        "lat": 34.7125,
+        "lng": 128.5695
+      },
+      "currentDisplay": {
+        "lat": 34.7125,
+        "lng": 128.5695
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0018",
+      "name": "가배항",
+      "region": "거제",
+      "locality": "동부면",
+      "archive": {
+        "lat": 34.7695,
+        "lng": 128.5735
+      },
+      "currentDisplay": {
+        "lat": 34.7695,
+        "lng": 128.5735
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000321",
+      "distanceFromArchiveMeters": 1762,
+      "distanceFromCurrentDisplayMeters": 1762,
+      "alternatives": [],
+      "applicationRows": [
+        20,
+        637
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0019",
+      "name": "구영항",
+      "region": "거제",
+      "locality": "동부면",
+      "archive": {
+        "lat": 34.7908,
+        "lng": 128.56276
+      },
+      "currentDisplay": {
+        "lat": 34.7908,
+        "lng": 128.56276
+      },
+      "status": "identity-review",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [
+        {
+          "id": "naraport:FP002372",
+          "name": "구영항",
+          "address": "경상남도 거제시 장목면 구영리 329-11",
+          "region": "거제",
+          "lat": 35.03016,
+          "lng": 128.696012
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0020",
+      "name": "성포항",
+      "region": "거제",
+      "locality": "사등면",
+      "archive": {
+        "lat": 34.9185,
+        "lng": 128.5195
+      },
+      "currentDisplay": {
+        "lat": 34.9185,
+        "lng": 128.5195
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000322",
+      "distanceFromArchiveMeters": 513,
+      "distanceFromCurrentDisplayMeters": 513,
+      "alternatives": [],
+      "applicationRows": [
+        22
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0021",
+      "name": "가조도 창호항",
+      "region": "거제",
+      "locality": "사등면",
+      "archive": {
+        "lat": 34.9285,
+        "lng": 128.4685
+      },
+      "currentDisplay": {
+        "lat": 34.9285,
+        "lng": 128.4685
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0022",
+      "name": "가조도 계도항",
+      "region": "거제",
+      "locality": "사등면",
+      "archive": {
+        "lat": 34.9615,
+        "lng": 128.4915
+      },
+      "currentDisplay": {
+        "lat": 34.9615,
+        "lng": 128.4915
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002353",
+      "distanceFromArchiveMeters": 2811,
+      "distanceFromCurrentDisplayMeters": 2811,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0023",
+      "name": "가조도 유교항",
+      "region": "거제",
+      "locality": "사등면",
+      "archive": {
+        "lat": 34.9485,
+        "lng": 128.4745
+      },
+      "currentDisplay": {
+        "lat": 34.9485,
+        "lng": 128.4745
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000323",
+      "distanceFromArchiveMeters": 5108,
+      "distanceFromCurrentDisplayMeters": 5108,
+      "alternatives": [],
+      "applicationRows": [
+        24,
+        641
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0024",
+      "name": "둔덕 학산항",
+      "region": "거제",
+      "locality": "둔덕면",
+      "archive": {
+        "lat": 34.85536,
+        "lng": 128.48115
+      },
+      "currentDisplay": {
+        "lat": 34.85536,
+        "lng": 128.48115
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002343",
+      "distanceFromArchiveMeters": 434,
+      "distanceFromCurrentDisplayMeters": 434,
+      "alternatives": [],
+      "applicationRows": [
+        25
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0025",
+      "name": "둔덕 시목항",
+      "region": "거제",
+      "locality": "둔덕면",
+      "archive": {
+        "lat": 34.83219,
+        "lng": 128.524
+      },
+      "currentDisplay": {
+        "lat": 34.83219,
+        "lng": 128.524
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0026",
+      "name": "거제 법동항",
+      "region": "거제",
+      "locality": "거제면",
+      "archive": {
+        "lat": 34.8198,
+        "lng": 128.54757
+      },
+      "currentDisplay": {
+        "lat": 34.8198,
+        "lng": 128.54757
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002312",
+      "distanceFromArchiveMeters": 2576,
+      "distanceFromCurrentDisplayMeters": 2576,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0027",
+      "name": "거제 외간항",
+      "region": "거제",
+      "locality": "거제면",
+      "archive": {
+        "lat": 34.8325,
+        "lng": 128.5685
+      },
+      "currentDisplay": {
+        "lat": 34.8325,
+        "lng": 128.5685
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0028",
+      "name": "하청 유계항",
+      "region": "거제",
+      "locality": "하청면",
+      "archive": {
+        "lat": 35.0015,
+        "lng": 128.6545
+      },
+      "currentDisplay": {
+        "lat": 35.0015,
+        "lng": 128.6545
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002389",
+      "distanceFromArchiveMeters": 4963,
+      "distanceFromCurrentDisplayMeters": 4963,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0029",
+      "name": "칠천도 어온항",
+      "region": "거제",
+      "locality": "하청면",
+      "archive": {
+        "lat": 34.9765,
+        "lng": 128.5965
+      },
+      "currentDisplay": {
+        "lat": 34.9765,
+        "lng": 128.5965
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002384",
+      "distanceFromArchiveMeters": 4780,
+      "distanceFromCurrentDisplayMeters": 4780,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0030",
+      "name": "칠천도 연구항",
+      "region": "거제",
+      "locality": "하청면",
+      "archive": {
+        "lat": 35.0106,
+        "lng": 128.6336
+      },
+      "currentDisplay": {
+        "lat": 35.0106,
+        "lng": 128.6336
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002387",
+      "distanceFromArchiveMeters": 1836,
+      "distanceFromCurrentDisplayMeters": 1836,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0031",
+      "name": "칠천도 송포항",
+      "region": "거제",
+      "locality": "하청면",
+      "archive": {
+        "lat": 34.9655,
+        "lng": 128.5945
+      },
+      "currentDisplay": {
+        "lat": 34.9655,
+        "lng": 128.5945
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000332",
+      "distanceFromArchiveMeters": 6738,
+      "distanceFromCurrentDisplayMeters": 6738,
+      "alternatives": [
+        {
+          "id": "naraport:FP002338",
+          "name": "송포항",
+          "address": "경상남도 사천시 송포동 1510-5",
+          "region": null,
+          "lat": 34.8336,
+          "lng": 128.468154
+        }
+      ],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0032",
+      "name": "장목항",
+      "region": "거제",
+      "locality": "장목면",
+      "archive": {
+        "lat": 35.0025,
+        "lng": 128.6785
+      },
+      "currentDisplay": {
+        "lat": 35.0025,
+        "lng": 128.6785
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP001968",
+      "distanceFromArchiveMeters": 1370,
+      "distanceFromCurrentDisplayMeters": 1370,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0033",
+      "name": "장목 궁농항",
+      "region": "거제",
+      "locality": "장목면",
+      "archive": {
+        "lat": 35.00813,
+        "lng": 128.70468
+      },
+      "currentDisplay": {
+        "lat": 35.00813,
+        "lng": 128.70468
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002374",
+      "distanceFromArchiveMeters": 825,
+      "distanceFromCurrentDisplayMeters": 825,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0034",
+      "name": "장목 대금항",
+      "region": "거제",
+      "locality": "장목면",
+      "archive": {
+        "lat": 34.9785,
+        "lng": 128.7125
+      },
+      "currentDisplay": {
+        "lat": 34.9785,
+        "lng": 128.7125
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002373",
+      "distanceFromArchiveMeters": 1421,
+      "distanceFromCurrentDisplayMeters": 1421,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0035",
+      "name": "장목 이수도항",
+      "region": "거제",
+      "locality": "장목면",
+      "archive": {
+        "lat": 34.96674,
+        "lng": 128.72673
+      },
+      "currentDisplay": {
+        "lat": 34.96674,
+        "lng": 128.72673
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP000328",
+      "distanceFromArchiveMeters": 242,
+      "distanceFromCurrentDisplayMeters": 242,
+      "alternatives": [],
+      "applicationRows": [
+        186
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0036",
+      "name": "지심도항",
+      "region": "거제",
+      "locality": "일운면",
+      "archive": {
+        "lat": 34.81969,
+        "lng": 128.74766
+      },
+      "currentDisplay": {
+        "lat": 34.81969,
+        "lng": 128.74766
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002370",
+      "distanceFromArchiveMeters": 229,
+      "distanceFromCurrentDisplayMeters": 229,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0037",
+      "name": "내도항",
+      "region": "거제",
+      "locality": "일운면",
+      "archive": {
+        "lat": 34.7862,
+        "lng": 128.71629
+      },
+      "currentDisplay": {
+        "lat": 34.7862,
+        "lng": 128.71629
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002369",
+      "distanceFromArchiveMeters": 401,
+      "distanceFromCurrentDisplayMeters": 401,
+      "alternatives": [],
+      "applicationRows": [
+        511
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0038",
+      "name": "외도선착장",
+      "region": "거제",
+      "locality": "일운면",
+      "archive": {
+        "lat": 34.77023,
+        "lng": 128.70962
+      },
+      "currentDisplay": {
+        "lat": 34.77023,
+        "lng": 128.70962
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0039",
+      "name": "덕포항",
+      "region": "거제",
+      "locality": "옥포동",
+      "archive": {
+        "lat": 34.91067,
+        "lng": 128.71087
+      },
+      "currentDisplay": {
+        "lat": 34.91067,
+        "lng": 128.71087
+      },
+      "status": "name-region-match",
+      "matchId": "naraport:FP002363",
+      "distanceFromArchiveMeters": 221,
+      "distanceFromCurrentDisplayMeters": 221,
+      "alternatives": [],
+      "applicationRows": [
+        27,
+        639
+      ]
+    },
+    {
+      "id": "KR-GN-GJ-0040",
+      "name": "수양항",
+      "region": "거제",
+      "locality": "동부면",
+      "archive": {
+        "lat": 34.7625,
+        "lng": 128.6595
+      },
+      "currentDisplay": {
+        "lat": 34.7625,
+        "lng": 128.6595
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    },
+    {
+      "id": "KR-GN-GJ-0041",
+      "name": "아주항",
+      "region": "거제",
+      "locality": "아주동",
+      "archive": {
+        "lat": 34.87598,
+        "lng": 128.69818
+      },
+      "currentDisplay": {
+        "lat": 34.87598,
+        "lng": 128.69818
+      },
+      "status": "legacy-only",
+      "matchId": null,
+      "distanceFromArchiveMeters": null,
+      "distanceFromCurrentDisplayMeters": null,
+      "alternatives": [],
+      "applicationRows": []
+    }
+  ],
+  "official": [
+    {
+      "id": "naraport:FP000097",
+      "name": "당포항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 삼덕리 372-10",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP000087",
+      "name": "외포항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 외포리 57-2",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000100",
+      "name": "욕지항",
+      "region": "통영",
+      "address": "경상남도 통영시 욕지면 동항리 544-1",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000089",
+      "name": "지세포항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 지세포리 929-112",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000098",
+      "name": "호두항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 용호리 354",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000090",
+      "name": "구조라항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 구조라리 42-17",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000099",
+      "name": "능양항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 양지리 187-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000088",
+      "name": "능포항",
+      "region": "거제",
+      "address": "경상남도 거제시 능포동 753-20",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000091",
+      "name": "다대다포항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 다대리 458-1",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000092",
+      "name": "대포근포항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 저구리 637-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000101",
+      "name": "매물도항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 매죽리 35-23",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP001968",
+      "name": "장목항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 장목리 319-28",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000375",
+      "name": "평림항",
+      "region": "통영",
+      "address": "경상남도 통영시 평림동 471-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000334",
+      "name": "하청항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 하청리 1213-2",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000379",
+      "name": "하포항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 하소리 782-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000372",
+      "name": "학림항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 저림리 32-23",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000324",
+      "name": "한내항",
+      "region": "거제",
+      "address": "경상남도 거제시 연초면 한내리 24-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000331",
+      "name": "황포항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 구영리 1173-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000367",
+      "name": "곤리항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 곤리리 206-7",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000325",
+      "name": "관포항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 관포리 60-13",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000377",
+      "name": "내항항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 비진리 144",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000326",
+      "name": "농소항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 농소리 51-25",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000317",
+      "name": "도장포항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 갈곶리 292-6",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000321",
+      "name": "가배항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 가배리 247-11",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000315",
+      "name": "거제항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 서정리 771-15",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000374",
+      "name": "견유항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 장평리 95-13",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000366",
+      "name": "돈지항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 돈지리 554-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000368",
+      "name": "마동항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 미남리 1035-8",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000333",
+      "name": "물안항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 어온리 148-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000323",
+      "name": "유교항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 596",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000329",
+      "name": "유호항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 유호리 447",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000328",
+      "name": "이수도항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 시방리 170-1",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000376",
+      "name": "장작지항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 두억리 599-6",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000316",
+      "name": "죽림항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 오수리 885-14",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP000363",
+      "name": "예포항",
+      "region": "통영",
+      "address": "경상남도 통영시 광도면 안정리 47-12",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000322",
+      "name": "성포항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 성포리 350-11",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000332",
+      "name": "송포항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 대곡리 80-6",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000364",
+      "name": "수월항",
+      "region": "통영",
+      "address": "경상남도 통영시 도산면 수월리 744-3",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000327",
+      "name": "시방항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 시방리 196-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000318",
+      "name": "쌍근항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 탑포리 520",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP000369",
+      "name": "연대항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 연곡리 92-7",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000370",
+      "name": "연명항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 연화리 256-1",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000373",
+      "name": "연화항",
+      "region": "통영",
+      "address": "경상남도 통영시 욕지면 연화리 146-13",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000371",
+      "name": "영운(이운)항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 영운리 269-4",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP000497",
+      "name": "곡용포항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 추봉리 34-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002221",
+      "name": "중화항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍   연화리 880-2",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002222",
+      "name": "궁항항",
+      "region": "통영",
+      "address": "경상남도 통영시 궁항길 46-8",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002223",
+      "name": "모상항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍   풍화리 753-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002224",
+      "name": "수월항",
+      "region": "통영",
+      "address": "경상남도 통영시 풍화일주로 541-13",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002225",
+      "name": "고다골항",
+      "region": "통영",
+      "address": "경상남도 통영시 풍화일주로 772",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002228",
+      "name": "미조항",
+      "region": "통영",
+      "address": "경상남도 통영시 산양읍 추도리 514-4",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002230",
+      "name": "오촌항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 동달리 33-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002231",
+      "name": "연기항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 장평리 996-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002232",
+      "name": "적촌항",
+      "region": "통영",
+      "address": "경상남도 통영시 원평길 302",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002233",
+      "name": "내포항",
+      "region": "통영",
+      "address": "경상남도 통영시 원평길 479",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002234",
+      "name": "대방포항",
+      "region": "통영",
+      "address": "경상남도 통영시 대방길 63-39",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002235",
+      "name": "삼화항",
+      "region": "통영",
+      "address": "경상남도 통영시 삼화양촌길 99",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002236",
+      "name": "신리항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 장문리 117-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002237",
+      "name": "대안항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 장문리 525",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002238",
+      "name": "기호항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 장문리 1055-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002239",
+      "name": "어의항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 어의리 산117-7",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002240",
+      "name": "수도항",
+      "region": "통영",
+      "address": "경상남도 통영시 수도길 98",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002241",
+      "name": "동부항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 지도리 374-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002242",
+      "name": "거망항",
+      "region": "통영",
+      "address": "경상남도 통영시 용남면 지도리 25-6",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002243",
+      "name": "서부항",
+      "region": "통영",
+      "address": "경상남도 통영시 서부길 54-23",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002244",
+      "name": "내촌항",
+      "region": "통영",
+      "address": "경상남도 통영시 광도면  황리 365-6",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002245",
+      "name": "구집항",
+      "region": "통영",
+      "address": "경상남도 통영시 덕포로 408",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002246",
+      "name": "창포항",
+      "region": "통영",
+      "address": "경상남도 통영시 덕포로 290-63",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002247",
+      "name": "손덕항",
+      "region": "통영",
+      "address": "경상남도 통영시 덕포로 258",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002248",
+      "name": "조암항",
+      "region": "통영",
+      "address": "경상남도 통영시 광도면  죽림리 1564",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002249",
+      "name": "상리항",
+      "region": "통영",
+      "address": "경상남도 통영시 상리길 38",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002250",
+      "name": "용초항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 용호리 969-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002251",
+      "name": "봉암항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 추봉리 911-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002252",
+      "name": "소고포항",
+      "region": "통영",
+      "address": "경상남도 통영시 세작목길 40",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002254",
+      "name": "관암항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 하소리 626-6",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002255",
+      "name": "동좌항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 창좌리 1-3",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002256",
+      "name": "서좌항",
+      "region": "통영",
+      "address": "경상남도 통영시 한산면 창좌리 340-5",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002257",
+      "name": "대항항(사량도)",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 금평리 산66-8",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002259",
+      "name": "내지항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 돈지리 237",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002260",
+      "name": "답포항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 돈지리 75-2",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002261",
+      "name": "수우항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 돈지리 산273",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002262",
+      "name": "먹방항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 읍덕리 57-2",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002263",
+      "name": "읍포항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 읍덕리 368-8",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002264",
+      "name": "덕동항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 읍덕리 202-11",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002265",
+      "name": "외지항",
+      "region": "통영",
+      "address": "경상남도 통영시 사량면 양지리 678-3",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002266",
+      "name": "민양항",
+      "region": "통영",
+      "address": "경상남도 통영시 인평동 932-2",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002267",
+      "name": "소포항",
+      "region": "통영",
+      "address": "경상남도 통영시 명정동 106",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002268",
+      "name": "당동항",
+      "region": "통영",
+      "address": "경상남도 통영시 도천동 51-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002269",
+      "name": "미수항",
+      "region": "통영",
+      "address": "경상남도 통영시 미수동 943-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002310",
+      "name": "내간항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 내간리 981-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002311",
+      "name": "고당항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 법동리 603-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002312",
+      "name": "법동항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 법동리 507-7",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002313",
+      "name": "산전항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 법동리 286-31",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002314",
+      "name": "산후항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 법동리 9-43",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002315",
+      "name": "실리항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 법동리 84-11",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002316",
+      "name": "소랑항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 소랑리 25-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002317",
+      "name": "오수항",
+      "region": "거제",
+      "address": "경상남도 거제시 거제면 오수리 836-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002318",
+      "name": "명사항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 저구리 248-15",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002319",
+      "name": "갈곶항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 갈곶리 84-4",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002321",
+      "name": "저구항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 저구리 216-12",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002322",
+      "name": "탑포항",
+      "region": "거제",
+      "address": "경상남도 거제시 남부면 탑포리 391-9",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002323",
+      "name": "쪽박항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 가배리 873-11",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002324",
+      "name": "함박항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 가배리 818-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002325",
+      "name": "양지말항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 오송리 430-6",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002326",
+      "name": "영북항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 오송리 438-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002327",
+      "name": "영월항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 오송리 818-5",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002328",
+      "name": "오송항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 오송리 284-35",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002329",
+      "name": "수산항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 학동리 150-2",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002330",
+      "name": "학동항",
+      "region": "거제",
+      "address": "경상남도 거제시 동부면 학동리 303-1",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002331",
+      "name": "녹산항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 108-56",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002332",
+      "name": "내평항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 750-12",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002333",
+      "name": "술역항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 789-8",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002334",
+      "name": "호곡항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 389-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002335",
+      "name": "면포항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 807-12",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002336",
+      "name": "미포항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 864-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002337",
+      "name": "발포항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 952-16",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002339",
+      "name": "염막포항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 943-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002340",
+      "name": "왜선포항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 술역리 880-16",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002341",
+      "name": "어구항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 어구리 142-10",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002342",
+      "name": "아사항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 학산리 521-16",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002343",
+      "name": "학산항",
+      "region": "거제",
+      "address": "경상남도 거제시 둔덕면 학산리 107-6",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002344",
+      "name": "견내량항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 덕호리 87-27",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002345",
+      "name": "광리항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 덕호리 288-94",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002346",
+      "name": "고개도항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 오량리 1325-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002347",
+      "name": "사곡항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 사곡리 62-12",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002348",
+      "name": "금포항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 사등리 1996-6",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002349",
+      "name": "성내항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 사등리 478-17",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002350",
+      "name": "항도항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 성포리 16-19",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002351",
+      "name": "후포항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 오량리 619-15",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002352",
+      "name": "지석항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 지석리 903-11",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002353",
+      "name": "계도항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 1070-18",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002354",
+      "name": "군령포항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 1080-7",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002355",
+      "name": "신교항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 78-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002356",
+      "name": "신전항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 2657-10",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002357",
+      "name": "실전항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 108-14",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002358",
+      "name": "진두항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 2057-3",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002359",
+      "name": "창외항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 1984-7",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002360",
+      "name": "창촌항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 창호리 1363-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002361",
+      "name": "청곡항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 청곡리 495-8",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002362",
+      "name": "청포항",
+      "region": "거제",
+      "address": "경상남도 거제시 사등면 청곡리 619-16",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002363",
+      "name": "덕포항",
+      "region": "거제",
+      "address": "경상남도 거제시 덕포동 81-6",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002364",
+      "name": "망치항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 망치리 434-11",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002366",
+      "name": "옥림항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 옥림리 587-3",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002367",
+      "name": "예구항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 와현리 630-12",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002368",
+      "name": "와현항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 와현리 619-9",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002369",
+      "name": "내도항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 와현리 15-1",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002370",
+      "name": "지심도항",
+      "region": "거제",
+      "address": "경상남도 거제시 일운면 옥림리 56-5",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002371",
+      "name": "두모항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 관포리 109-2",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002372",
+      "name": "구영항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 구영리 329-11",
+      "status": "identity-review"
+    },
+    {
+      "id": "naraport:FP002373",
+      "name": "대금항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 대금리 328-10",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002374",
+      "name": "궁농항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 송진포리 121-11",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002375",
+      "name": "송진포항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 송진포리 678-5",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002376",
+      "name": "흥남항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 시방리 280-13",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002377",
+      "name": "대계항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 외포리 1228-5",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002378",
+      "name": "소계항",
+      "region": "거제",
+      "address": "경상남도 거제시 장목면 외포리 1218-5",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002379",
+      "name": "곡촌항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 연구리 805-8",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002380",
+      "name": "대곡항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 대곡리 318-9",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002381",
+      "name": "황덕항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 대곡리 810-1",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002382",
+      "name": "덕곡항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 덕곡리 594-47",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002383",
+      "name": "석포항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 석포리 358-8",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002384",
+      "name": "어온항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 어온리 359-5",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002385",
+      "name": "장곶항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 어온리 620-5",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002386",
+      "name": "금곡항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 연구리 429-4",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002387",
+      "name": "연구항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 연구리 552-7",
+      "status": "matched"
+    },
+    {
+      "id": "naraport:FP002388",
+      "name": "옥계항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 연구리 414-13",
+      "status": "official-only"
+    },
+    {
+      "id": "naraport:FP002389",
+      "name": "유계항",
+      "region": "거제",
+      "address": "경상남도 거제시 하청면 유계리 1054-7",
+      "status": "matched"
+    }
+  ]
+}

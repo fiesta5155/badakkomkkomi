@@ -27,6 +27,15 @@ export function escapeHtml(raw: string): string {
     .replace(/'/g, '&#39;');
 }
 
+/** The name tip and symbol center share the geographic anchor. */
+export function buildPortNamePointSpec(name: string, showLabel: boolean): MarkerTemplateSpec {
+  const color = '#003360';
+  return {
+    width: 52, height: 52, anchorX: 26, anchorY: 26, xAnchorRatio: 0.5, yAnchorRatio: 0.5,
+    html: `<button type="button" data-reference-point="port_names" aria-label="${escapeHtml(name)}" title="${escapeHtml(name)}" style="position:relative;display:block;box-sizing:border-box;width:52px;height:52px;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation;color:${color};font-family:inherit">${showLabel ? `<span data-reference-label style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);filter:drop-shadow(0 1px 2px #0003)"><span style="display:block;box-sizing:border-box;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${color};color:white;border-radius:5px;padding:2px 6px;font-size:11px;font-weight:700;line-height:16px">${escapeHtml(name)}</span><span data-reference-tip aria-hidden="true" style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid ${color}"></span></span>` : ''}<span data-reference-symbol aria-hidden="true" style="position:absolute;left:22px;top:22px;box-sizing:border-box;width:8px;height:8px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 1px 3px #0005"></span></button>`,
+  };
+}
+
 /**
  * 접안지 등급별 GIS 오버레이 zIndex 산출 헬퍼
  * - 복수 등급 또는 전체(55개소) 동시 표출 시에도 '위험주의(red)' 마커가 일반 마커에 가려지지 않도록 최상위 비선택 우선순위를 부여합니다.
