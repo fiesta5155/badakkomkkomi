@@ -72,6 +72,11 @@ export function validatePermit(input: PermitInput) {
   permitExpiryDate(input.endDate);
 }
 export function permitStatus(p: Pick<PermitInput, 'startDate' | 'endDate'>, today = koreaToday()) { return today < p.startDate ? '예정' : today > p.endDate ? '만료' : '조사 가능'; }
+// The live collection alone controls map contents. A detail/calendar snapshot is
+// never an additional map record, including after expiry or manual deletion.
+export function activePermitRecords<T extends Pick<PermitInput, 'startDate' | 'endDate'>>(records: readonly T[], today: string): T[] {
+  return records.filter(p => permitStatus(p, today) === '조사 가능');
+}
 export function permitLabel(p: Pick<PermitInput, 'permitNumber' | 'target'>) { return `${p.permitNumber.match(/\d+/g)?.join('') || p.permitNumber}-${p.target}`; }
 export function permitSnapshot(p: PermitInput): PermitSnapshot { return { permitNumber: p.permitNumber, target: p.target, sourceCrs: p.sourceCrs, vertices: p.vertices, startDate: p.startDate, endDate: p.endDate }; }
 export function permitInterior(vertices: XY[]): XY {

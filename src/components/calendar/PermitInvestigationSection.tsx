@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useActivityPermits } from '../../hooks/useActivityPermits';
+import type { PermitWorkspace } from '../../hooks/useActivityPermits';
 import { useFirebaseAuth } from '../../hooks/useFirebaseAuth';
 import { addInvestigations, deleteInvestigation, subscribeInvestigations, updateInvestigation } from '../../services/activityPermitService';
 import { getFirebaseClient } from '../../services/firebaseClient';
@@ -9,6 +9,7 @@ const button = 'min-h-11 rounded-xl border border-sky-200 px-3 py-2 text-sm font
 const field = 'min-h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-2 text-base';
 
 type Props = {
+  workspace: PermitWorkspace;
   date: string; vessel: '101' | '103'; isAdmin: boolean;
   onOpenPermit: (id: string, snapshot: PermitSnapshot) => void;
 };
@@ -16,8 +17,8 @@ export function PermitInvestigationSection(props: Props) {
   const auth = useFirebaseAuth();
   return <InvestigationSection key={`${auth.profile?.uid ?? ''}:${props.date}:${props.vessel}`} {...props} />;
 }
-function InvestigationSection({ date, vessel, isAdmin, onOpenPermit }: Props) {
-  const workspace = useActivityPermits(), uid = workspace.profile?.uid ?? '';
+function InvestigationSection({ date, vessel, isAdmin, onOpenPermit, workspace }: Props) {
+  const uid = workspace.profile?.uid ?? '';
   const scope = `${uid}:${vessel}:${date.slice(0, 7)}`;
   const [state, setState] = useState({ scope: '', records: [] as PermitInvestigation[], ready: false, error: '' });
   const [retry, setRetry] = useState(0), [picking, setPicking] = useState(false), [selected, setSelected] = useState<string[]>([]);

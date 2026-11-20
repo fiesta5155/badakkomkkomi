@@ -25,7 +25,7 @@ function Fixture(){
  React.useEffect(()=>{window.qaView=(value)=>setView(v=>({...v,...value}));},[]);
  const focus=(p)=>{window.qaFocus=p;setView(v=>({...v,mode:'detail',selected:p}));};
  return React.createElement(FirebaseAuthContext.Provider,{value:{status:'ready',profile:window.qaWorkspace.profile}},
-   view.mode==='calendar'?React.createElement('main',{className:'mx-auto max-w-lg p-3'},React.createElement(PermitInvestigationSection,{date:view.date,vessel:view.vessel,isAdmin:false,onOpenPermit:(id,p)=>focus({...p,id})})):
+   view.mode==='calendar'?React.createElement('main',{className:'mx-auto max-w-lg p-3'},React.createElement(PermitInvestigationSection,{date:view.date,vessel:view.vessel,isAdmin:false,workspace:window.qaWorkspace,onOpenPermit:(id,p)=>focus({...p,id})})):
    React.createElement(React.Fragment,null,view.mode==='detail'&&React.createElement('div',{style:{height:'100dvh'}},React.createElement(LegacyLeafletCanvas,{
     baseMapType:'roadmap',overlayMapTypes:[],activeMainTab:'notebook',navSubTab:'route',features:[],selectedFeature:null,layers:[permitLayer(undefined,view.mapVisible!==false)],geoJsonLayersData:{activity_permits:permitFeatureCollection([view.selected])},
     showPorpoiseLayer:false,isPorpoiseAddMode:false,isReportPickMode:false,porpoiseRecords:[],routeWaypoints:[],routeLegs:[],portsList:[],showPortMarkersOnMap:false,weatherCoords:{lat:34.8,lng:128.4},weatherGrade:'unknown',userLocation:null,viewport:{lat:34.8,lng:128.4,zoom:11},flyTarget:null,zoomStepTrigger:null,

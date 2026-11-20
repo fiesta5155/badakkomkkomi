@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
-import { Pause, Play, Settings, X } from 'lucide-react';
+import { Settings, X } from 'lucide-react';
 import { useFirebaseAuth } from '../../hooks/useFirebaseAuth';
 import { useAnnouncements } from '../../hooks/useAnnouncements';
 import { announcementError, nextAnnouncementId, publishedAnnouncements, validateAnnouncement } from '../../services/announcementModel';
@@ -37,7 +37,6 @@ function NoticeBoard({ uid }: { uid: string }) {
   const [detailId, setDetailId] = useState<string | null>(null);
   const detail = published.find((notice) => notice.id === detailId);
   const [managing, setManaging] = useState(false);
-  const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -46,12 +45,12 @@ function NoticeBoard({ uid }: { uid: string }) {
     return () => media.removeEventListener('change', change);
   }, []);
   useEffect(() => {
-    if (!reduced || paused || detail || managing || published.length < 2) return;
+    if (!reduced || detail || managing || published.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveId((id) => nextAnnouncementId(published, id));
     }, 10000);
     return () => window.clearInterval(timer);
-  }, [reduced, paused, detail, managing, published]);
+  }, [reduced, detail, managing, published]);
   const advance = () => {
     if (!active || published.length < 2) return;
     setActiveId(nextAnnouncementId(published, active.id));
@@ -59,16 +58,13 @@ function NoticeBoard({ uid }: { uid: string }) {
   return <>
     {notices.error && <p role="status" className="mt-2 rounded-xl bg-white/90 p-2 text-xs text-rose-800">{notices.error}
       <button type="button" onClick={notices.retry} className="ml-2 min-h-9 underline">다시 확인</button></p>}
-    {active && <section aria-label="공지사항" className="bada-notice-bar mt-2.5 flex min-h-12 items-center gap-2 rounded-2xl border-2 border-white bg-white/95 px-3 text-[#003360] shadow-md"
-      data-paused={paused || Boolean(detail) || managing}>
+    {active && <section aria-label="공지사항" className="bada-notice-bar mt-2.5 flex min-h-12 items-center gap-2 rounded-2xl border-2 border-white bg-white/95 px-3 text-[#003360] shadow-md">
       <span className="shrink-0 text-xl" aria-hidden="true">📢</span>
       <button type="button" onClick={() => setDetailId(active.id)} aria-label={`공지: ${active.title}. 전체 내용 보기`}
         className="min-h-11 min-w-0 flex-1 overflow-hidden text-left text-sm font-bold">
         <span key={`${active.id}/${active.title}`} className="bada-notice-copy" onAnimationIteration={advance}
-          style={{ '--notice-duration': `${Math.max(18, Math.min(60, active.title.length / 3 + 12))}s` } as CSSProperties}>{active.title}</span>
+          style={{ '--notice-duration': `${Math.max(18, Math.min(60, active.title.length / 3 + 12)) / 1.3}s` } as CSSProperties}>{active.title}</span>
       </button>
-      <button type="button" onClick={() => setPaused((value) => !value)} aria-label={paused ? '공지 순환 재생' : '공지 순환 일시정지'} aria-pressed={paused}
-        className="flex h-11 w-9 shrink-0 items-center justify-center rounded-lg">{paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</button>
       {notices.isAdmin && <button type="button" onClick={() => setManaging(true)} aria-label="공지사항 관리" className="flex h-11 w-9 shrink-0 items-center justify-center rounded-lg"><Settings className="h-5 w-5" /></button>}
     </section>}
     {!active && notices.isAdmin && <button type="button" onClick={() => setManaging(true)} className={`${buttonStyle} mt-2 self-end bg-white/95`}><Settings className="mr-1 inline h-4 w-4" />공지사항 관리</button>}

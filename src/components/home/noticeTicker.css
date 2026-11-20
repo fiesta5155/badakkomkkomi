@@ -10,9 +10,6 @@
   white-space: nowrap;
   animation: bada-notice-travel var(--notice-duration, 20s) linear infinite;
 }
-.bada-notice-bar:hover .bada-notice-copy,
-.bada-notice-bar:focus-within .bada-notice-copy,
-.bada-notice-bar[data-paused="true"] .bada-notice-copy { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
   .bada-notice-copy {
     animation: none;

@@ -13,6 +13,7 @@ import { AccountPanel } from '../auth/AccountPanel';
 import { CalendarDetailConditions } from './CalendarDayConditions';
 import { PermitInvestigationSection } from './PermitInvestigationSection';
 import type { PermitSnapshot } from '../../services/activityPermitModel';
+import type { PermitWorkspace } from '../../hooks/useActivityPermits';
 
 type CalendarView = 'month' | 'detail' | 'editor';
 type EntryKind = VoyageKind | 'memo';
@@ -28,8 +29,8 @@ function fullDateLabel(value: string): string {
     .format(new Date(`${value}T12:00:00+09:00`));
 }
 
-type CalendarProps = { onBackHome: () => void; onOpenPermit: (id: string, snapshot: PermitSnapshot) => void };
-export function CalendarScreen({ onBackHome, onOpenPermit }: CalendarProps) {
+type CalendarProps = { onBackHome: () => void; onOpenPermit: (id: string, snapshot: PermitSnapshot) => void; permitWorkspace: PermitWorkspace };
+export function CalendarScreen({ onBackHome, onOpenPermit, permitWorkspace }: CalendarProps) {
   const auth = useFirebaseAuth();
   if (auth.status !== 'ready' || !auth.user || !auth.profile) return (
     <div className="h-dvh overflow-y-auto bg-white p-4" style={{ paddingTop: 'var(--safe-top)' }}>
@@ -40,7 +41,7 @@ export function CalendarScreen({ onBackHome, onOpenPermit }: CalendarProps) {
       <LegacyCalendarBackup />
     </div>
   );
-  return <SharedCalendarScreen key={auth.user.uid} onBackHome={onBackHome} onOpenPermit={onOpenPermit} />;
+  return <SharedCalendarScreen key={auth.user.uid} onBackHome={onBackHome} onOpenPermit={onOpenPermit} permitWorkspace={permitWorkspace} />;
 }
 
 function LegacyCalendarBackup() {
@@ -66,7 +67,7 @@ function LegacyCalendarBackup() {
   </aside>;
 }
 
-function SharedCalendarScreen({ onBackHome, onOpenPermit }: CalendarProps) {
+function SharedCalendarScreen({ onBackHome, onOpenPermit, permitWorkspace }: CalendarProps) {
   const auth = useFirebaseAuth();
   const profile = auth.profile!;
   const repository = useMemo(() => createCalendarRepository(window.localStorage), []);
@@ -253,7 +254,7 @@ function SharedCalendarScreen({ onBackHome, onOpenPermit }: CalendarProps) {
                 {canDelete(day.status) && <button type="button" disabled={busy || !ready} onClick={deleteStatus} aria-label="운항 상태 삭제" className="rounded-lg p-1.5 text-red-600"><Trash2 className="h-4 w-4" /></button>}
               </div> : null}
             </div>
-            <PermitInvestigationSection date={selectedDate} vessel={vessel} isAdmin={shared.isAdmin} onOpenPermit={onOpenPermit} />
+            <PermitInvestigationSection date={selectedDate} vessel={vessel} isAdmin={shared.isAdmin} onOpenPermit={onOpenPermit} workspace={permitWorkspace} />
             <div className="rounded-2xl border border-sky-200 bg-white p-3">
               <h3 className="mb-2 text-sm font-black">메모 {day.memos.length > 0 ? day.memos.length : ''}</h3>
               {day.memos.length > 0 && <ul className="space-y-2">

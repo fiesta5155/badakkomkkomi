@@ -94,7 +94,7 @@ import { usePorpoiseStorage } from './hooks/usePorpoiseStorage';
 import { usePorpoiseLocationPicker } from './hooks/usePorpoiseLocationPicker';
 import { useActivityPermits } from './hooks/useActivityPermits';
 import { ActivityPermitPanel } from './components/notebook/ActivityPermitPanel';
-import { PERMIT_LAYER_ID, permitFeatureCollection, permitLayer, permitStatus, type PermitMapFocus, type PermitSnapshot } from './services/activityPermitModel';
+import { PERMIT_LAYER_ID, activePermitRecords, permitFeatureCollection, permitLayer, type PermitMapFocus, type PermitSnapshot } from './services/activityPermitModel';
 import { useMarineWeather } from './hooks/useMarineWeather';
 import {
   calculateRouteSummary,
@@ -240,11 +240,10 @@ export function App() {
   const [permitFocus, setPermitFocus] = useState<PermitMapFocus | null>(null);
   useEffect(() => { if (route.screen !== 'notebook') { setPermitPanel(null); setSelectedPermit(null); setPermitFocus(null); } }, [route.screen]);
   useEffect(() => { setSelectedPermit(null); setPermitPanel(current => current === 'detail' ? null : current); }, [permitWorkspace.profile?.uid]);
-  const permitMapRecords = useMemo(() => {
-    const rows: (PermitSnapshot & { id: string })[] = permitWorkspace.records.filter(p => permitStatus(p, permitWorkspace.today) === '조사 가능');
-    if (selectedPermit && !rows.some(p => p.id === selectedPermit.id)) rows.push(selectedPermit);
-    return rows;
-  }, [permitWorkspace.records, permitWorkspace.today, selectedPermit]);
+  const permitMapRecords = useMemo(
+    () => activePermitRecords(permitWorkspace.records, permitWorkspace.today),
+    [permitWorkspace.records, permitWorkspace.today],
+  );
   const permitMapLayers = useMemo(() => [...layers, permitLayer(layers.find(l => l.id === 'protected_area'), permitVisible && route.screen === 'notebook')], [layers, permitVisible, route.screen]);
   const permitMapData = useMemo(() => ({ ...geoJsonLayersData, [PERMIT_LAYER_ID]: permitFeatureCollection(permitMapRecords) }), [geoJsonLayersData, permitMapRecords]);
   const [porpoiseModalCoords, setPorpoiseModalCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -745,6 +744,8 @@ export function App() {
   }, []);
   const handleFocusPermit = useCallback((p: PermitSnapshot & { id: string }) => {
     setIsPorpoiseAddMode(false); setIsReportPickMode(false); setSelectedFeature(null);
+    // An explicit selection turns the layer ON for all live, valid permits.
+    // Selection requests a camera move only; it never adds a snapshot to the map.
     setSelectedPermit(p); setPermitVisible(true); setPermitPanel('detail');
     setPermitFocus({ vertices: p.vertices, nonce: Date.now() });
     setHasEnteredWorkspace(true); navigateToScreen('notebook', 'route');
@@ -1290,7 +1291,7 @@ export function App() {
 
       {isCalendarScreen && (
         <Suspense fallback={<div className="h-dvh bg-white" />}>
-          <CalendarScreen onBackHome={() => navigateHome(navSubTab)} onOpenPermit={handleCalendarPermit} />
+          <CalendarScreen onBackHome={() => navigateHome(navSubTab)} onOpenPermit={handleCalendarPermit} permitWorkspace={permitWorkspace} />
         </Suspense>
       )}
 
