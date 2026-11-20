@@ -20,6 +20,16 @@ const DEFAULT_QGIS_SHP_PATH =
 
 const OUTPUT_GEOJSON_PATH = path.join(ROOT, 'public', 'data', 'layers', 'protected_area.geojson');
 
+// Match the official ID and name so a future change to the source is visible.
+const PROTECTED_AREA_DISPLAY_NAMES = new Map([
+  ['한동-01', { name: '학동동백림', species: '팔색조' }],
+  ['한동-03', { name: '갈곶도', species: '풍란, 석곡' }],
+  ['한동-04', { name: '다포도', species: '풍란' }],
+  ['한동-05', { name: '대병대도', species: '수달' }],
+  ['한동-06', { name: '소병대도', species: '수달' }],
+  ['한동-09', { name: '방화도', species: '수달' }],
+]);
+
 // EPSG:5181 (Korea 2000 / Central Belt, False Northing = 500,000m)
 const EPSG_5181_DEF =
   '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs';
@@ -241,6 +251,9 @@ function main() {
 
     const code = String(rec['코드명'] || `SPA-${i + 1}`).trim();
     const rawName = String(rec['명칭'] || code).trim();
+    const display = PROTECTED_AREA_DISPLAY_NAMES.get(code);
+    const matchesOfficialName =
+      display && rawName.replace(/,\s*/g, ', ') === `${display.name} ${display.species}`;
     const officeName =
       rec['관리'] === '한동' ? '국립공원공단 한려해상동부사무소' : '국립공원공단 한려해상국립공원사무소';
     const locationType = String(rec['입지'] || '').trim();
@@ -256,11 +269,12 @@ function main() {
       id: code,
       properties: {
         id: code,
-        name: rawName,
+        name: matchesOfficialName ? display.name : rawName,
         코드명: code,
         관리: rec['관리'],
         office: officeName,
         명칭: rawName,
+        ...(matchesOfficialName ? { 보호대상: display.species } : {}),
         입지: locationType,
         유형: zoneType,
         상태: status,

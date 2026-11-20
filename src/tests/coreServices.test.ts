@@ -790,6 +790,37 @@ describe('6. v2.4 Spatial CRS Detection, Route Leg Label Toggle & Nearby Marine 
     assert.equal(hasLegacyDummyFeatures(realProtectedFc), false);
     assert.equal(realProtectedFc.features.length, 20);
   });
+
+  it('uses short place names for the six designated protected areas and retains the official names and species', () => {
+    const { features } = JSON.parse(
+      fs.readFileSync(new URL('../../public/data/layers/protected_area.geojson', import.meta.url), 'utf8'),
+    );
+    const shortened = new Map([
+      ['한동-01', ['학동동백림', '팔색조']],
+      ['한동-03', ['갈곶도', '풍란, 석곡']],
+      ['한동-04', ['다포도', '풍란']],
+      ['한동-05', ['대병대도', '수달']],
+      ['한동-06', ['소병대도', '수달']],
+      ['한동-09', ['방화도', '수달']],
+    ]);
+    const seen = new Set<string>();
+    for (const { id, properties } of features) {
+      const expected = shortened.get(id);
+      assert.equal(properties.id, id);
+      assert.equal(properties.코드명, id);
+      assert.ok(!seen.has(id), id);
+      seen.add(id);
+      if (expected) {
+        const [name, species] = expected;
+        assert.equal(properties.name, name);
+        assert.equal(properties.명칭, `${name} ${species}`);
+        assert.equal(properties.보호대상, species);
+      } else {
+        assert.equal(properties.name, properties.명칭);
+      }
+    }
+    for (const id of shortened.keys()) assert.ok(seen.has(id), id);
+  });
 });
 
 describe('7. Registered Port Candidate Selection, Sibling Port Switcher & Post-Edit Sanitization (routePortSelectionService.ts)', () => {
