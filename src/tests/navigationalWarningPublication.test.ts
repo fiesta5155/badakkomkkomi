@@ -187,3 +187,13 @@ test('downloaded missing-key artifact is not a normal zero-warning collection', 
   const empty = pair(at, 0);
   assert.equal(validateWarningPair(encode(empty.snapshot), encode(empty.status)).snapshot.lastSuccessfulAt, at);
 });
+
+test('Pages tests repository seeds before replacing them with runtime collection JSON', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');
+  const tests = workflow.indexOf('npm test');
+  const prepare = workflow.indexOf('      - name: Prepare complete warning data');
+  const build = workflow.indexOf('npm run build');
+  assert.ok(tests >= 0 && tests < prepare && prepare < build);
+  assert.equal((workflow.match(/npm test/g) ?? []).length, 1);
+  assert.equal((workflow.match(/npm run build/g) ?? []).length, 1);
+});
