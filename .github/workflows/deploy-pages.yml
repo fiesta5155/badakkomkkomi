@@ -168,7 +168,24 @@ jobs:
           NAV_WARNING_PAGES_URL: ${{ steps.pages.outputs.base_url }}
           NAV_WARNING_SOURCE_RUN_ID: ${{ steps.navigation.outputs.run }}
           NAV_WARNING_SOURCE_RUN_ATTEMPT: ${{ steps.navigation.outputs.attempt }}
-        run: node scripts/prepare-navigational-warnings.mjs
+          NAV_WARNING_REQUIRE_ARTIFACT: ${{ github.event_name == 'workflow_run' || steps.navigation.outputs.id != '' }}
+        run: |
+          # Bootstrap without a collector history is allowed on an initial push.
+          # A collection-triggered publication must validate its actual artifact.
+          node --input-type=module <<'NODE'
+          import {readWarningArtifact} from './scripts/prepare-navigational-warnings.mjs';
+          if (process.env.NAV_WARNING_REQUIRE_ARTIFACT === 'true') {
+            const pair = await readWarningArtifact(process.env.NAV_WARNING_ARTIFACT_DIR);
+            if (!pair) {
+              console.error('::error::Selected collection artifact is missing or invalid. Existing Pages data is preserved.');
+              process.exitCode = 1;
+            } else if (!['success', 'failed'].includes(pair.status.status)) {
+              console.error('::error::Selected artifact contains no collection attempt. Check KHOA_NAV_WARNING_SERVICE_KEY. Existing Pages data is preserved.');
+              process.exitCode = 1;
+            }
+          }
+          NODE
+          node scripts/prepare-navigational-warnings.mjs
 
       - name: Pre-flight Lint, Unit Tests, Production Build & Post-Build SW Integrity Check
         env:

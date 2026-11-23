@@ -146,3 +146,44 @@ test('actual workflow selector rejects forks, PRs, expired attempts and spoofed 
   assert.equal((await invoke({ attempt: 1 })).rejected, true);
   assert.equal((await invoke({ push: true })).outputs.id, '2');
 });
+
+function workflowGuard(file: string, step: string) {
+  const workflow = readFileSync(new URL(`../../.github/workflows/${file}`, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+  const block = workflow.slice(workflow.indexOf(`      - name: ${step}`));
+  const code = block.match(/node --input-type=module <<'NODE'\n([\s\S]*?)^          NODE/m)?.[1];
+  assert.ok(code, 'The actual workflow guard must be present');
+  return code.split('\n').map(line => line.replace(/^ {10}/, '')).join('\n').replace(/^import .*;$/gm, '');
+}
+
+test('collector workflow fails missing-key skips instead of reporting a successful collection', async () => {
+  const code = workflowGuard('collect-navigational-warnings.yml', 'Collect official XML');
+  const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+  for (const status of ['not_configured', 'not_collected', 'failed', 'success']) {
+    const process = { exitCode: 0 }; const errors: string[] = [];
+    await new AsyncFunction('readFile', 'process', 'console', code)(async () => JSON.stringify({ status }), process, { error: (s: string) => errors.push(s) });
+    assert.equal(process.exitCode, status === 'success' ? 0 : 1);
+    if (status === 'not_configured') assert.match(errors[0], /KHOA_NAV_WARNING_SERVICE_KEY/);
+  }
+});
+
+test('Pages workflow blocks missing, invalid and unconfigured collection artifacts before preparation', async () => {
+  const code = workflowGuard('deploy-pages.yml', 'Prepare complete warning data');
+  const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+  for (const status of [null, 'not_configured', 'not_collected', 'failed', 'success']) {
+    const process = { env: { NAV_WARNING_REQUIRE_ARTIFACT: 'true', NAV_WARNING_ARTIFACT_DIR: '/isolated' }, exitCode: 0 };
+    await new AsyncFunction('readWarningArtifact', 'process', 'console', code)(async () => status && { status: { status } }, process, { error: () => {} });
+    assert.equal(process.exitCode, status === 'failed' || status === 'success' ? 0 : 1);
+  }
+  const process = { env: { NAV_WARNING_REQUIRE_ARTIFACT: 'false' }, exitCode: 0 };
+  await new AsyncFunction('readWarningArtifact', 'process', 'console', code)(async () => { throw Error('bootstrap must not require an artifact'); }, process, { error: () => {} });
+  assert.equal(process.exitCode, 0);
+});
+
+test('downloaded missing-key artifact is not a normal zero-warning collection', () => {
+  const skipped = pair(null, 0, 'not_configured', at);
+  const parsed = validateWarningPair(encode(skipped.snapshot), encode(skipped.status));
+  assert.equal(parsed.snapshot.lastSuccessfulAt, null);
+  assert.equal(parsed.status.status, 'not_configured');
+  const empty = pair(at, 0);
+  assert.equal(validateWarningPair(encode(empty.snapshot), encode(empty.status)).snapshot.lastSuccessfulAt, at);
+});
