@@ -188,3 +188,20 @@
 사용자가 공식 좌표 154곳의 지도 위치를 직접 확인하고 운영 반영을 승인했다. 바다수첩의 항·포구 명칭 레이어는 [승인 스냅샷](../data/public-port-names.final-candidate.geojson)을 사용한다. 검증 보류 71곳의 판정과 출처를 유지한다. 제외 12곳, 주소·코드 불일치 8행 및 공식 자료와 대응하지 않은 기존 40곳은 운영 명칭 레이어에서 제외한다.
 
 [지도 데이터 변환](../src/data/portNameMapPoints.ts)은 공식 GeoJSON의 경도·위도를 두 지도 엔진에 그대로 전달한다. 이름표와 심볼은 같은 기준점을 사용한다. 명칭 레이어의 표시 설정은 기존 접안·위험정보·보호구역과 독립적이다. [전환 전 81곳의 원본과 명칭 좌표 이력](./PLACE_NAME_COORDINATES.md)을 보존한다.
+
+## 이전 로컬 승인 작업 기록
+
+
+
+| 파일 | 로컬 적용 |
+|---|---|
+| [App.tsx](../src/App.tsx) | 바다수첩 명칭 레이어의 데이터 선택을 최종 후보로 전환. 경로 계산·접안 파일 로딩과 분리 |
+| [최종 후보 GeoJSON](../data/public-port-names.final-candidate.geojson) | 승인된 스냅샷을 명칭 전용 번들 자료로 사용. 좌표·검증 보류 상태 유지 |
+| [dataSources.ts](../src/config/dataSources.ts), [LayerControlModal.tsx](../src/components/notebook/LayerControlModal.tsx) | 운영 자료의 81곳 안내와 출처를 새 수량 및 검증 상태에 맞춤 |
+| [portNameMarkers.browser.mjs](../src/tests/portNameMarkers.browser.mjs), [mapInformation.browser.mjs](../src/tests/mapInformation.browser.mjs) | 기본 모드 검증 기준을 154곳으로 전환하고 별도 레이어 회귀 검증 유지 |
+| [mapInformationData.test.ts](../src/tests/mapInformationData.test.ts), [verify-integrity.mjs](../scripts/verify-integrity.mjs) | 154곳의 지역별 수량·확대 정책과 승인 스냅샷의 정합 확인 |
+| [AGENTS.md](../AGENTS.md), [README.md](../README.md), [ARCHITECTURE_AND_DESIGN.md](./ARCHITECTURE_AND_DESIGN.md), [DATA_AND_TECH_SOURCES.md](./DATA_AND_TECH_SOURCES.md), [SITEMAP.md](./designs/SITEMAP.md), [PLACE_NAME_COORDINATES.md](./PLACE_NAME_COORDINATES.md) | 운영 수량·출처·유지보수 절차의 기준 갱신 |
+
+2026-11-20 승인에 따라 일반 개발 모드와 로컬 운영 빌드를 154곳으로 연결하고 후보 전용 분기를 제거했다. 검증 보류 71곳의 상태를 유지했다. 제외 12곳·별도 검토 8행·기존 미확정 40곳은 편입하지 않았다. 원본 81곳의 데이터·승인 좌표·Git 이력과 두 후보 스냅샷은 보존했다. 배포 전에 실제 Kakao SDK가 연결되는 환경에서 밀집 구간과 동명 표식을 점검하고 배포 승인을 받는다.
+
+로컬 운영 빌드에 승인 GeoJSON이 포함된 것을 원문과 대조했다. 빌드 미리보기에서 테스트 인증으로 Leaflet 표식 154개의 명칭, ON/OFF, 확대·축소, 심볼과 이름표 정렬을 확인했다. 일반 개발 모드에서 Leaflet과 합성 Kakao SDK를 각각 320·390·1280px로 검사해 154개 명칭·좌표와 다른 레이어의 동작을 확인했다. 실제 Kakao SDK는 localhost 및 127.0.0.1에서 연결하지 못해 미검증 상태다.

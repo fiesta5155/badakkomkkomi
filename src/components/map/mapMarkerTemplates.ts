@@ -36,6 +36,16 @@ export function buildPortNamePointSpec(name: string, showLabel: boolean): Marker
   };
 }
 
+/** Port symbols persist at (26, 26); the attached label tip targets that same coordinate. */
+export function buildReferencePointSpec(name: string, showLabel: boolean, hazard = false): MarkerTemplateSpec {
+  const color = hazard ? '#b2415f' : '#003360';
+  if (!hazard) return buildPortNamePointSpec(name, showLabel);
+  return {
+    width: 52, height: 52, anchorX: 26, anchorY: 26, xAnchorRatio: 0.5, yAnchorRatio: 0.5,
+    html: `<button type="button" data-reference-point="${hazard ? 'hazard' : 'port_names'}" aria-label="${escapeHtml(name)}" title="${escapeHtml(name)}" style="position:relative;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border:0;background:transparent;cursor:pointer;touch-action:manipulation;color:${color}"><span aria-hidden="true" style="width:${hazard ? 16 : 8}px;height:${hazard ? 16 : 8}px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 1px 3px #0005"></span>${showLabel ? `<span style="position:absolute;top:35px;left:50%;transform:translateX(-50%);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fffffff0;border-radius:5px;padding:2px 5px;font-size:11px;font-weight:700;line-height:16px">${escapeHtml(name)}</span>` : ''}</button>`,
+  };
+}
+
 /**
  * 접안지 등급별 GIS 오버레이 zIndex 산출 헬퍼
  * - 복수 등급 또는 전체(55개소) 동시 표출 시에도 '위험주의(red)' 마커가 일반 마커에 가려지지 않도록 최상위 비선택 우선순위를 부여합니다.

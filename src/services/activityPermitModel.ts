@@ -41,6 +41,12 @@ export function validPermitPolygon(vertices: PermitVertex[]) {
   if (!Array.isArray(vertices) || vertices.length < 4 || vertices.length > PERMIT_POINT_LABELS.length) return false;
   try { for (const p of vertices) if (!p || p.lat !== dmsDecimal(p.latDms, 'lat') || p.lng !== dmsDecimal(p.lngDms, 'lng')) return false; }
   catch { return false; }
+  return validSimplePolygon(vertices);
+}
+// Geometry-only validation shared by permits and reviewed official warning areas.
+// Permit-specific DMS and 4–20 vertex requirements remain above.
+export function validSimplePolygon(vertices: XY[]) {
+  if (vertices.length < 3 || vertices.some(p => !Number.isFinite(p.lat) || !Number.isFinite(p.lng) || Math.abs(p.lat) > 90 || Math.abs(p.lng) > 180)) return false;
   if (new Set(vertices.map(p => `${p.lng},${p.lat}`)).size !== vertices.length) return false;
   if (Math.max(...vertices.map(p => p.lng)) - Math.min(...vertices.map(p => p.lng)) > 180) return false;
   let area = 0;

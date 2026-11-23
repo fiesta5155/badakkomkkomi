@@ -26,6 +26,16 @@ export function SettingsInformation({ screen, focusSourceId }: { screen: 'guide'
         <div className="min-w-0"><h3 className="text-sm font-bold">{guide.title}</h3><p className="mt-1 text-sm leading-relaxed text-slate-600">{guide.description}</p></div>
       </div>)}
     </div>
+    <section aria-labelledby="navigational-warning-guide" className="mt-4 border-t border-sky-100 pt-3">
+      <h3 id="navigational-warning-guide" className="text-sm font-bold">항행경보 안내</h3>
+      <div className="mt-2 space-y-2 text-xs leading-relaxed text-slate-600">
+        <p>국립해양조사원 공식 항행경보를 자동 수집해 저장된 자료를 조회하는 방식입니다. 수집 스케줄은 매시간 23분으로 설정돼 있으며 실행이 지연될 수 있습니다.</p>
+        <p>앱 자동 갱신 연결은 아직 준비 중입니다. 최종 정상 수집 시각과 미수집·실패·오래됨 표시를 확인하세요. 개발용 미리보기는 과거 자료입니다.</p>
+        <p>한국시간 어제·오늘·내일을 기준으로 조회합니다. 날짜·상설·취소 경보의 처리 규칙이 완전히 확인되지 않아 모든 유효 경보의 포함 여부는 보장되지 않습니다.</p>
+        <p>공식 항행안전정보 확인을 대체하지 않습니다. 운항 전 공식 경보 원문과 현장 상황을 확인하세요.</p>
+        <a href="https://www.khoa.go.kr/nwb/mainPage.do?lang=ko" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center underline">국립해양조사원 항행경보 (공식 출처 · 새 창)</a>
+      </div>
+    </section>
     <p className="mt-4 rounded-xl bg-sky-50 p-3 text-xs leading-relaxed text-slate-700">항로와 기상정보는 참고용이며, 실제 운항 시에는 현장 상황과 공식 항행정보를 확인해 주세요.</p>
   </section>;
 

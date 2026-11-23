@@ -4,6 +4,10 @@ on:
   push:
     branches: ['main']
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Collect KHOA navigational warnings (artifact only)']
+    types: [completed]
+    branches: ['main']
   schedule:
     # 19:17 UTC on the previous day = 04:17 KST. Scheduling may be delayed.
     - cron: '17 19 * * *'
@@ -19,7 +23,12 @@ concurrency:
 jobs:
   build-and-deploy:
     # One path for push, schedule and manual refresh. Never deploy arbitrary refs.
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'workflow_dispatch')))
     permissions:
       contents: read
       actions: read
@@ -34,7 +43,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: false
+
+      - name: Record checked-out source revision
+        id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -90,7 +104,7 @@ jobs:
 
       - name: Collect 32 days of KHOA forecasts
         # First push needs bootstrap; subsequent pushes inherit the last good data.
-        if: github.event_name != 'push' || steps.recovery.outputs.restored != 'true'
+        if: github.event_name != 'workflow_run' && (github.event_name != 'push' || steps.recovery.outputs.restored != 'true')
         env:
           KHOA_SERVICE_KEY: ${{ secrets.KHOA_SERVICE_KEY }}
         run: node scripts/update-khoa-tides.mjs
@@ -98,9 +112,68 @@ jobs:
       - name: Require validated tide data before any deployment
         run: node --input-type=module -e "import {readSnapshot,OUTPUT} from './scripts/update-khoa-tides.mjs'; if (!await readSnapshot(OUTPUT)) { console.error('Missing verified tide snapshot. Deployment blocked.'); process.exit(1); }"
 
+      - name: Find trusted navigational warning artifact
+        id: navigation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowPath = '.github/workflows/collect-navigational-warnings.yml';
+            const allowed = run => run.path === workflowPath && run.head_branch === 'main' &&
+              run.status === 'completed' && ['schedule', 'workflow_dispatch'].includes(run.event);
+            const output = (artifact, run, attempt) => {
+              core.setOutput('id', String(artifact.id));
+              core.setOutput('run', String(run.id));
+              core.setOutput('attempt', String(attempt));
+            };
+            if (context.eventName === 'workflow_run') {
+              const eventRun = context.payload.workflow_run;
+              const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id: eventRun.id});
+              if (!allowed(run) || eventRun.head_repository.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
+                core.setFailed('Untrusted collection event. No deployment.'); return;
+              }
+              if (run.run_attempt !== eventRun.run_attempt) { core.setFailed('Superseded collection attempt. No deployment.'); return; }
+              const {data} = await github.rest.actions.listWorkflowRunArtifacts({...context.repo, run_id: run.id, per_page: 100});
+              const artifact = data.artifacts.find(a => !a.expired && a.name === `khoa-navigation-${run.id}-${eventRun.run_attempt}`);
+              if (artifact) output(artifact, run, eventRun.run_attempt);
+              return;
+            }
+            // First deployment may have no collector history yet. Published Pages is
+            // the recovery baseline; an API/search error never replaces it with zeros.
+            for (let page = 1; page <= 3; page++) {
+              const {data} = await github.rest.actions.listArtifactsForRepo({...context.repo, per_page: 100, page});
+              for (const a of data.artifacts) {
+                const match = /^khoa-navigation-(\d+)-(\d+)$/.exec(a.name);
+                if (a.expired || !match || a.workflow_run?.head_branch !== 'main' || a.workflow_run.id !== Number(match[1])) continue;
+                const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id: Number(match[1])});
+                if (allowed(run) && run.run_attempt === Number(match[2])) { output(a, run, Number(match[2])); return; }
+              }
+              if (data.artifacts.length < 100) break;
+            }
+
+      - name: Download navigational warning JSON
+        if: steps.navigation.outputs.id != ''
+        # Deleted/expired between discovery and download: use the published baseline.
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.navigation.outputs.id }}
+          run-id: ${{ steps.navigation.outputs.run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/navigation-publication
+          merge-multiple: true
+
+      - name: Prepare complete warning data with published fallback
+        env:
+          NAV_WARNING_ARTIFACT_DIR: ${{ runner.temp }}/navigation-publication
+          NAV_WARNING_PAGES_URL: ${{ steps.pages.outputs.base_url }}
+          NAV_WARNING_SOURCE_RUN_ID: ${{ steps.navigation.outputs.run }}
+          NAV_WARNING_SOURCE_RUN_ATTEMPT: ${{ steps.navigation.outputs.attempt }}
+        run: node scripts/prepare-navigational-warnings.mjs
+
       - name: Pre-flight Lint, Unit Tests, Production Build & Post-Build SW Integrity Check
         env:
           GITHUB_ACTIONS: 'true'
+          VITE_BASE_PATH: ${{ format('{0}/', steps.pages.outputs.base_path) }}
           KAKAO_MAP_API_KEY: ${{ secrets.KAKAO_MAP_API_KEY }}
           VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -114,13 +187,16 @@ jobs:
           npm test
           npm run build
           npm run verify
+          node scripts/verify-navigational-warning-preview.mjs
 
       - name: Reject superseded source revision
         uses: actions/github-script@v7
+        env:
+          CHECKED_OUT_SHA: ${{ steps.source.outputs.sha }}
         with:
           script: |
             const {data} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
-            if (data.commit.sha !== context.sha) core.setFailed('main advanced during this run. Re-run the latest main revision; no deployment was started.');
+            if (data.commit.sha !== process.env.CHECKED_OUT_SHA) core.setFailed('main advanced during this run. Re-run the latest main revision; no deployment was started.');
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -130,6 +206,9 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Record actual deployment outcome
+        run: echo 'Pages deployment completed. Navigational warning publication metadata records preparation; this step confirms deployment success.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Preserve successfully deployed tide snapshot
         uses: actions/upload-artifact@v4

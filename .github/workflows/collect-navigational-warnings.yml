@@ -1,0 +1,83 @@
+name: Collect KHOA navigational warnings (artifact only)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 * * * *'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: navigational-warning-collection
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --prefer-offline --no-audit
+      - name: Find previous snapshot (including a failed attempt retaining good data)
+        id: previous
+        uses: actions/github-script@v7
+        with:
+          script: |
+            for (let page = 1; page <= 3; page++) {
+              const {data} = await github.rest.actions.listArtifactsForRepo({...context.repo, per_page: 100, page});
+              for (const a of data.artifacts) {
+                if (a.expired || !/^khoa-navigation-\d+-\d+$/.test(a.name) || a.workflow_run?.head_branch !== 'main') continue;
+                const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id: a.workflow_run.id});
+                if (run.path !== '.github/workflows/collect-navigational-warnings.yml' || run.status !== 'completed' || !['schedule', 'workflow_dispatch'].includes(run.event)) continue;
+                core.setOutput('id', String(a.id));
+                core.setOutput('run', String(run.id));
+                return;
+              }
+              if (data.artifacts.length < 100) break;
+            }
+      - name: Download previous data
+        if: steps.previous.outputs.id != ''
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.previous.outputs.id }}
+          run-id: ${{ steps.previous.outputs.run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/navigation-recovery
+          merge-multiple: true
+      - name: Validate and restore previous snapshot
+        if: steps.previous.outputs.id != ''
+        env:
+          RECOVERY_FILE: ${{ runner.temp }}/navigation-recovery/latest.json
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFile} from 'node:fs/promises';
+          import {isSnapshot} from './scripts/lib/navigational-warnings.mjs';
+          import {atomicJson} from './scripts/collect-navigational-warnings.mjs';
+          try {
+            const snapshot = JSON.parse(await readFile(process.env.RECOVERY_FILE, 'utf8'));
+            if (!isSnapshot(snapshot)) throw new Error();
+            await atomicJson('public/data/navigational-warnings/latest.json', snapshot);
+          } catch { console.error('Previous navigation snapshot invalid; collection stopped.'); process.exitCode = 1; }
+          NODE
+      - name: Collect official XML (no browser credentials)
+        id: collection
+        env:
+          KHOA_NAV_WARNING_SERVICE_KEY: ${{ secrets.KHOA_NAV_WARNING_SERVICE_KEY }}
+        run: node scripts/collect-navigational-warnings.mjs
+      - name: Preserve snapshot and attempt status
+        if: always() && (steps.collection.outcome == 'success' || steps.collection.outcome == 'failure')
+        uses: actions/upload-artifact@v4
+        with:
+          name: khoa-navigation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: public/data/navigational-warnings/*.json
+          retention-days: 90
+          if-no-files-found: error

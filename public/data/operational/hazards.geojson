@@ -1,0 +1,6 @@
+{
+  "type": "FeatureCollection",
+  "name": "독립 위험정보",
+  "metadata": { "description": "위치가 확인된 암초·폐로프·항행 장애물 등의 독립 원장. 현재 등록 자료 없음. 접안 등급을 재사용하지 않음." },
+  "features": []
+}

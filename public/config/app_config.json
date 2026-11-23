@@ -28,10 +28,10 @@
       "name": "갯바위 접안 포인트",
       "visible": true,
       "color": "#38bdf8",
-      "description": "5개 색상별 접안 안전도 및 현장 정보",
+      "description": "현장 확인을 완료한 운영 접안정보 (현재 0건)",
       "isSystemLayer": true,
       "geometryTypes": ["Point"],
-      "featureCount": 55
+      "featureCount": 0
     },
     {
       "id": "national_park",

@@ -14,7 +14,7 @@ import {PermitInvestigationSection} from '/src/components/calendar/PermitInvesti
 import {FirebaseAuthContext} from '/src/hooks/useFirebaseAuth.ts';
 import {LegacyLeafletCanvas} from '/src/components/map/LegacyLeafletCanvas.tsx';
 import {permitLayer,permitFeatureCollection} from '/src/services/activityPermitModel.ts';
-import '/node_modules/leaflet/dist/leaflet.css';
+const leafletStyles=document.createElement('link');leafletStyles.rel='stylesheet';leafletStyles.href='/node_modules/leaflet/dist/leaflet.css';document.head.append(leafletStyles);
 const vertex=(a,b)=>({latDms:{degrees:34,minutes:a,seconds:0,hemisphere:'N'},lngDms:{degrees:128,minutes:b,seconds:0,hemisphere:'E'},lat:34+a/60,lng:128+b/60});
 const p={id:'p1',permitNumber:'통영양식 제1531호',target:'미역',sourceCrs:'EPSG:4326',vertices:[vertex(48,24),vertex(48,25),vertex(49,25),vertex(49,24)],startDate:'2026-11-01',endDate:'2026-11-30',notes:'현장 비고',authorUid:'owner',authorName:'범진',revision:1};
 window.qaWorkspace={profile:{uid:'owner',realName:'범진'},records:[p,{...p,id:'p2',target:'굴'},{...p,id:'old',endDate:'2026-10-31',startDate:'2026-10-01'}],ready:true,error:'',today:'2026-11-19',isAdmin:false,retry:()=>{}};

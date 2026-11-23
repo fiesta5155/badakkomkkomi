@@ -232,9 +232,9 @@ test('workflow guards bootstrap, push inheritance, successful backup provenance 
   assert.equal((yaml.match(/secrets\.KHOA_SERVICE_KEY/g) ?? []).length, 1);
   assert.match(yaml, /github\.event_name != 'push' \|\| steps\.recovery\.outputs\.restored != 'true'/);
   assert.match(yaml, /run\.conclusion !== 'success'/);
-  assert.match(yaml, /data\.commit\.sha !== context\.sha/);
+  assert.match(yaml, /data\.commit\.sha !== process\.env\.CHECKED_OUT_SHA/);
   assert.ok(yaml.indexOf('Require validated tide data') < yaml.indexOf('Upload Pages artifact'));
-  assert.ok(yaml.indexOf('Preserve successfully deployed tide snapshot') > yaml.indexOf('Deploy to GitHub Pages\n'));
+  assert.ok(yaml.indexOf('Preserve successfully deployed tide snapshot') > yaml.search(/- name: Deploy to GitHub Pages\r?\n/));
 });
 
 test('actual workflow scripts reject failed/foreign artifacts and superseded reruns', async () => {
@@ -256,11 +256,13 @@ test('actual workflow scripts reject failed/foreign artifacts and superseded rer
   }, repos: { getBranch: async () => ({ data: { commit: { sha: 'new-main' } } }) } } };
   let failed = false;
   const core = { setOutput: (name: string, value: string) => { outputs[name] = value; }, setFailed: () => { failed = true; } };
-  await new AsyncFunction('github', 'context', 'core', scripts[0])(github, { repo: {} }, core);
+  const backupScript = scripts.find(source => source.includes('khoa-tides-'))!;
+  const revisionScript = scripts.find(source => source.includes('repos.getBranch'))!;
+  await new AsyncFunction('github', 'context', 'core', backupScript)(github, { repo: {} }, core);
   assert.deepEqual(outputs, { id: '4', run: '4' });
-  await new AsyncFunction('github', 'context', 'core', scripts[1])(github, { repo: {}, sha: 'original-rerun-sha' }, core);
+  await new AsyncFunction('github', 'context', 'core', 'process', revisionScript)(github, { repo: {} }, core, { env: { CHECKED_OUT_SHA: 'original-rerun-sha' } });
   assert.equal(failed, true);
   failed = false;
-  await new AsyncFunction('github', 'context', 'core', scripts[1])(github, { repo: {}, sha: 'new-main' }, core);
+  await new AsyncFunction('github', 'context', 'core', 'process', revisionScript)(github, { repo: {} }, core, { env: { CHECKED_OUT_SHA: 'new-main' } });
   assert.equal(failed, false);
 });

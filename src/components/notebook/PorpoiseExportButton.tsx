@@ -5,7 +5,7 @@ import { isValidRealName } from '../../services/userProfileService';
 import { createPorpoiseCsvFile, downloadPorpoiseCsv, sharePorpoiseCsv } from '../../services/porpoiseExportService';
 import type { PorpoiseRecord } from '../../types/porpoise';
 
-export function PorpoiseExportButton({ records }: { records: readonly PorpoiseRecord[] }) {
+export function PorpoiseExportButton({ records, compact = false }: { records: readonly PorpoiseRecord[]; compact?: boolean }) {
   const auth = useFirebaseAuth();
   const [busy, setBusy] = useState(false);
   const lock = useRef(false);
@@ -35,13 +35,14 @@ export function PorpoiseExportButton({ records }: { records: readonly PorpoiseRe
       setDownloadAvailable(fileCreated);
     } finally { lock.current = false; setBusy(false); }
   };
-  return <div className="mt-2">
+  return <div className={compact ? 'contents' : 'mt-2'}>
     <button type="button" disabled={busy} aria-busy={busy} onClick={() => void exportRecords()}
-      className="flex min-h-11 w-full touch-manipulation items-center justify-center gap-2 rounded-xl border border-teal-300 bg-white px-3 py-2 text-sm font-extrabold text-[#00846c] active:bg-teal-100 disabled:opacity-50">
-      <Download className="h-4 w-4 shrink-0" aria-hidden="true" />관찰기록 내보내기
+      aria-label="관찰기록 내보내기" title="관찰기록 내보내기"
+      className={compact ? 'col-start-2 row-start-1 flex h-11 w-11 touch-manipulation items-center justify-center rounded-lg text-[#00846c] hover:bg-teal-50 active:bg-teal-100 disabled:opacity-50' : 'flex min-h-11 w-full touch-manipulation items-center justify-center gap-2 rounded-xl border border-teal-300 bg-white px-3 py-2 text-sm font-extrabold text-[#00846c] active:bg-teal-100 disabled:opacity-50'}>
+      <Download className="h-4 w-4 shrink-0" aria-hidden="true" />{!compact && '관찰기록 내보내기'}
     </button>
-    <p role="status" className="mt-1 text-xs font-semibold leading-relaxed text-[#484843]">{message}</p>
+    <p role="status" className={compact ? (message ? 'col-span-full row-start-2 mt-1 px-1.5 text-xs font-semibold leading-relaxed text-[#484843]' : 'sr-only') : 'mt-1 text-xs font-semibold leading-relaxed text-[#484843]'}>{message}</p>
     {downloadAvailable && <button type="button" disabled={busy} onClick={() => void exportRecords(true)}
-      className="min-h-11 rounded-xl px-3 text-sm font-bold text-[#00846c] underline disabled:opacity-50">CSV 파일 다운로드</button>}
+      className={`${compact ? 'col-span-full row-start-3' : ''} min-h-11 rounded-xl px-3 text-sm font-bold text-[#00846c] underline disabled:opacity-50`}>CSV 파일 다운로드</button>}
   </div>;
 }

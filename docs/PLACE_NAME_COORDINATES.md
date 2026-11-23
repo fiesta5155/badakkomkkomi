@@ -102,3 +102,5 @@
 
 - [해양수산부 어촌어항관리시스템](https://naraport.mof.go.kr/): 홈페이지의 공개 조회 POST /json/gisPortListJson.do (NP/FP, appn_at=Y), 2026-11-20 확인.
 - [통영시 스마트도시계획](https://smartcity.go.kr/wp-content/uploads/2023/05/%ED%86%B5%EC%98%81%EC%8B%9C-%EC%8A%A4%EB%A7%88%ED%8A%B8%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf): 좌도에 동좌항 선착장이 있다는 장소 식별 참고. 이 문서에서 앱의 좌이도선착장 ID와 동일한 기준점을 확인하지는 못했다.
+
+기존 `mapInformationData.ts`의 `portNamePoints()`는 전환 전 81곳의 좌표 정정 이력을 검증하는 호환 도우미로 유지한다. 운영 154곳은 `portNameMapPoints.ts`가 전달하며 항행경보와 독립적으로 켜고 끌 수 있다.

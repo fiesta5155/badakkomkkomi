@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { createTideCachePlugin } from './scripts/khoa-tide-cache.ts';
+import { navigationalWarningPreviewPlugin } from './scripts/navigational-warning-preview.ts';
 
 function resolveViteBasePath(env: NodeJS.ProcessEnv): string {
   const explicitBase = env.VITE_BASE_PATH?.trim();
@@ -58,6 +59,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    navigationalWarningPreviewPlugin(base),
     react(),
     tailwindcss(),
     {
@@ -121,7 +123,7 @@ export default defineConfig({
       workbox: {
         cacheId: 'bada-kkomkkomi-v2.4',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json,geojson}'],
-        globIgnores: ['**/dev/**', '**/data/tides/**'],
+        globIgnores: ['**/dev/**', '**/data/tides/**', '**/data/navigational-warnings/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
@@ -129,6 +131,12 @@ export default defineConfig({
         navigateFallback: `${base}index.html`,
         navigateFallbackDenylist: [/\/data\//, /\/images\//, /\/config\//],
         runtimeCaching: [
+          {
+            // Warning pairs carry a generation hash; never pin old JSON in SW caches.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/data\/navigational-warnings\/(latest|status)\.json$/.test(url.pathname),
+            handler: 'NetworkOnly',
+            options: { fetchOptions: { cache: 'no-store' } },
+          },
           {
             urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/data\/tides\//.test(url.pathname),
             handler: 'NetworkFirst',

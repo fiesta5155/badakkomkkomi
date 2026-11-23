@@ -1,9 +1,10 @@
+import type { ReferenceMapPoint } from './mapInformationData';
 import type { DockingFeature } from '../../types/docking';
 
 /** Presentation only: never change the source records or the user's active filters. */
-export function getNotebookDisplay(features: DockingFeature[], showHazards: boolean) {
-  const visibleFeatures = showHazards ? features : features.filter((feature) => feature.properties.color !== 'red');
-  const hazardFeatures = visibleFeatures.filter((feature) => feature.properties.color === 'red');
+export function getNotebookDisplay(features: DockingFeature[], showHazards: boolean, hazards: ReferenceMapPoint[] = []) {
+  const visibleFeatures = features;
+  const hazardFeatures = showHazards ? hazards : [];
   return {
     visibleFeatures,
     hazardFeatures,

@@ -78,6 +78,13 @@ assert(
   'Invalid app_config.json: wave_threshold_meter must satisfy 0 < good < moderate',
 );
 
+// Operational sources are separate from the immutable legacy archive below.
+for (const name of ['docking_points', 'hazards']) {
+  const source = JSON.parse(fs.readFileSync('public/data/operational/' + name + '.geojson', 'utf8'));
+  assert(source.type === 'FeatureCollection' && Array.isArray(source.features) && source.features.length === 0,
+    'Operational ' + name + ': no verified records have been registered');
+}
+
 execFileSync(process.execPath, ['scripts/build-port-names-final-candidate.mjs', '--check'], { stdio: 'inherit' });
 
 // 3. docking_points.geojson (55개소) 및 ports.json (136개소 + 300개 변침점) + coastlinePolygons.ts (378개 실측 해안선 폴리곤) 무결성 검증
@@ -95,6 +102,7 @@ assert(
   'Invalid docking_points.geojson: expected >=55 features',
 );
 
+execFileSync(process.execPath, ['scripts/build-port-names-final-candidate.mjs', '--check'], { stdio: 'inherit' });
 const portsData = JSON.parse(fs.readFileSync('public/data/ports.json', 'utf8'));
 assert(
   Array.isArray(portsData.ports) &&
@@ -270,6 +278,7 @@ if (fs.existsSync('dist/sw.js')) {
   const urlMatches = [...swContent.matchAll(/\{url:"([^"]+)",revision:/g)].map((m) => m[1]);
   const uniqueUrls = new Set(urlMatches);
   assert(!urlMatches.some(url => /(^|\/)data\/tides\//.test(url)), 'Tide JSON must never enter the SW precache');
+  assert(!urlMatches.some(url => /(^|\/)data\/navigational-warnings\//.test(url)), 'Warning JSON must never enter the SW precache');
   assert(
     urlMatches.length > 0 && urlMatches.length === uniqueUrls.size,
     `Duplicate precache URLs detected in dist/sw.js: total=${urlMatches.length}, unique=${uniqueUrls.size}`,

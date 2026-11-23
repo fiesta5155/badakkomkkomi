@@ -7,30 +7,19 @@ import { buildDockingMarkerSpec } from '../components/map/mapMarkerTemplates.ts'
 
 const collection = JSON.parse(readFileSync(new URL('../../public/data/docking_points.geojson', import.meta.url), 'utf8')) as DockingFeatureCollection;
 
-test('hazard visibility filters display only and restores the same source records and counts', () => {
-  const records = collection.features;
-  const snapshot = structuredClone(records);
-  const enabled = getNotebookDisplay(records, true);
+test('independent hazard visibility never filters docking grades or derives hazards from them', () => {
+  const records = collection.features, snapshot = structuredClone(records);
+  const hazards = [{ id: 'test-obstacle', name: '테스트 장애물', lat: 34.8, lng: 128.4 }];
+  assert.equal(getNotebookDisplay(records, true).hazardCount, 0);
+  const enabled = getNotebookDisplay(records, true, hazards);
   assert.equal(enabled.visibleFeatures, records);
-  assert.deepEqual(enabled.hazardFeatures.map((feature) => feature.properties.id), records.filter((feature) => feature.properties.color === 'red').map((feature) => feature.properties.id));
-  assert.equal(enabled.hazardCount, enabled.hazardFeatures.length);
-  const disabled = getNotebookDisplay(records, false);
+  assert.equal(enabled.hazardFeatures, hazards);
+  assert.equal(enabled.hazardCount, 1);
+  const disabled = getNotebookDisplay(records, false, hazards);
+  assert.equal(disabled.visibleFeatures, records);
   assert.equal(disabled.hazardCount, 0);
-  assert.equal(disabled.hazardFeatures.length, 0);
-  assert.deepEqual(disabled.visibleFeatures, records.filter((feature) => feature.properties.color !== 'red'));
   assert.deepEqual(records, snapshot);
-  assert.equal(getNotebookDisplay(records, true).visibleFeatures, records);
-  for (const feature of disabled.visibleFeatures) assert.ok(records.includes(feature));
-});
-
-test('existing color, region and search results survive hazard OFF and ON unchanged', () => {
-  const filtered = collection.features.filter((feature) => ['red', 'green'].includes(feature.properties.color)).slice(0, 7);
-  const snapshot = structuredClone(filtered);
-  getNotebookDisplay(filtered, false);
-  assert.deepEqual(filtered, snapshot);
-  assert.equal(getNotebookDisplay(filtered, true).visibleFeatures, filtered);
-  assert.equal(getNotebookDisplay([], true).hazardCount, 0);
-  assert.deepEqual(getNotebookDisplay([], false).visibleFeatures, []);
+  assert.equal(getNotebookDisplay([], true, hazards).hazardCount, 1);
 });
 
 test('hazard markers hide code badges while retaining their pin, warning and geographic anchor', () => {

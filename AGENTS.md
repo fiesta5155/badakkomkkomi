@@ -16,11 +16,13 @@ EGM artifact directory: .dev/docs
 - `_agents/skills/bada-kkomkkomi-elephant`: [Elephant 스킬](./_agents/skills/bada-kkomkkomi-elephant/SKILL.md) - Google EGM 워크플로에서 프로젝트 컨텍스트와 불변식을 로드합니다.
 
 ## Global Invariants
-- **좌표계 및 공간데이터 정합 불변식**: 모든 런타임/정적 GeoJSON은 `EPSG:4326`(`WGS84`) `[lng, lat]` 순서를 따릅니다. QGIS 구 중부원점(`EPSG:5181`, `False_Northing=500,000m`)과 신 중부원점(`EPSG:5186`, `False_Northing=600,000m`)의 100km 위도 차이를 `.prj` WKT 파라미터로 구분합니다. `public/data/ports.json`(136개 항구·300개 변침점)과 `public/data/docking_points.geojson`(55개 접안지)은 동일 ID 간 좌표 오차 `1e-5` 이내를 유지하며, 378개 해안선 폴리곤(`src/data/coastlinePolygons.ts`) 내부 육지를 침범하지 않습니다.
+- **좌표계 및 공간데이터 정합 불변식**: 모든 런타임/정적 GeoJSON은 `EPSG:4326`(`WGS84`) `[lng, lat]` 순서를 따릅니다. QGIS 구 중부원점(`EPSG:5181`, `False_Northing=500,000m`)과 신 중부원점(`EPSG:5186`, `False_Northing=600,000m`)의 100km 위도 차이를 `.prj` WKT 파라미터로 구분합니다. `public/data/ports.json`(보존 사전 136개·300개 변침점)과 `public/data/docking_points.geojson`(출처 미확인 보존 접안 자료 55개)은 동일 ID 간 좌표 오차 `1e-5` 이내를 유지하며, 378개 해안선 폴리곤(`src/data/coastlinePolygons.ts`) 내부 육지를 침범하지 않습니다.
 - **자유 직선 그리기·초기 빈 경로 불변식**: 페이지 신규 접속 시 `routeWaypoints`는 `localStorage`의 이전 경로를 자동 복원하지 않고 빈 배열(`[]`)로 시작합니다. `시간계산` 화면에서 지도 클릭은 좌표를 그대로 순서대로 추가하며, `straightRouteService.ts`는 이를 `지점 1, 2, …`로 번호 붙입니다. 인접한 점만 직선 연결하고 마지막 점과 첫 점을 자동 연결하지 않습니다. Haversine 거리(NM)와 입력 속력(knots)으로 구간·전체 예상시간을 계산합니다. 항구 자동 선택·좌표 보정·섬 자동 우회·자동 변침점·A* 탐색은 사용하지 않습니다. 육지 교차 시 선을 유지하고 경고만 표시합니다. 마지막 점 취소와 전체 초기화를 지원하며, 두 지도 캔버스는 직선 구간(`leg.pathPositions`)과 중점 배지를 렌더링합니다.
 - **ECMWF 단일 모델 및 안전 실패(Fail-Safe) 불변식**: `ecmwfWeatherService.ts`는 `ecmwf_ifs`(풍속)와 `ecmwf_wam`(파고) 단일 모델만 고정 호출하고 동일 KST(`Asia/Seoul`) 타임스탬프 기준으로 결합합니다. 결측치(`null`/`NaN`)나 네트워크/오프라인 오류 발생 시 과거 캐시를 재사용하지 않고 즉시 `unknown`(`미확인(?)`) 등급을 반환합니다.
 - **Always-Fresh PWA 및 단일 레이어 SSOT 불변식**: `useAppConfig.ts`는 앱 전체 공간레이어의 유일한 SSOT로서 공식 기준 레이어(`national_park`, `protected_area`, `docking`)에 대해 항상 최신 정적 GeoJSON을 우선 로드하며, 구버전 가짜 직사각형 더미 피처(`NP-TY-01`, `NP-GJ-02`, `SPA-01`, `SPA-02`)는 영구 차단합니다.
 - **버전·출처·문서 무드리프트(Zero-Drift) 불변식**: `src/config/appVersion.ts`의 버전(`APP_VERSION`, `APP_VERSION_DISPLAY`)은 `package.json`, `package-lock.json`, `vite.config.ts`, `index.html`, `README.md`, `DEPLOY_GUIDE.md`, `docs/DATA_AND_TECH_SOURCES.md`와 100% 일치해야 하며, 모든 마크다운 상대 경로 링크는 실제 파일로 해석되어야 합니다.
+
+운영 접안정보와 독립 위험정보는 `public/data/operational/`의 각각 0건 원장을 사용합니다. 기존 55건은 운영 지도에서 제외하고 원본과 이력을 보존합니다. 항·포구 명칭 154곳은 어촌어항관리시스템 기반 지명 참고용이며 `data/public-port-names.final-candidate.geojson`을 사용합니다. 기존 81곳의 사전과 명칭 좌표 이력은 보존하며 운영 명칭·경로 계산을 분리합니다. 검수 상태·GPS 반영 절차는 [지명 좌표 유지보수](./docs/PLACE_NAME_COORDINATES.md)를 따릅니다.
 
 항·포구 명칭 운영 레이어는 [공식 지도 좌표 154곳](./data/public-port-names.final-candidate.geojson)을 지명 참고용으로 표시한다. 출처와 검증 판정을 보존하며 기존 접안·경로 계산 좌표와 분리한다. [전환 전 81곳의 좌표 이력](./docs/PLACE_NAME_COORDINATES.md)을 보존한다.
 

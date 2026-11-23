@@ -1,4 +1,5 @@
-import { EMPTY_REFERENCE_POINTS, type ReferenceMapPoint } from '../data/portNameMapPoints';
+import type { WarningMapFocus } from '../services/navigationalWarningMap';
+import { EMPTY_REFERENCE_POINTS, type ReferenceMapPoint } from './notebook/mapInformationData';
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Compass,
@@ -74,12 +75,15 @@ interface UserGpsLocation {
 export interface MapViewProps {
   permitFocus?: import('../services/activityPermitModel').PermitMapFocus | null;
   onSelectPermit?: (id: string) => void;
+  warningFocus?: WarningMapFocus | null;
+  onSelectWarning?: (id: string) => void;
   isMapFocused: boolean;
   onMapFocusChange: (focused: boolean) => void;
   activeMainTab: 'notebook' | 'navigation';
   navSubTab: 'route' | 'weather';
 
   // 3.1 꼬미의 바다수첩
+  hazardPoints?: readonly ReferenceMapPoint[];
   portNamePoints?: readonly ReferenceMapPoint[];
   features: DockingFeature[];
   selectedFeature: DockingFeature | null;
@@ -132,12 +136,15 @@ export interface MapViewProps {
 export function MapView({
   permitFocus,
   onSelectPermit,
+  warningFocus,
+  onSelectWarning,
   isMapFocused,
   onMapFocusChange,
   activeMainTab,
   navSubTab,
   portNamePoints = EMPTY_REFERENCE_POINTS,
   features,
+  hazardPoints = EMPTY_REFERENCE_POINTS,
   selectedFeature,
   onSelectFeature,
   layers,
@@ -371,6 +378,8 @@ export function MapView({
       {/* 1. 메인 지도 캔버스 (Kakao Map Primary vs Legacy Leaflet Fallback) */}
       {activeEngine === 'kakao' && kakaoNamespace ? (
         <KakaoMapCanvas
+          warningFocus={warningFocus}
+          onSelectWarning={isMapFocused ? undefined : onSelectWarning}
           permitFocus={permitFocus}
           onSelectPermit={isMapFocused ? undefined : onSelectPermit}
           kakaoMaps={kakaoNamespace}
@@ -378,8 +387,9 @@ export function MapView({
           overlayMapTypes={overlayMapTypes}
           activeMainTab={activeMainTab}
           navSubTab={navSubTab}
-          portNamePoints={portNamePoints}
           features={features}
+                hazardPoints={hazardPoints}
+                portNamePoints={portNamePoints}
           selectedFeature={selectedFeature}
           onSelectFeature={mapActions.onSelectFeature}
           layers={layers}
@@ -428,14 +438,17 @@ export function MapView({
           }
         >
           <LegacyLeafletCanvas
+            warningFocus={warningFocus}
+            onSelectWarning={isMapFocused ? undefined : onSelectWarning}
             permitFocus={permitFocus}
             onSelectPermit={isMapFocused ? undefined : onSelectPermit}
             baseMapType={baseMapType}
             overlayMapTypes={overlayMapTypes}
             activeMainTab={activeMainTab}
             navSubTab={navSubTab}
-            portNamePoints={portNamePoints}
             features={features}
+                hazardPoints={hazardPoints}
+                portNamePoints={portNamePoints}
             selectedFeature={selectedFeature}
             onSelectFeature={mapActions.onSelectFeature}
             layers={layers}

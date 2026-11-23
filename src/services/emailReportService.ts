@@ -2,34 +2,41 @@ import type { FieldReportData, EmailReportPayload } from '../types/report';
 import type { AdminConfig } from '../types/config';
 
 /**
- * 현장정보 제보 이메일 본문 및 mailto URL 서식 생성
+ * 현장제보 이메일 출력 양식. attachedPhotoCount는 선택한 사진 수가 아니라
+ * 해당 전송 경로에 실제로 포함한 파일 수이며, mailto/텍스트 공유에서는 0이다.
  */
 export function buildEmailReportPayload(
   data: FieldReportData,
-  adminConfig: AdminConfig
+  adminConfig: AdminConfig,
+  attachedPhotoCount = 0,
 ): EmailReportPayload {
   const targetName = data.pointName ? `[${data.pointId || '포인트'}] ${data.pointName}` : '해상 일반 지점';
-  const subject = `[바다꼼꼬미 현장제보] ${targetName} (${data.createdAt.slice(0, 16).replace('T', ' ')})`;
+  const parts = new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(data.createdAt));
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((value) => value.type === type)?.value;
+  const date = `${part('year')}.${part('month')}.${part('day')}.`;
+  const reportTime = `${date} ${part('hour')}:${part('minute')}`;
+  const subject = `[바다꼼꼬미] 현장제보 (${date})`;
 
   const mapLinkNaver = `https://map.naver.com/v5/?c=${data.lng},${data.lat},15,0,0,0,dh`;
   const mapLinkGoogle = `https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`;
 
-  const body = `[해양 현장업무 제보 접수 알림]
+  const body = `현장제보 내용
+제보 대상: ${targetName}
+제보 일시: ${reportTime}
+제보자: ${data.reporterName?.trim() || '현장 점검 요원'}
+GPS 좌표: ${data.lat.toFixed(5)}°N, ${data.lng.toFixed(5)}°E
 
-1. 제보 대상: ${targetName}
-2. GPS 좌표: ${data.lat.toFixed(5)}°N, ${data.lng.toFixed(5)}°E
-   - 네이버 지도 바로가기: ${mapLinkNaver}
-   - 구글 지도 바로가기: ${mapLinkGoogle}
-3. 제보 일시: ${data.createdAt.replace('T', ' ')}
-4. 제보자: ${data.reporterName?.trim() || '현장 점검 요원'}
+현장 내용
+${data.memo}
 
-5. 현장 특이사항 및 메모:
---------------------------------------------------
-${data.memo.trim() || '(입력된 메모 없음)'}
---------------------------------------------------
-
-* 현장 사진: ${data.photos.length > 0 ? `총 ${data.photos.length}장의 사진이 첨부되었습니다.` : '첨부된 사진 없음'}
-* 본 메일은 바다꼼꼬미 PWA 앱에서 현장 점검 중 발송되었습니다.`;
+위치 확인
+네이버 지도 바로가기:
+${mapLinkNaver}
+구글 지도 바로가기:
+${mapLinkGoogle}${attachedPhotoCount > 0 ? `\n\n첨부사진: ${attachedPhotoCount}장` : ''}`;
 
   return {
     to: adminConfig.report_recipient_email,
@@ -69,6 +76,7 @@ export async function sendFieldReport(
 
       if (shareFiles.length > 0 && navigator.canShare && navigator.canShare({ files: shareFiles })) {
         shareData.files = shareFiles;
+        shareData.text = buildEmailReportPayload(data, adminConfig, shareFiles.length).body;
       }
 
       await navigator.share(shareData);
@@ -84,14 +92,16 @@ export async function sendFieldReport(
 
   // 2. 표준 mailto 프로토콜 폴백
   try {
-    const params = new URLSearchParams();
-    params.set('subject', payload.subject);
-    params.set('body', payload.body);
+    // mailto uses percent-encoded spaces and CRLF, not form-style '+' encoding.
+    const params = [
+      `subject=${encodeURIComponent(payload.subject)}`,
+      `body=${encodeURIComponent(payload.body.replace(/\r?\n/g, '\r\n'))}`,
+    ];
     if (payload.cc) {
-      params.set('cc', payload.cc);
+      params.push(`cc=${encodeURIComponent(payload.cc)}`);
     }
 
-    const mailtoUrl = `mailto:${encodeURIComponent(payload.to)}?${params.toString()}`;
+    const mailtoUrl = `mailto:${encodeURIComponent(payload.to)}?${params.join('&')}`;
     window.location.href = mailtoUrl;
 
     // 클립보드에도 메모와 좌표 자동 복사 (메일 본문 길이 제한 대비)

@@ -53,7 +53,7 @@ export interface OfflineCapabilityRow {
  */
 export const OFFLINE_CAPABILITY_MATRIX: readonly OfflineCapabilityRow[] = [
   {
-    featureName: '항·포구 명칭 154곳 · 접안지 · 공원경계',
+    featureName: '항·포구 명칭 · 보호구역 · 공원경계',
     isOfflineGuaranteed: true,
     statusBadge: '🟢 100% 오프라인',
     detail: '앱 설치 시 정적 데이터·모식도가 기기에 내장되어 통신 없이 즉시 열람',
@@ -91,25 +91,25 @@ export const DATA_SOURCE_REGISTRY: readonly DataSourceItem[] = [
   {
     id: 'ports_docking',
     badgeLabel: '항포구 · 접안지 · 공원경계',
-    governanceLabel: '공공 고시 · 현장 실측',
+    governanceLabel: '공식 어항 자료 · 공식 보호구역',
     governanceType: 'public_official',
-    title: '통영·거제 항·포구 명칭 154곳 · 55개 접안지 · 국립공원 구역',
-    providerSummary: '해양수산부 어촌어항관리시스템 · 국립해양조사원(KHOA) · 지자체 어항고시 · 환경부/국립공원공단(KNPS)',
+    title: '항·포구 명칭 154곳 · 보호구역 20곳',
+    providerSummary: '해양수산부 어촌어항관리시스템 · 환경부/국립공원공단(KNPS)',
     operationMode: 'offline_embedded',
     operationModeLabel: '🟢 앱 내장 (100% 오프라인)',
     keyPoints: [
-      '⚓ 항·포구 명칭 154곳 · 55개 접안지',
-      '📐 자체 제작 SVG 수심 모식도',
+      '⚓ 항·포구 명칭 154곳 · 운영 접안 0곳',
+      '위험정보 0곳 · 기존 접안 55건 별도 보존',
       '📴 바다 위 100% 오프라인 열람',
     ],
     plainExplanation:
-      '항·포구 명칭은 해양수산부 어촌어항관리시스템의 통영 57곳과 거제 97곳을 사용합니다. 위치 일치 확인 83곳과 검증 보류 71곳을 포함하며, 해상 통신 없이도 지명을 확인할 수 있습니다.',
-    faqQuestion: '상세창에 실제 사진 대신 컴퓨터 그림(SVG)이 있는 이유는?',
+      '항·포구 154곳은 어촌어항관리시스템의 지명 참고 자료입니다. 위치 일치 확인은 83곳, 검증 보류는 71곳입니다. 운영 접안정보와 독립 위험정보는 각각 0건입니다. 기존 접안 55건은 출처 미확인 자료로 보존합니다.',
+    faqQuestion: '보존 접안 자료를 운영 지도에서 볼 수 없는 이유는?',
     faqAnswer:
-      '오프라인 즉시 열람과 만조·간조 수심·암초 위치를 한눈에 보여주려 자체 제작한 "현장 모식도"이며, 실사 사진(.jpg/.png) 등록 시 즉시 교체됩니다.',
+      '현장 조사 근거를 확인할 수 없어 안전등급과 수심을 검증된 정보로 취급하지 않습니다. 상세 관리에서 원본을 내려받을 수 있습니다.',
     technicalSpecs: [
-      '해양수산부 국립해양조사원(KHOA) 기본수준면(DL) 수심·해안선(138섬) 및 기상청(KMA) 해역 기준',
-      '경상남도·통영시·거제시 어항 고시 및 현장 옛 지명·별칭(강구안, 원항, 제승당항 등) 통합',
+      '보존 자료의 수심·등급·시설 좌표는 조사 근거 미확인; 운영 원장과 분리',
+      '통영 57곳·거제 97곳의 공식 지도 좌표를 명칭 표시에 사용하며 seaApproach와 경로 계산은 별도로 유지',
       '환경부·국립공원공단 공식 QGIS 특별보호구역 20개소 정밀 폴리곤(EPSG:5181→EPSG:4326) 및 공원 경계 내장 (QGIS 원본 .gpkg/.shp 업로드 시 즉시 추가·교체)',
     ],
   },

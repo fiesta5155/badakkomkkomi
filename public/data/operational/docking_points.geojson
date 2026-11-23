@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "name": "운영 접안정보",
+  "metadata": {
+    "description": "현장 확인을 완료한 운영 접안정보. 현재 등록 자료 없음.",
+    "archivedSource": "../docking_points.geojson",
+    "archiveStatus": "기존 55건은 출처 미확인 보존 자료이며 운영 데이터가 아님"
+  },
+  "features": []
+}

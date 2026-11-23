@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
@@ -55,25 +55,30 @@ import {
 } from '../../services/githubLayerSyncService';
 import { resolveLayerProvenance } from '../../config/dataSources';
 import type { PorpoiseRecord } from '../../types/porpoise';
-import { PorpoiseExportButton } from './PorpoiseExportButton';
+import { MapInformationCards } from './MapInformationCards';
 
 interface LayerControlModalProps {
   permitVisible?: boolean;
+  permitCount?: number;
   onTogglePermits?: () => void;
   isOpen: boolean;
   onClose: () => void;
   layers: MapLayerConfig[];
   geoJsonLayersData: Record<string, SpatialFeatureCollection>;
   onToggleLayer: (layerId: string) => void;
-  portNamesVisible: boolean;
-  portNamesCount: number;
-  onTogglePortNames: () => void;
   showHazardInformation: boolean;
   onToggleHazardInformation: () => void;
+  onOpenNavigationalWarnings?: () => void;
+  portNamesVisible?: boolean;
+  portNamesCount?: number;
+  onTogglePortNames?: () => void;
   dockingCount: number;
   hazardCount: number;
   onFitProtectedAreas: () => void;
   notebookDisplayControls: ReactNode;
+  dockingFiltersOpen?: boolean;
+  onToggleDockingFilters?: () => void;
+  dockingCardRef?: Ref<HTMLLIElement>;
   onSaveOperationalLayers: (params: {
     nextLayers: MapLayerConfig[];
     nextGeoJsonById: Record<string, SpatialFeatureCollection>;
@@ -161,6 +166,7 @@ function getFeatureCenterLatLng(feature: SpatialFeature): [number, number] | nul
 }
 
 export function LayerControlModal({
+  permitCount = 0,
   permitVisible = true,
   onTogglePermits,
   isOpen,
@@ -168,15 +174,19 @@ export function LayerControlModal({
   layers,
   geoJsonLayersData,
   onToggleLayer,
+  showHazardInformation,
+  onToggleHazardInformation,
+  onOpenNavigationalWarnings,
   portNamesVisible,
   portNamesCount,
   onTogglePortNames,
-  showHazardInformation,
-  onToggleHazardInformation,
   dockingCount,
   hazardCount,
   onFitProtectedAreas,
   notebookDisplayControls,
+  dockingFiltersOpen = false,
+  onToggleDockingFilters,
+  dockingCardRef,
   onSaveOperationalLayers,
   onFlyToPoint,
   releaseId,
@@ -186,10 +196,12 @@ export function LayerControlModal({
   snapshots,
   showPorpoiseLayer,
   onTogglePorpoiseLayer,
-  porpoiseCount,
   porpoiseRecords,
 }: LayerControlModalProps) {
   const [activeTab, setActiveTab] = useState<ModalWorkspaceTab>('list');
+  const [detailed, setDetailed] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { titleRef.current?.focus(); }, [detailed]);
 
   // 편집 중인 작업 레이어 및 GeoJSON 맵 상태 ([저장] 클릭 시 즉시 운영 반영)
   const [draftLayers, setDraftLayers] = useState<MapLayerConfig[]>(() =>
@@ -296,6 +308,11 @@ export function LayerControlModal({
     },
     [recordChangeNote, onToggleLayer],
   );
+
+  const handleToggleMapInformation = (layerId: string) => {
+    setDraftLayers(prev => prev.map(layer => layer.id === layerId ? { ...layer, visible: !layer.visible } : layer));
+    onToggleLayer(layerId);
+  };
 
   const handleUpdateLayerMeta = useCallback(
     (layerId: string, patch: Partial<MapLayerConfig>) => {
@@ -874,7 +891,7 @@ export function LayerControlModal({
       className="bada-modal-dialog fixed inset-0 m-0 flex h-dvh max-h-none w-full max-w-none items-center justify-center border-none bg-transparent p-2.5 text-[#003360] sm:p-4"
     >
       <div
-        className="knps-modal-surface flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border-2 border-[#00a79d]/60 bg-white text-[#003360] shadow-2xl"
+        className="knps-modal-surface flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border-2 border-[#00a79d]/60 bg-white text-[#003360] shadow-2xl [&_button]:min-h-11 [&_button]:min-w-11 [&_summary]:min-h-11"
       >
         {/* 1. 상단 헤더 & 현재 운영 릴리스 상태 배지 */}
         <div className="flex items-center justify-between border-b border-sky-200 px-4 py-3 sm:px-5">
@@ -885,12 +902,14 @@ export function LayerControlModal({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-1.5">
                 <h2
+                  ref={titleRef}
+                  tabIndex={-1}
                   id="layer-modal-title"
                   className="text-base font-black tracking-tight text-[#003360] sm:text-lg"
                 >
-                  공간정보 레이어 관리
+                  지도 정보 관리
                 </h2>
-                <span className="rounded-md border border-[#00846c]/40 bg-emerald-50 px-1.5 py-0.5 font-mono text-[10px] font-black text-[#00846c]">
+                {detailed && <><span className="rounded-md border border-[#00846c]/40 bg-emerald-50 px-1.5 py-0.5 font-mono text-[10px] font-black text-[#00846c]">
                   {releaseId}
                 </span>
                 <span
@@ -903,11 +922,10 @@ export function LayerControlModal({
                   {remoteSyncStatus === 'synced'
                     ? 'GitHub 운영 동기화됨'
                     : '앱·기기 즉시 운영 반영됨'}
-                </span>
+                </span></>}
               </div>
               <p className="mt-0.5 truncate text-[11px] font-bold text-[#484843]">
-                QGIS 멀티포맷(.gpkg · .zip/shp · .geojson · .kml) · 한국좌표계 자동변환 ·{' '}
-                <strong className="text-[#00846c]">[저장] 클릭 시 즉시 운영 반영</strong>
+                {detailed ? '파일 등록 · 속성 편집 · 이력 및 원격 동기화' : '필요한 정보를 지도에 표시하세요.'}
               </p>
             </div>
           </div>
@@ -915,18 +933,31 @@ export function LayerControlModal({
             type="button"
             onClick={onClose}
             aria-label="레이어 창 닫기"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#003360] hover:bg-slate-100 active:scale-95"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#003360] hover:bg-slate-100 active:scale-95"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* 2. 4개 실무 워크스페이스 탭 네비게이션 */}
-        <div className="grid grid-cols-4 gap-1 border-b border-sky-200 bg-sky-50/90 px-3 py-2 sm:px-5">
+        {detailed && <div id="layer-detail-workspace">
+        <div className="flex items-center justify-between gap-2 bg-sky-50/90 px-4 pt-2 sm:px-5">
+          <h3 className="text-sm font-black">상세 관리</h3>
+
+          <button type="button" onClick={() => setDetailed(false)} className="min-h-11 rounded-xl border border-sky-200 bg-white px-3 text-sm font-bold">기본 목록으로</button>
+        </div>
+          <details className="mx-4 my-2 rounded-xl border border-sky-200 bg-white p-3 text-xs">
+            <summary className="min-h-11 cursor-pointer py-3 font-bold">보존 자료</summary>
+            <p>기존 접안 55건은 출처가 확인되지 않은 개발 자료로 보존하며 운영 지도에서는 제외합니다. 모든 원본 좌표는 유지합니다.</p>
+            <a href={import.meta.env.BASE_URL + 'data/docking_points.geojson'} download className="mt-2 inline-flex min-h-11 items-center underline">기존 접안 55건 원본 내려받기</a>
+            <p>항·포구 명칭 154곳은 해양수산부 어촌어항관리시스템의 지명 참고 자료입니다. 위치 일치 확인 83곳과 검증 보류 71곳을 포함하며 접안 위치나 경로 계산에 사용하지 않습니다.</p>
+          </details>
+        <div className="grid grid-cols-2 gap-1 border-b border-sky-200 bg-sky-50/90 px-3 py-2 sm:grid-cols-4 sm:px-5">
           <button
             type="button"
             onClick={() => setActiveTab('list')}
-            className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
+            aria-pressed={activeTab === 'list'}
+            className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
               activeTab === 'list'
                 ? 'bg-[#00846c] text-white shadow-xs'
                 : 'border border-sky-200 bg-white text-[#003360] hover:bg-sky-100'
@@ -939,7 +970,8 @@ export function LayerControlModal({
           <button
             type="button"
             onClick={() => setActiveTab('import')}
-            className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
+            aria-pressed={activeTab === 'import'}
+            className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
               activeTab === 'import'
                 ? 'bg-[#0284c7] text-white shadow-xs'
                 : 'border border-sky-200 bg-white text-[#003360] hover:bg-sky-100'
@@ -952,7 +984,8 @@ export function LayerControlModal({
           <button
             type="button"
             onClick={() => setActiveTab('features')}
-            className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
+            aria-pressed={activeTab === 'features'}
+            className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
               activeTab === 'features'
                 ? 'bg-[#003360] text-white shadow-xs'
                 : 'border border-sky-200 bg-white text-[#003360] hover:bg-sky-100'
@@ -965,7 +998,8 @@ export function LayerControlModal({
           <button
             type="button"
             onClick={() => setActiveTab('history')}
-            className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
+            aria-pressed={activeTab === 'history'}
+            className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition ${
               activeTab === 'history'
                 ? 'bg-[#00a79d] text-white shadow-xs'
                 : 'border border-sky-200 bg-white text-[#003360] hover:bg-sky-100'
@@ -976,44 +1010,27 @@ export function LayerControlModal({
           </button>
         </div>
 
+        </div>}
+
         {/* 3. 스크롤 가능한 본문 영역 */}
-        <div className="flex-1 overflow-y-auto px-4 py-3.5 sm:px-5">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3.5 sm:px-5">
+          {!detailed && <MapInformationCards
+            layers={draftLayers} onToggleLayer={handleToggleMapInformation}
+            showHazardInformation={showHazardInformation} onToggleHazardInformation={onToggleHazardInformation}
+            onOpenNavigationalWarnings={onOpenNavigationalWarnings}
+            portNamesVisible={portNamesVisible} portNamesCount={portNamesCount} onTogglePortNames={onTogglePortNames}
+            permitVisible={permitVisible} permitCount={permitCount} onTogglePermits={onTogglePermits}
+            showPorpoiseLayer={showPorpoiseLayer} onTogglePorpoiseLayer={onTogglePorpoiseLayer}
+            porpoiseRecords={porpoiseRecords} dockingCount={dockingCount} hazardCount={hazardCount}
+            protectedCount={draftGeoJsonById.protected_area?.features.length ?? draftLayers.find(layer => layer.id === 'protected_area')?.featureCount ?? 0}
+            dockingFilters={notebookDisplayControls}
+            dockingFiltersOpen={dockingFiltersOpen} onToggleDockingFilters={onToggleDockingFilters} dockingCardRef={dockingCardRef}
+          />}
           {/* ================================================================
               TAB 1: 레이어 목록 · 표시/숨김 · 스타일/라벨 편집
              ================================================================ */}
-          {activeTab === 'list' && (
+          {detailed && activeTab === 'list' && (
             <div className="space-y-3">
-              <section aria-label="지도 표시 설정" className="rounded-2xl border border-sky-200 p-3">
-                <h3 className="mb-2 text-sm font-bold">지도에 표시할 정보</h3>
-                <div className="divide-y divide-sky-100">
-                  {draftLayers.filter((layer) => layer.id === 'docking' || layer.id === 'protected_area').map((layer) => {
-                    const count = layer.id === 'docking' ? dockingCount : (geoJsonLayersData[layer.id]?.features.length ?? layer.featureCount ?? 0);
-                    return <div key={layer.id} className="flex items-center gap-2">
-                      <button type="button" role="switch" aria-checked={layer.visible} onClick={() => handleToggleDraftLayer(layer.id)}
-                        className="flex min-h-11 flex-1 touch-manipulation items-center justify-between gap-2 py-2 text-left text-sm">
-                        <span>{layer.id === 'docking' ? '갯바위 접안 포인트' : '특별보호구역'} <span className="text-xs text-slate-500">({count})</span></span>
-                        <span className={layer.visible ? 'font-bold text-[#00846c]' : 'text-slate-500'}>{layer.visible ? 'ON' : 'OFF'}</span>
-                      </button>
-                      {layer.id === 'protected_area' && <button type="button" onClick={onFitProtectedAreas} className="min-h-11 touch-manipulation rounded-lg px-2 text-xs font-bold text-[#0066b3] active:bg-sky-50">구역맞춤</button>}
-                    </div>;
-                  })}
-                  <div className="py-1">
-                    <button type="button" role="switch" aria-checked={portNamesVisible} onClick={onTogglePortNames}
-                      className="flex min-h-11 w-full touch-manipulation items-center justify-between gap-2 text-left text-sm">
-                      <span>항·포구 명칭 <span className="text-xs text-slate-500">({portNamesCount})</span></span>
-                      <span className={portNamesVisible ? 'font-bold text-[#00846c]' : 'text-slate-500'}>{portNamesVisible ? 'ON' : 'OFF'}</span>
-                    </button>
-                    <p className="pb-2 text-xs text-slate-600">해양수산부 어촌어항관리시스템 · 위치 일치 확인 83곳 · 검증 보류 71곳</p>
-                  </div>
-                  <button type="button" role="switch" aria-checked={showHazardInformation} onClick={onToggleHazardInformation}
-                    className="flex min-h-11 w-full touch-manipulation items-center justify-between gap-2 py-2 text-left text-sm">
-                    <span>위험정보 <span className="text-xs text-slate-500">({hazardCount})</span></span>
-                    <span className={showHazardInformation ? 'font-bold text-[#00846c]' : 'text-slate-500'}>{showHazardInformation ? 'ON' : 'OFF'}</span>
-                  </button>
-                </div>
-                <p className="mt-1 text-xs text-slate-500">표시를 꺼도 기록과 필터는 유지됩니다.</p>
-              </section>
-              {notebookDisplayControls}
               {/* 상단 빠른 파일 등록 & 실무 샘플 원클릭 테스트 바 */}
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sky-300 bg-[#f0f9ff] p-3">
                 <div className="text-xs text-[#003360]">
@@ -1103,8 +1120,9 @@ export function LayerControlModal({
                           type="button"
                           onClick={() => handleMoveLayerOrder(index, -1)}
                           disabled={index === 0}
-                          title="레이어 순서 위로"
-                          className="rounded-lg border border-slate-300 bg-white p-1 text-[#003360] hover:bg-sky-50 disabled:opacity-30"
+                          title="지도 그리기 순서 위로"
+                          aria-label={`${layer.name} 지도 그리기 순서 위로`}
+                          className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300 bg-white text-[#003360] hover:bg-sky-50 disabled:opacity-30"
                         >
                           <ArrowUp className="h-3.5 w-3.5" />
                         </button>
@@ -1112,8 +1130,9 @@ export function LayerControlModal({
                           type="button"
                           onClick={() => handleMoveLayerOrder(index, 1)}
                           disabled={index === draftLayers.length - 1}
-                          title="레이어 순서 아래로"
-                          className="rounded-lg border border-slate-300 bg-white p-1 text-[#003360] hover:bg-sky-50 disabled:opacity-30"
+                          title="지도 그리기 순서 아래로"
+                          aria-label={`${layer.name} 지도 그리기 순서 아래로`}
+                          className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300 bg-white text-[#003360] hover:bg-sky-50 disabled:opacity-30"
                         >
                           <ArrowDown className="h-3.5 w-3.5" />
                         </button>
@@ -1123,6 +1142,7 @@ export function LayerControlModal({
                     {/* 레이어별 실무 액션 바 (시스템 고정 접안 마커 외 모든 공간 레이어) */}
                     {!isSystem && (
                       <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-sky-100 pt-2.5">
+                        {layer.id === 'protected_area' && <button type="button" onClick={onFitProtectedAreas} className="min-h-11 rounded-lg border border-sky-300 bg-sky-50 px-2 text-xs font-bold">구역맞춤</button>}
                         <button
                           type="button"
                           onClick={() => handleFlyToLayerBounds(layer)}
@@ -1351,40 +1371,13 @@ export function LayerControlModal({
                 );
               })}
 
-              {onTogglePermits && <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-2xl border border-yellow-400 bg-yellow-50 p-3.5"><input type="checkbox" checked={permitVisible} onChange={onTogglePermits} className="h-5 w-5 accent-yellow-600" /><span className="text-sm font-extrabold text-[#003360]">행위허가</span></label>}
-              {/* 개인 상괭이 관찰 표식 레이어 */}
-              <div className="rounded-2xl border border-[#00a79d]/50 bg-teal-50/70 p-3.5 transition hover:border-[#00a79d]">
-                <label className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={showPorpoiseLayer}
-                    onChange={onTogglePorpoiseLayer}
-                    className="mt-1 h-5 w-5 rounded border-slate-400 bg-white accent-[#00846c]"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[#00a79d]" />
-                      <span className="text-sm font-extrabold text-[#003360]">
-                        개인 상괭이 관찰 표식
-                      </span>
-                      <span className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-black text-[#00846c]">
-                        {porpoiseCount}건
-                      </span>
-                    </div>
-                    <p className="mt-0.5 text-xs font-semibold text-[#484843]">
-                      기기에 저장된 상괭이 목격 위치 핀 표시
-                    </p>
-                  </div>
-                </label>
-                <PorpoiseExportButton records={porpoiseRecords} />
-              </div>
             </div>
           )}
 
           {/* ================================================================
               TAB 2: + 파일 등록 (QGIS .gpkg / .zip Shapefile / .geojson / .kml)
              ================================================================ */}
-          {activeTab === 'import' && (
+          {detailed && activeTab === 'import' && (
             <div className="space-y-3.5">
               {/* 브라우저 내부 100% 로컬 처리 및 좌표계 원천 안내 배너 (RC-SRC-04, RC-SRC-05) */}
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50/75 px-3.5 py-2.5 text-[11px] font-bold leading-snug text-[#003360]">
@@ -1722,7 +1715,7 @@ export function LayerControlModal({
           {/* ================================================================
               TAB 3: 속성·피처 편집 (CRUD)
              ================================================================ */}
-          {activeTab === 'features' && (
+          {detailed && activeTab === 'features' && (
             <div className="space-y-3">
               {/* 편집 대상 레이어 선택 및 검색 바 */}
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sky-200 bg-[#f0f9ff] p-3">
@@ -1773,7 +1766,7 @@ export function LayerControlModal({
                     value={newColumnKey}
                     onChange={(e) => setNewColumnKey(e.target.value)}
                     placeholder="새 속성 필드명 (예: 관리담당자)"
-                    className="flex-1 rounded-xl border-2 border-slate-400 bg-white px-3 py-2 text-xs font-bold text-[#003360] placeholder-slate-500"
+                    className="min-w-0 flex-1 rounded-xl border-2 border-slate-400 bg-white px-3 py-2 text-base font-bold text-[#003360] placeholder-slate-500"
                   />
                   <button
                     type="button"
@@ -1878,7 +1871,7 @@ export function LayerControlModal({
           {/* ================================================================
               TAB 4: 버전 이력(롤백) · GitHub 원격 저장소 자동 배포 설정
              ================================================================ */}
-          {activeTab === 'history' && (
+          {detailed && activeTab === 'history' && (
             <div className="space-y-4">
               {/* 1. 저장된 운영 버전 스냅샷 이력 및 원클릭 복원 */}
               <div className="rounded-2xl border border-sky-200 bg-[#f0f9ff] p-3.5">
@@ -2063,7 +2056,12 @@ export function LayerControlModal({
           )}
         </div>
 
+        {!detailed && <div className="flex items-center justify-between gap-2 border-t border-sky-200 bg-sky-50/90 px-4 py-3 sm:px-5">
+          <button type="button" onClick={() => setDetailed(true)} className="min-h-11 rounded-xl border border-sky-200 bg-white px-3 text-sm font-bold">상세 관리{totalPendingChanges > 0 ? ` (${totalPendingChanges})` : ''}</button>
+          <button type="button" onClick={onClose} className="min-h-11 rounded-xl bg-[#00846c] px-5 text-sm font-black text-white shadow-md">닫기</button>
+        </div>}
         {/* 4. 하단 고정 [저장 = 즉시 운영 반영] 액션 바 */}
+        {detailed && <>
         <div className="border-t border-sky-200 bg-sky-50/90 px-4 py-3 sm:px-5">
           {saveBanner && (
             <div
@@ -2099,6 +2097,7 @@ export function LayerControlModal({
               <button
                 type="button"
                 onClick={() => setSaveBanner(null)}
+                aria-label="저장 알림 닫기"
                 className="text-slate-500 hover:text-slate-900"
               >
                 <X className="h-4 w-4" />
@@ -2165,6 +2164,7 @@ export function LayerControlModal({
             </div>
           </div>
         </div>
+        </>}
       </div>
     </dialog>
   );

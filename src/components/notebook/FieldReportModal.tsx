@@ -4,15 +4,14 @@ import {
   Camera,
   X,
   Send,
-  AlertCircle,
   Compass,
-  CheckCircle2,
   MapPin,
   Settings2,
 } from 'lucide-react';
 import type { FieldReportData } from '../../types/report';
 import type { AdminConfig } from '../../types/config';
 import { sendFieldReport } from '../../services/emailReportService';
+import { DEFAULT_REPORT_RECIPIENT, isValidReportRecipient } from '../../services/reportRecipientStorage';
 
 interface FieldReportModalProps {
   isOpen: boolean;
@@ -22,19 +21,11 @@ interface FieldReportModalProps {
   initialLat: number;
   initialLng: number;
   adminConfig: AdminConfig;
-  onUpdateAdminEmail: (newEmail: string) => void;
+  onUpdateAdminEmail: (newEmail: string) => boolean;
   onPickLocationOnMap: () => void;
   defaultReporterName?: string;
   onChangeReporterName?: (name: string) => void;
 }
-
-const FIELD_REPORT_QUICK_CHIPS = [
-  '⚓ 선착장·슬립웨이 점검필요',
-  '⚠️ 암초·수심 주의',
-  '🚫 특별보호구역 출입계도',
-  '🛟 부표·안내판 파손',
-  '🗑️ 해양쓰레기 유입',
-] as const;
 
 export function FieldReportModal({
   isOpen,
@@ -56,6 +47,7 @@ export function FieldReportModal({
   const [isSending, setIsSending] = useState(false);
   const [sendResult, setSendResult] = useState<string | null>(null);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [recipientEmailInput, setRecipientEmailInput] = useState(
     adminConfig.report_recipient_email,
   );
@@ -117,11 +109,15 @@ export function FieldReportModal({
 
   const handleSaveRecipientEmail = () => {
     const trimmed = recipientEmailInput.trim();
-    if (!trimmed || !trimmed.includes('@')) {
-      alert('유효한 이메일 주소를 입력해주세요.');
+    if (!isValidReportRecipient(trimmed)) {
+      setEmailError('유효한 이메일 주소를 입력해주세요.');
       return;
     }
-    onUpdateAdminEmail(trimmed);
+    if (!onUpdateAdminEmail(trimmed)) {
+      setEmailError('이 기기에 주소를 저장하지 못했습니다. 저장소 설정을 확인해주세요.');
+      return;
+    }
+    setEmailError(null);
     setIsEditingEmail(false);
   };
 
@@ -150,12 +146,11 @@ export function FieldReportModal({
     setIsSending(false);
 
     if (res.success) {
-      setSendResult('제보 내용이 이메일 클라이언트/공유창으로 전달되었습니다.');
-      window.setTimeout(() => {
-        onClose();
-      }, 1400);
+      setSendResult(res.method === 'share'
+        ? '공유창 처리를 마쳤습니다. 실제 발송 여부는 확인할 수 없습니다.'
+        : '메일 앱 실행을 요청했습니다. 실제 발송 여부는 확인할 수 없습니다.');
     } else {
-      alert(res.error || '이메일 전송 호출 중 오류가 발생했습니다.');
+      alert(res.error || '메일 앱 또는 공유창을 열지 못했습니다.');
     }
   };
 
@@ -169,83 +164,65 @@ export function FieldReportModal({
         }
       }}
       aria-labelledby="report-modal-title"
-      className="bada-modal-dialog knps-modal-surface fixed inset-0 z-[1300] m-auto max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto rounded-3xl border-2 border-[#00a79d]/65 bg-white p-5 text-[#003360] shadow-2xl"
+      className="bada-modal-dialog knps-modal-surface fixed inset-0 z-[1300] m-auto max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto overscroll-contain rounded-3xl border border-slate-300 bg-white p-5 text-[#003360] shadow-2xl"
     >
       <div>
-        <div className="flex items-center justify-between border-b border-sky-200 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-300 bg-amber-50 text-amber-700">
-              <Mail className="h-5 w-5" />
-            </div>
-            <div>
-              <h2
-                id="report-modal-title"
-                className="text-base font-black tracking-tight text-[#003360]"
-              >
-                현장정보 이메일 제보
-              </h2>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-                <span>수신:</span>
-                <span className="font-mono font-bold text-[#0066b3]">
-                  {adminConfig.report_recipient_email}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setIsEditingEmail((v) => !v)}
-                  className="inline-flex items-center gap-0.5 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 hover:bg-amber-100"
-                >
-                  <Settings2 className="h-3 w-3" />
-                  <span>변경</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="제보 창 닫기"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#003360] shadow-2xs active:scale-95"
-          >
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <h2 id="report-modal-title" className="flex items-center gap-2 text-base font-black tracking-tight text-[#003360]">
+            <Mail className="h-5 w-5" />
+            현장제보
+          </h2>
+          <button type="button" onClick={onClose} aria-label="제보 창 닫기"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#003360]">
             <X className="h-5 w-5" />
           </button>
         </div>
-
-        {/* 운영자 수신 이메일 설정/변경 패널 */}
+        <div className="mt-2 flex min-w-0 items-center gap-2 text-xs font-bold text-slate-600">
+          <span className="shrink-0">수신</span>
+          <span className="min-w-0 flex-1 truncate font-mono text-[#0066b3]" title={adminConfig.report_recipient_email}>
+            {adminConfig.report_recipient_email}
+          </span>
+          <button type="button" aria-expanded={isEditingEmail} aria-controls="report-email-settings"
+            onClick={() => {
+              setRecipientEmailInput(adminConfig.report_recipient_email);
+              setEmailError(null);
+              setIsEditingEmail((v) => !v);
+            }}
+            className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl px-2 text-xs font-bold text-[#0066b3]">
+            <Settings2 className="h-3.5 w-3.5" />변경
+          </button>
+        </div>
         {isEditingEmail && (
-          <div className="mt-3 rounded-2xl border border-amber-300 bg-amber-50/75 p-3">
-            <label
-              htmlFor="report-recipient-email-input"
-              className="mb-1 block text-xs font-extrabold text-amber-950"
-            >
-              제보 수신 관리자 이메일 설정
+          <div id="report-email-settings" className="mt-2 space-y-2">
+            <label htmlFor="report-recipient-email-input" className="block text-xs font-extrabold text-[#003360]">
+              수신 이메일
             </label>
             <div className="flex gap-2">
-              <input
-                id="report-recipient-email-input"
-                type="email"
-                value={recipientEmailInput}
-                onChange={(e) => setRecipientEmailInput(e.target.value)}
-                placeholder="marine_admin@knps.or.kr"
-                className="flex-1 rounded-xl border-2 border-slate-400 bg-white px-3 py-2 font-mono text-base font-bold text-[#003360] focus:border-[#0066b3] focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleSaveRecipientEmail}
-                className="rounded-xl bg-[#00846c] px-3 py-2 text-xs font-black text-white active:scale-95"
-              >
-                저장
-              </button>
+              <input id="report-recipient-email-input" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false}
+                value={recipientEmailInput} onChange={(e) => { setRecipientEmailInput(e.target.value); setEmailError(null); }}
+                aria-invalid={Boolean(emailError)} aria-describedby={emailError ? 'report-email-error' : undefined}
+                placeholder={DEFAULT_REPORT_RECIPIENT}
+                className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-400 bg-white px-3 py-2 font-mono text-base text-[#003360] focus:border-[#0066b3] focus:outline-none" />
+              <button type="button" onClick={handleSaveRecipientEmail}
+                className="min-h-11 shrink-0 rounded-xl bg-[#00846c] px-3 py-2 text-xs font-bold text-white">저장</button>
             </div>
-            <p className="mt-1 text-[10px] font-semibold text-slate-600">
-              * 영구 기본값은 <code className="font-bold text-[#0066b3]">public/config/app_config.json</code>에서 관리하며, 이곳에서 변경 시 현재 기기에 즉시 적용됩니다.
-            </p>
+            {emailError && <p id="report-email-error" role="alert" className="text-xs text-red-700">{emailError}</p>}
+            <button type="button" onClick={() => {
+              if (onUpdateAdminEmail(DEFAULT_REPORT_RECIPIENT)) {
+                setRecipientEmailInput(DEFAULT_REPORT_RECIPIENT);
+                setEmailError(null);
+                setIsEditingEmail(false);
+              } else {
+                setEmailError('기본 주소를 저장하지 못했습니다. 저장소 설정을 확인해주세요.');
+              }
+            }} className="min-h-11 rounded-xl px-2 text-xs font-bold text-[#0066b3]">기본 주소로 복원</button>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           {/* 1. 제보 위치 정보 및 지도 위치 재지정 버튼 */}
-          <div className="rounded-2xl border border-sky-200 bg-sky-50/80 p-3">
-            <div className="flex items-center justify-between gap-2">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold text-slate-600">제보 위치 좌표</span>
                 <p className="mt-0.5 flex items-center gap-1 font-mono text-xs font-black text-[#0066b3]">
@@ -256,7 +233,7 @@ export function FieldReportModal({
               <button
                 type="button"
                 onClick={onPickLocationOnMap}
-                className="flex items-center gap-1 rounded-xl border border-sky-300 bg-white px-2.5 py-2 text-xs font-black text-[#0066b3] shadow-2xs active:scale-95"
+                className="flex min-h-11 items-center gap-1 rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-black text-[#0066b3] shadow-2xs enabled:active:scale-[0.96]"
               >
                 <MapPin className="h-3.5 w-3.5" />
                 <span>지도에서 위치 선택</span>
@@ -267,11 +244,7 @@ export function FieldReportModal({
                 {pointId ? `[${pointId}] ` : ''}
                 {pointName}
               </p>
-            ) : (
-              <p className="mt-1 text-[11px] font-semibold text-slate-600">
-                특정 접안 포인트와 무관한 독립 현장 제보 위치입니다.
-              </p>
-            )}
+            ) : null}
           </div>
 
           {/* 2. 제보자 이름 (선택 · 한 번 입력 시 기기에 기억) */}
@@ -292,11 +265,11 @@ export function FieldReportModal({
                 onChangeReporterName?.(next);
               }}
               placeholder="예: 홍길동 주무관"
-              className="w-full rounded-xl border-2 border-slate-400 bg-white px-3.5 py-2.5 text-base font-bold text-[#003360] placeholder-slate-400 shadow-2xs focus:border-[#0066b3] focus:outline-none"
+              className="w-full rounded-xl border border-slate-400 bg-white px-3.5 py-2.5 text-base font-bold text-[#003360] placeholder-slate-400 shadow-2xs focus:border-[#0066b3] focus:outline-none"
             />
           </div>
 
-          {/* 3. 현장 자유 메모 (필수) + 원터치 현장 상황 태그 칩 */}
+          {/* 3. 현장 메모 (필수) */}
           <div>
             <label
               htmlFor="report-memo-textarea"
@@ -304,36 +277,14 @@ export function FieldReportModal({
             >
               현장 자유 메모 및 위험/특이사항 (필수)
             </label>
-            <div
-              role="group"
-              aria-label="현장 상황 빠른 입력 태그"
-              className="mb-2 flex flex-wrap gap-1.5"
-            >
-              {FIELD_REPORT_QUICK_CHIPS.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={() =>
-                    setMemo((prev) => {
-                      const prefix = `[${chip}] `;
-                      if (prev.includes(prefix)) return prev;
-                      return prev.trim() ? `${prev.trim()}\n${prefix}` : prefix;
-                    })
-                  }
-                  className="rounded-lg border border-sky-300 bg-sky-50 px-2 py-1 text-[11px] font-extrabold text-[#003360] transition hover:border-[#0066b3] hover:bg-sky-100 active:scale-95"
-                >
-                  + {chip}
-                </button>
-              ))}
-            </div>
             <textarea
               id="report-memo-textarea"
               required
               rows={4}
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
-              placeholder="예: 물양장 3번 비트 볼트 부식으로 계류 시 파손 위험. 간조 시 노출 암초 신규 확인."
-              className="w-full resize-y rounded-xl border-2 border-slate-400 bg-white p-3.5 text-base font-bold text-[#003360] placeholder-slate-400 shadow-2xs focus:border-[#0066b3] focus:outline-none"
+              placeholder="예: 허가받지 않은 유어장 시설물 설치 의심. 현장 확인 및 관련 허가 여부 검토 필요."
+              className="w-full resize-y rounded-xl border border-slate-400 bg-white p-3.5 text-base font-bold text-[#003360] placeholder-slate-400 shadow-2xs focus:border-[#0066b3] focus:outline-none"
             />
           </div>
 
@@ -348,20 +299,20 @@ export function FieldReportModal({
                   key={i}
                   className="relative h-16 w-16 overflow-hidden rounded-xl border border-slate-300 bg-slate-100"
                 >
-                  <img src={src} alt={`첨부사진 ${i + 1}`} className="h-full w-full object-cover" />
+                  <img src={src} alt={`첨부사진 ${i + 1}`} className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10" />
                   <button
                     type="button"
                     onClick={() => removePhoto(i)}
                     aria-label={`첨부사진 ${i + 1} 삭제`}
-                    className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white"
+                    className="absolute top-0 right-0 flex h-11 w-11 items-center justify-center text-white"
                   >
-                    <X className="h-3 w-3" />
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600"><X className="h-3 w-3" /></span>
                   </button>
                 </div>
               ))}
 
               {photos.length < 4 && (
-                <label className="flex h-16 w-16 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-slate-50 text-slate-600 transition hover:border-[#0066b3] hover:bg-sky-50 hover:text-[#0066b3]">
+                <label className="relative flex h-16 w-16 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-400 text-slate-600 focus-within:outline-2 focus-within:outline-[#0066b3]">
                   <Camera className="h-5 w-5" />
                   <span className="mt-1 text-[10px] font-black">사진 추가</span>
                   <input
@@ -370,38 +321,28 @@ export function FieldReportModal({
                     multiple
                     capture="environment"
                     onChange={handlePhotoUpload}
-                    className="hidden"
+                    aria-label="현장 사진 추가"
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   />
                 </label>
               )}
             </div>
           </div>
 
-          {/* 안내문 */}
-          <div className="rounded-xl border border-[#d6c6b2] bg-[#f7f4ee] p-3 text-[11px] font-semibold leading-relaxed text-slate-700">
-            <div className="mb-0.5 flex items-center gap-1.5 font-extrabold text-[#8b5e3c]">
-              <AlertCircle className="h-3.5 w-3.5" />
-              <span>안내: 외부 서버 수집 없이 기기 메일·공유 앱으로 직접 전달됩니다</span>
-            </div>
-            제보 내용은 별도 중계 서버에 저장되지 않고 사용자의 메일 앱(또는 모바일 공유시트)으로 직접 발송되며, 위치 확인 편의를 위해 네이버·구글 지도 좌표 링크가 자동 첨부됩니다. 관리자가 검토 후 QGIS 원본 데이터를 수정하여 반영합니다.
-          </div>
-
           {sendResult && (
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-xs font-black text-[#00846c]">
-              <CheckCircle2 className="h-4 w-4" />
-              <span>{sendResult}</span>
-            </div>
+            <p role="status" className="text-xs leading-relaxed text-slate-600">{sendResult}</p>
           )}
 
           {/* 제출 버튼 */}
           <button
             type="submit"
             disabled={isSending}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00854a] via-[#00846c] to-[#0066b3] py-3.5 text-sm font-black text-white shadow-md transition active:scale-95 disabled:opacity-50"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00854a] via-[#00846c] to-[#0066b3] py-3.5 text-sm font-black text-white shadow-md transition enabled:active:scale-[0.96] disabled:opacity-50"
           >
             <Send className="h-4 w-4" />
-            <span>{isSending ? '제보 데이터 구성 중...' : '이메일 클라이언트로 제보 발송'}</span>
+            <span>{isSending ? '이메일 준비 중...' : '이메일로 제보하기'}</span>
           </button>
+          <p className="text-center text-xs leading-relaxed text-slate-600">메일 앱에서 내용을 확인한 후 최종 전송해주세요.</p>
         </form>
       </div>
     </dialog>

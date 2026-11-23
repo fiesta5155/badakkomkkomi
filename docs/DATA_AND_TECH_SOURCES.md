@@ -11,7 +11,7 @@ KHOA 조석예보(고·저조)는 [공식 API](https://www.data.go.kr/data/15156
 > [!IMPORTANT]
 > **📌 30초 핵심 요점 (TL;DR)**
 > 1. **100% 무료 · 무서버 아키텍처**: 별도 유료 백엔드나 외부 유료 길찾기/GIS API 없이 **국가 공공데이터 + 글로벌 오픈 기상 모델(ECMWF) + 자체 개발 직선거리 계산·QGIS 파서**로 동작합니다.
-> 2. **바다 위 오프라인 생존성 보장**: **136개 항포구 · 55개 접안지 · 직선거리 기반 예상시간 · QGIS 파일 변환 · 상괭이 기록**은 인터넷이 끊긴 해상 음영지역에서도 **100% 오프라인 작동**합니다.
+> 2. **바다 위 오프라인 생존성 보장**: **항·포구 명칭 154곳 · 접안 보존 자료 55건 · 직선거리 기반 예상시간 · QGIS 파일 변환 · 상괭이 기록**은 인터넷이 끊긴 해상 음영지역에서도 **100% 오프라인 작동**합니다.
 > 3. **데이터 유출 원천 차단**: 업로드한 기관 내부 QGIS 파일(`.gpkg`/`.shp`)과 현장 관찰 기록은 외부 서버로 전송되지 않고 **100% 스마트폰/브라우저 내부(`IndexedDB`/`localStorage`)에서만 처리·보관**됩니다.
 
 ---
@@ -22,7 +22,7 @@ KHOA 조석예보(고·저조)는 [공식 API](https://www.data.go.kr/data/15156
 flowchart LR
     subgraph OFFLINE["🟢 기기 내장 · 100% 오프라인 작동 (외부 전송 0건)"]
         direction TB
-        D1["⚓ 136개 항포구 · 55개 접안지<br/>(KHOA 수심 · 지자체 어항고시 · 공단 현장실측)"]
+        D1["⚓ 지명 참고 154곳 · 접안 보존 55건<br/>(해양수산부 어항 지도 · 접안 조사 근거 미확인)"]
         D2["🧭 바닷길 직선거리 기반 예상시간 · 초성 검색<br/>(Haversine 거리 · 입력 속력 · 육지 교차 경고)"]
         D3["📂 무변환 QGIS 파서 · 좌표 변환<br/>(.gpkg/.shp 자체 파서 + proj4 국가좌표계)"]
         D4["🎨 브랜드 · 깃대종 컬러 · UI 표준<br/>(공단 CI · 팔색조 NPIP AS 920 · 행안부 KRDS)"]
@@ -44,7 +44,7 @@ flowchart LR
 
 | 구분 | 대상 기능 | 동작 배지 | 핵심 동작 원리 |
 | :---: | :--- | :---: | :--- |
-| **오프라인 보장** | **55개 접안지 · 136개 항포구 · 내장 공원경계** | `🟢 100% 오프라인` | 앱 설치 시 정적 `GeoJSON`/`JSON` 및 현장 모식도(`SVG`) 기기 내장 |
+| **오프라인 보장** | **항·포구 명칭 154곳 · 접안 보존 자료 55건 · 내장 공원경계** | `🟢 100% 오프라인` | 앱 설치 시 정적 `GeoJSON`/`JSON` 및 현장 모식도(`SVG`) 기기 내장 |
 | **오프라인 보장** | **바닷길 직선거리 시간계산 · 초성 검색 · 상괭이 기록** | `🟢 100% 오프라인` | 기기 CPU 자체 연산 및 브라우저 내부 저장소(`IndexedDB`/`localStorage`) 보관 |
 | **오프라인 보장** | **QGIS 파일(`.gpkg`/`.shp`) · 한국 좌표계 변환** | `🟢 100% 오프라인` | 브라우저 메모리 내 직접 해독·재투영 (`외부 서버 전송 0건`) |
 | **온라인 연동** | **배경 지도 타일 (카카오맵 · 위성 · 3D 로드뷰 / OSM)** | `🔵 온라인 + 열람 캐시` | 열어본 해역 타일은 30일 캐시, 미방문 해역 타일·3D 로드뷰는 통신 필요 |
@@ -56,7 +56,7 @@ flowchart LR
 
 | 영역 | 앱 내 기능 | 원천 기관 · 기술 출처 | 비용 / 라이선스 | 코드 정본 위치 |
 | :--- | :--- | :--- | :---: | :--- |
-| **1. 항포구·접안지·공원경계** | 55개 접안지, 136개 항포구 사전, 공원·특별보호구역 | **국립해양조사원(KHOA)** 수심·해안선 + **지자체 어항고시** + **환경부·국립공원공단(KNPS)** 현장 데이터 | 공공데이터 / 자체 구축 | [`ports.json`](../public/data/ports.json)<br>[`docking_points.geojson`](../public/data/docking_points.geojson) |
+| **1. 항포구·접안지·공원경계** | 운영 접안 0건·위험정보 0건, 지명 154곳, 보존 접안 55건, 공원·특별보호구역 | 해양수산부 어촌어항관리시스템 + 기존 접안 보존 자료 + **환경부·국립공원공단(KNPS)** 보호구역 | 공공데이터 / 자체 구축 | [`ports.json`](../public/data/ports.json)<br>[`docking_points.geojson`](../public/data/docking_points.geojson) |
 | **2. 실시간 해상 기상** | 48시간 해상 풍속(`kn`)·유의파고(`m`) 3단계 신호등 | **유럽중기예보센터(ECMWF)** `IFS HRES 9km` + `WAM 9km` (중계: **Open-Meteo**) | 무료 오픈 API (무인증) | [`ecmwfWeatherService.ts`](../src/services/ecmwfWeatherService.ts) |
 | **3. 배경 지도·위성·로드뷰** | 일반·위성·하이브리드·지형·지적도, 360° 3D 로드뷰 | **카카오맵 SDK v3** (**국토지리정보원 NGII** 기반) + **OpenStreetMap(OSM)** & **Leaflet** 자동 폴백 | 무료 약관 / `ODbL`·`BSD` | [`kakaoMapLoader.ts`](../src/services/kakaoMapLoader.ts)<br>[`LegacyLeafletCanvas.tsx`](../src/components/map/LegacyLeafletCanvas.tsx) |
 | **4. 바닷길 항로·초성 검색** | 선택 지점 간 직선거리, 예상시간(ETA), 초성(`ㅅㄷㅎ`) 검색 | 외부 API 없이 자체 개발한 **Haversine 거리·입력 속력 계산** 및 378개 실측 해안선 육지 교차 경고 | 자체 개발 (`100% 무료`) | [`routeGeoService.ts`](../src/services/routeGeoService.ts)<br>[`coastlinePolygons.ts`](../src/data/coastlinePolygons.ts) |
@@ -95,8 +95,8 @@ flowchart LR
 
 | 데이터셋 | 파일 경로 | 수량 / 범위 | 원천 출처 및 자주 묻는 질문(FAQ) 핵심 해명 |
 | :--- | :--- | :---: | :--- |
-| **항포구·선착장 사전 및 해상 변침점** | [`public/data/ports.json`](../public/data/ports.json)<br>[`src/data/coastlinePolygons.ts`](../src/data/coastlinePolygons.ts) | **136개 항포구**<br>+ **300개 변침점**<br>+ **378개 해안선** | · **국립해양조사원(KHOA)** 수로·조석·해안선, **OpenStreetMap(`natural=coastline`) 실측 해안선 폴리곤 378개(12,794정점)** 및 **지자체 어항 지정 고시**(국가·지방·정주·소규모어항 81곳 + 소규모 선착장 50곳 + 조사선 거점 5곳) 통합<br>· 현장 옛 지명·별칭(`강구안`, `원항`, `제승당항` 등) 및 방파제 외측 진입점(`seaApproach`) 전수 실측 해수면 보정 내장 |
-| **현장 접안지 상세 및 수심 모식도** | [`public/data/docking_points.geojson`](../public/data/docking_points.geojson)<br>[`public/images/docking/*.svg`](../public/images/docking/) | **55개 접안지**<br>+ **10종 모식도** | · 국립공원공단 현장 점검 데이터(접안 목적, 만조·간조 수심, 암초·폐로프 위험요소) 수록<br>· 💡 **왜 실제 사진 대신 그림(`.svg`)인가요?**: 오프라인 즉시 열람과 수심·위험요소 도해를 위해 자체 제작한 **현장 이해용 모식도**이며, 실사 사진(`.jpg`/`.png`) 등록 시 앱이 확장자를 자동 판별해 **`📷 현장 실사 사진`** 배지로 즉시 전환 표시함 |
+| **항포구·선착장 사전 및 해상 변침점** | [`public/data/ports.json`](../public/data/ports.json)<br>[`src/data/coastlinePolygons.ts`](../src/data/coastlinePolygons.ts) | **136개 항포구**<br>+ **300개 변침점**<br>+ **378개 해안선** | · 기존 136건 사전(항구 분류 81건·접안 분류 55건)은 개별 시설 실측 근거 미확인. 별도 **OpenStreetMap(`natural=coastline`) 해안선 폴리곤 378개(12,794정점)**는 기존 육지 교차 검증용으로 보존<br>· 현장 옛 지명·별칭(`강구안`, `원항`, `제승당항` 등) 보존. `seaApproach`는 지명 표식에 사용하지 않음; 개별 시설 위치의 실측 근거 미확인 |
+| **현장 접안지 상세 및 수심 모식도** | [`public/data/docking_points.geojson`](../public/data/docking_points.geojson)<br>[`public/images/docking/*.svg`](../public/images/docking/) | **55개 접안지**<br>+ **10종 모식도** | · 조사 근거 미확인 개발 자료(접안 목적·수심·위험요소·등급)를 보존하며 운영 지도에서는 제외<br>· 💡 **왜 실제 사진 대신 그림(`.svg`)인가요?**: 오프라인 즉시 열람과 수심·위험요소 도해를 위해 자체 제작한 **현장 이해용 모식도**이며, 실사 사진(`.jpg`/`.png`) 등록 시 앱이 확장자를 자동 판별해 **`📷 현장 실사 사진`** 배지로 즉시 전환 표시함 |
 | **국립공원 경계 · 특별보호구역** | [`national_park.geojson`](../public/data/layers/national_park.geojson)<br>[`protected_area.geojson`](../public/data/layers/protected_area.geojson) | **기본 2개 레이어**<br>(20개 보호구역 내장) | · **환경부·국립공원공단** 공식 QGIS 원천 데이터 기반 **한려해상국립공원 특별보호구역 20개소 정밀 폴리곤(`EPSG:5181 → EPSG:4326` 전수 변환)** 및 공원 경계 내장<br>· 실무자가 `[레이어 > + 파일 등록]`에서 신규 공단 QGIS 원본(`.gpkg`/`.shp`) 업로드 시 즉시 추가·교체 가능 |
 
 ---
@@ -139,3 +139,7 @@ flowchart LR
 
 1. **항해 보조 참고용 도구**: `바닷길 콕콕`의 직선거리·예상시간과 `꼬미의 바다수첩` 수심·암초 정보는 현장 업무 편의를 위한 **참고용 추정치**입니다. 직선은 육지를 가로지를 수 있으며 공식 항해용 전자해도(ECDIS), 국립해양조사원 최신 수로고시, 선장의 현장 판단을 대체하지 않습니다.
 2. **기상 수치예보 격자 한계**: `ECMWF IFS/WAM (9km 격자)` 모델은 광역 수치예보이므로 좁은 수로의 급조류·국지 해무·방파제 월파를 모두 반영하지 못합니다. 출항 전 반드시 **기상청(KMA) 공식 해상특보**와 현장 관측을 함께 확인하십시오.
+
+### 운영 자료 구분
+
+현장 확인된 운영 접안정보와 독립 위험정보는 각각 0건이며 `public/data/operational/`의 별도 원장입니다. 보존 자료의 red 등급은 위험정보로 재사용하지 않습니다. 운영 항·포구 명칭은 [공식 154곳 스냅샷](../data/public-port-names.final-candidate.geojson)의 지명 참고 위치를 사용합니다. 통영 57곳과 거제 97곳이며 일치 확인 83곳, 검증 보류 71곳입니다. 원본 사전·변침점과 [기존 명칭 좌표 이력](./PLACE_NAME_COORDINATES.md)은 별도로 보존합니다.

@@ -33,6 +33,20 @@
 
 ---
 
+### 1.3 지도 정보 관리 UI와 지도 데이터 순서 분리
+
+운영 접안정보는 `public/data/operational/docking_points.geojson`, 독립 위험정보는 `public/data/operational/hazards.geojson`을 사용하며 현재 각각 0건입니다. 기존 접안 55건과 `ports.json` 136건·300변침점은 바이트와 좌표를 보존합니다. 항·포구 명칭은 [승인된 154곳 스냅샷](../data/public-port-names.final-candidate.geojson)을 정적 번들 입력으로 사용합니다. 기존 81곳의 사전과 [명칭 전용 정정 원장](../src/data/portNameLocations.ts)은 이력으로 보존합니다. 명칭은 `seaApproach`·경로 선택과 분리하고 [검수 상태와 GPS 반영 절차](./PLACE_NAME_COORDINATES.md)를 개발 문서에서 관리합니다. 새 표식은 양쪽 지도 모두 52px 콘텐츠와 중앙 앵커(26px, 0.5)를 공유합니다. 항·포구 명칭을 펼치면 이름표의 하단 삼각 끝과 원형 심볼 중심이 중앙 앵커를 함께 가리킵니다. 심볼은 확대 수준과 이름표 유무에 관계없이 유지하며 연결부를 겹쳐 표시합니다. 줌 12 미만은 점으로 표시하고, 이후에는 최대 120px 이름표와 120×36px 겹침 제어를 유지합니다. 선택한 점은 확대 수준과 관계없이 이름표를 표시합니다. 기존 접안 핀의 높이·앵커 불일치는 보존 자료의 잔여 문제로 기록하며 원본 좌표를 보정하지 않습니다.
+
+`bada_map_information_visibility_v1`은 위험정보·항·포구 명칭·행위허가·상괭이 표시만 저장합니다. 처음 실행할 때는 표시하며 저장된 false를 유지합니다. 접안·특별보호구역은 기존 운영 설정의 visible을 유지합니다. 기존 키·데이터·드래프트·인증·Firestore를 초기화하지 않습니다.
+
+[`LayerControlModal.tsx`](../src/components/notebook/LayerControlModal.tsx)의 기본 화면은 **지도 정보 관리**이며, [`MapInformationCards.tsx`](../src/components/notebook/MapInformationCards.tsx)가 갯바위 접안 포인트 → 특별보호구역 → 위험정보 → 항·포구 명칭 → 행위허가 → 상괭이 관찰 기록 순서의 통합 카드를 제공합니다. 기본 카드는 높이 약 58~62px, 카드 간격 8px의 압축형 목록입니다. 체크박스 / 항목명·건수 / 추가 기능 아이콘 / 위아래 화살표 순서로 배치하며 터치 영역은 44px 이상을 유지합니다. 접안 운영 자료는 현재 0건이며 필터를 숨깁니다. 자료가 있을 때만 설정 아이콘으로 카드 하단에 펼칩니다. 상괭이 카드의 다운로드 아이콘은 기존 `PorpoiseExportButton`의 `compact` 표시를 사용하며 CSV·인증·공유·오류 처리는 동일합니다. 행위허가 건수는 지도에 표시 가능한 기록 수이며 상괭이 건수에는 기기 저장 안내를 덧붙입니다. 필터를 접을 때 다른 카드의 클릭 위치가 움직이지 않도록 바깥 클릭 완료 후 닫으며, Escape는 필터만 닫고 열기 버튼으로 초점을 돌립니다.
+
+[`mapInformationOrder.ts`](../src/components/notebook/mapInformationOrder.ts)의 `bada_map_information_ui_order_v1`은 현재 기기의 기본 카드 순서만 저장하는 별도 UI 설정입니다. 기존 localStorage 키·운영 데이터 스키마를 변경하지 않습니다. UI 이동은 `handleMoveLayerOrder()`를 호출하지 않으며 `draftLayers`, GeoJSON, 지도 배열 순서, `style.zIndex`, 표식 우선순위 및 GitHub 원격 저장 내용에 영향을 주지 않습니다. 손상되거나 부분적인 UI 설정은 알려진 6개 카드로 복구하며 저장소 접근 실패는 화면에 안내합니다.
+
+국립공원 경계는 기본 목록에서만 숨깁니다. **상세 관리**에서 기존 레이어 전체와 파일 등록, 추가·삭제, 속성·피처 편집, 스타일, GeoJSON 내보내기, 실제 지도 그리기 순서, 저장·이력·복원·원격 동기화를 계속 제공합니다. 상세/기본 화면 전환은 기존 드래프트를 유지합니다. 공식 접안·특별보호구역 표시 토글은 기존 `useAppConfig.toggleLayer()`를 통해 즉시 지도 및 기기 저장소에 반영하고, 전문 편집은 기존 저장 흐름을 유지합니다. 행위허가와 상괭이 표시·데이터·권한·CSV 처리 계약은 바꾸지 않습니다.
+
+---
+
 ## 2장. 바닷길 정박지 선택 상태 머신 및 직선 경로 렌더링 상세 명세
 
 ### 2.1 자유 직선 그리기 및 시간계산 데이터 흐름

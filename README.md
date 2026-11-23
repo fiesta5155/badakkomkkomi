@@ -1,5 +1,7 @@
 # 바다꼼꼬미 (Bada-Kkomkkomi) [v2.4]
 
+항행경보 수집·검증: [API 안내](./docs/NAVIGATIONAL_WARNINGS.md), [단일 Pages 배포 연결](./docs/NAVIGATIONAL_WARNING_DEPLOYMENT.md). 지도 표시는 비활성이고 실제 배포는 수행하지 않았습니다.
+
 국립공원공단 해양국립공원(한려해상·통영·거제) 직원의 해상·도서 현장업무 지원을 위한 오프라인 우선(Offline-First) PWA 웹 애플리케이션입니다.
 백엔드 서버나 외부 유료 DB 없이 **순수 정적 데이터(`GeoJSON`, `JSON`, 로컬 이미지) + 인앱 공간정보 운영 저장소(`IndexedDB` / GitHub 자동 커밋)만으로 무상(Zero-cost) 운영 및 자동 배포**되도록 설계되었습니다.
 
@@ -38,20 +40,21 @@
 - **2단 슬림 HUD & 깊이 인식 히스토리 라우터**: 모바일 화면 상단 고정 바 점유율을 12% 미만(`~92px`)으로 압축하고, 인앱 진입 시 `[< 홈]` 클릭이 `window.history.back()`으로 동작하여 뒤로가기 무한 루프(Back-Button Trap)를 방지합니다.
 
 ### 2.1. 꼬미의 바다수첩 (`3.1`)
-- **A. 갯바위 접안정보 및 소규모 선착장 (`docking_points.geojson` — 55개소 · '위험주의' 우선 노출 UX)**:
-  - 통영·거제 해역 공식 조사선 접안지(5개소) 및 부잔교·슬립웨이·물양장·돌제선착장 등 소규모 접안시설(50개소) 총 **55개소**를 5가지 색상(`red` 위험주의 9, `amber` 조석주의 14, `green` 안전접안 13, `blue` 전용부두 12, `purple` 비상거점 7) 전술 마커로 표시합니다.
-  - **Hazard-First 다중 등급 · 권역(`전체/통영/거제`) · 검색어 필터**: 초기 진입 시 **`red`(위험·암초 주의 9개소)만 단독 기본 표시**하며, 상단 `[+등급·권역 ▾]` 팝오버에서 5개 등급 복수 선택(Multi-Select), 권역 필터, 명칭·코드 검색을 제공합니다.
-  - 하단 슬라이딩 상세 바텀시트(`DockingDetailSheet`), CSS Scroll Snap 현장 사진 스와이프(`PhotoGallery`), 360° 3D 현장 로드뷰(`Roadview3DModal`), **`[🧭 이 접안지를 목적지로 바닷길 시간·기상 계산하기]` 도메인 간 브릿지**를 제공합니다.
-- **B. 직원용 QGIS 멀티포맷 공간정보 레이어 운영 관리 (`LayerControlModal` + `spatialFileParser` + `layerStorageService`)**:
+- **A. 운영 자료와 보존 자료 분리**:
+  - 현장 확인된 갯바위 접안정보와 독립 위험정보는 각각 **0건**입니다. 기존 접안 55건(등급·수심·SVG 포함)은 조사 근거 미확인 보존 자료로 남기고 운영 지도에서는 제외합니다. 상세 관리에서 원본을 내려받을 수 있습니다.
+  - 항·포구 명칭 **154곳**은 어촌어항관리시스템의 지명 참고 레이어입니다. 위치 일치 확인 83곳과 검증 보류 71곳의 공식 지도 좌표를 보존합니다. 명칭과 간결한 점을 표시하며 겹치는 이름은 확대 수준에 따라 줄입니다. 점을 누르면 이름을 확인할 수 있습니다. 해상 접근점이나 경로 계산과 연결하지 않습니다.
+  - 기존 접안 필터·상세 컴포넌트는 보존하되, 운영 자료가 없는 동안 필터를 기본 화면에서 숨깁니다. 새 입력·공유 기능은 구현하지 않습니다.
+- **B. 지도 정보 관리 (`LayerControlModal` + `spatialFileParser` + `layerStorageService`)**:
+  - 기본 화면에서 접안 포인트·특별보호구역·위험정보·항·포구 명칭·행위허가·상괭이 관찰 기록을 압축형 카드(약 58~62px, 간격 8px)로 표시합니다. 접안 필터는 설정 아이콘으로 펼치고 내보내기는 다운로드 아이콘으로 실행합니다. 카드 순서는 기기별 UI 설정에만 저장하며 지도 그리기 순서는 바꾸지 않습니다. 국립공원 경계와 전문 기능은 **상세 관리**에서 접근합니다.
   - **QGIS 실무 파일 무변환 직접 업로드**: `.gpkg` (OGC GeoPackage SQLite3 바이너리), `.zip` / `.shp+.dbf+.prj+.cpg` (ESRI Shapefile), `.geojson`/`.json`, `.kml`/`.kmz` 파일을 브라우저에서 직접 파싱하며, 복수 레이어 포함 시 선택·일괄 반입을 지원합니다.
   - **한국 공공측량 좌표계(`EPSG:5179`, `5186`, `5187`, `5185`, `5181`, `5174`, `3857`) & `CP949`(`EUC-KR`) 인앱 자동 변환**: `proj4`와 `TextDecoder('euc-kr')`를 내장하여 별도의 QGIS 재투영이나 인코딩 변환 없이도 `EPSG:4326`(WGS 84) 및 정상 한글 속성으로 즉시 자동 복원합니다.
   - **전 도형(`Polygon`, `LineString`, `Point`) & 동적 스타일/피처 편집**: 선/면 색상, 두께, 실선/점선, 채우기 투명도, 지도 라벨 표시 속성(`labelField`), 피처 속성값 편집 및 Douglas-Peucker 모바일 경량화를 Kakao Map과 Legacy Leaflet 양쪽에서 동일하게 렌더링합니다.
-  - **`[저장 (운영 반영)]` = 즉시 운영 반영**: 관리 화면에서 **`[저장 (운영 반영)]`** 버튼을 누르면 즉시 활성 지도와 기기 영속 저장소(`IndexedDB` + `localStorage`, 최대 12개 버전 스냅샷 및 즉시 롤백 지원)에 운영 본으로 반영되며, 원격 GitHub 토큰 설정 시 `main` 브랜치 원자적 자동 커밋 및 GitHub Pages 배포까지 원클릭으로 수행합니다.
+  - **`[저장 (운영 반영)]` = 즉시 운영 반영**: 상세 관리 화면에서 **`[저장 (운영 반영)]`** 버튼을 누르면 즉시 활성 지도와 기기 영속 저장소(`IndexedDB` + `localStorage`, 최대 12개 버전 스냅샷 및 즉시 롤백 지원)에 운영 본으로 반영되며, 원격 GitHub 토큰 설정 시 `main` 브랜치 원자적 자동 커밋 및 GitHub Pages 배포까지 원클릭으로 수행합니다.
 - **C. 현장정보 제보 (`FieldReportModal` + `emailReportService`)**:
   - 접안 포인트 상세창 또는 독립 제보 버튼(**`지도에서 위치 선택`** 지원)을 통해 위경도 좌표·현장 사진·자유 메모를 입력합니다.
-  - 운영자 수신 이메일(`admin.report_recipient_email`, 앱 내에서도 즉시 변경·저장 가능)로 규격화된 제보 메일(`mailto:`)을 발송하거나 클립보드에 전문을 복사합니다.
+  - 수신 이메일은 형식 확인 후 기기에 기억하며 기본 주소(`marine_admin@knps.or.kr`)로 복원할 수 있습니다. 규격화된 제보 내용을 메일 앱(`mailto:`)·공유창에 전달하며 최종 전송은 메일 앱에서 진행합니다. 앱에서는 실제 발송 성공 여부를 확인하지 않습니다.
 - **D. 개인 상괭이 관찰 기록 (`PorpoiseObservationModal` + `usePorpoiseStorage`)**:
-  - 레이어 관리의 **관찰기록 내보내기**에서 현재 기기의 전체 기록을 관찰일시 순으로 UTF-8 BOM CSV(현지 조사표 14열)로 내보냅니다. 실명 등록이 완료된 로그인 프로필의 `realName`을 조사자로 사용하며, 저장된 현지 관찰일시와 기존 저장 키·구조는 그대로 유지합니다. 파일 공유 지원 기기에서는 기본 공유창을, 미지원 환경에서는 다운로드를 사용합니다.
+  - 지도 정보 관리의 상괭이 카드 **다운로드 아이콘(관찰기록 내보내기)**에서 현재 기기의 전체 기록을 관찰일시 순으로 UTF-8 BOM CSV(현지 조사표 14열)로 내보냅니다. 실명 등록이 완료된 로그인 프로필의 `realName`을 조사자로 사용하며, 저장된 현지 관찰일시와 기존 저장 키·구조는 그대로 유지합니다. 파일 공유 지원 기기에서는 기본 공유창을, 미지원 환경에서는 다운로드를 사용합니다.
   - 지도에서 상괭이 목격 위치를 탭하면 현재 일시와 기본 개체수(`1마리`)가 자동 입력되며, 기기 내부(`localStorage`)에 저장되어 전용 상괭이 표식으로 렌더링됩니다. (기획 명세에 따라 사진·메모·통계 기능 제외, 개별 조회·수정·삭제 및 레이어 표시/숨김 지원)
 
 ### 2.2. 바닷길 콕콕 (`3.2`)
@@ -101,7 +104,8 @@ bada-kkomkkomi/
 │   ├── config/
 │   │   └── app_config.json            # 운영자 수신 이메일, 기본 해역, 속력·기상 기본값, 공간레이어 정의
 │   ├── data/
-│   │   ├── docking_points.geojson     # 갯바위 접안 포인트 및 소규모 선착장 (55개소, 5색 안전 등급, OSM 해안선 보정 완료)
+│   │   ├── docking_points.geojson     # 출처 미확인 접안 보존 자료 55건 (좌표·원본 유지)
+│   │   ├── operational/               # 운영 접안 0건 / 독립 위험정보 0건
 │   │   ├── ports.json                 # 통영·거제 136개 항포구·선착장 사전 및 300개 해상 변침점 단일 연결 그래프
 │   │   └── layers/
 │   │       ├── national_park.geojson  # 한려해상국립공원 경계 폴리곤
@@ -125,7 +129,12 @@ bada-kkomkkomi/
 │   │   ├── DockingDetailSheet.tsx     # 접안 포인트 하단 슬라이딩 상세 시트 (3D 현장뷰 & 바닷길 계산 브릿지)
 │   │   ├── PhotoGallery.tsx           # 현장 사진 전체화면 라이트박스 모달
 │   │   ├── notebook/
-│   │   │   ├── LayerControlModal.tsx        # 직원용 QGIS 멀티포맷 공간정보 레이어 운영 관리 워크스페이스
+│   │   │   ├── LayerControlModal.tsx        # 지도 정보 관리 기본 목록 / 전문 파일·레이어·이력 상세 관리
+│   │   │   ├── mapInformationData.ts      # 운영 위험정보 파싱·지명 좌표·라벨 겹침 제어
+│   │   │   ├── mapInformationVisibility.ts # 별도 UI 표시 설정 (기존 저장소 보존)
+│   │   │   ├── MapInformationCards.tsx      # 6개 지도 정보 표시 카드·접안 필터·관찰기록 내보내기
+│   │   │   ├── NavigationalWarningPanel.tsx # 정적 항행경보 목록·원문 상세·수집 상태
+│   │   │   ├── mapInformationOrder.ts       # 지도 렌더링과 분리된 기기별 기본 카드 순서
 │   │   │   ├── FieldReportModal.tsx         # 현장정보 이메일 제보 & 지도 위치 선택 모달
 │   │   │   ├── PorpoiseObservationModal.tsx # 개인 상괭이 관찰 기록 추가/수정/삭제 모달
 │   │   │   └── PorpoiseExportButton.tsx # 로그인 실명 확인 및 전체 관찰기록 CSV 공유·다운로드
@@ -161,6 +170,8 @@ bada-kkomkkomi/
 │   │   ├── activityPermitService.ts   # 작성자 트랜잭션·별도 조사 일정 및 구역 스냅샷
 │   │   ├── khoaTideSchema.ts          # KHOA 32일 묶음 검증·갱신 시각·신선도
 │   │   ├── khoaTideService.ts         # 날짜 상세 카드용 정적 조석 JSON 검증·조회
+│   │   ├── navigationalWarningService.ts # 정적 항행경보 검증·조회·KST 시각·상태
+│   │   ├── navigationalWarningMap.ts # 검증된 항행경보 좌표·도형 및 기존 hazard 지도 연결
 │   │   ├── firebaseClient.ts          # VITE_FIREBASE_* 기반 SDK 초기화 (설정 누락 시 기존 기능 유지)
 │   │   ├── userProfileService.ts      # UID별 실명 프로필 서버 조회·저장 및 한글 두 글자 검증
 │   │   ├── pwaInstallation.ts         # 조타실의 기기별 홈 화면 추가 안내 (실제 설치 가능 여부는 브라우저 이벤트 기준)
@@ -179,6 +190,7 @@ bada-kkomkkomi/
 │   │   ├── ecmwfWeatherService.ts     # ECMWF IFS(풍속) + WAM(파고) 전용 URL 생성 및 KST 타임스탬프 결합기
 │   │   ├── weatherThresholdStorage.ts # 공통 기상 기준 저장·복원 및 구형 기본값 호환 처리
 │   │   ├── emailReportService.ts      # 이메일 제보 전문 포맷팅, mailto URI 생성, 클립보드 복사
+│   │   ├── reportRecipientStorage.ts  # 제보 수신 이메일 검증·기기 저장·기본 주소 복원 (제보자명과 분리)
 │   │   ├── routeGeoService.ts         # Haversine 직선거리·예상시간 계산 및 실측 해안선 교차 경고
 │   │   ├── routeLegLabelService.ts    # 줌 레벨·구간 길이 적응형 지도 구간 배지(시간·NM) 포맷팅 서비스
 │   │   ├── routePortSelectionService.ts # 136개 등록 항구 즉시 선택(applyDirectPortSelection)·유효성 검증·편집 후 정규화 서비스

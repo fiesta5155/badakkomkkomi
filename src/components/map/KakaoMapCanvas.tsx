@@ -1,5 +1,6 @@
-import { buildPortNamePointSpec } from './mapMarkerTemplates';
-import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../../data/portNameMapPoints';
+import type { WarningMapFocus } from '../../services/navigationalWarningMap';
+import { buildReferencePointSpec } from './mapMarkerTemplates';
+import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../notebook/mapInformationData';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DockingFeature } from '../../types/docking';
 import type { PorpoiseRecord } from '../../types/porpoise';
@@ -40,6 +41,8 @@ import {
 export interface KakaoMapCanvasProps {
   permitFocus?: PermitMapFocus | null;
   onSelectPermit?: (id: string) => void;
+  warningFocus?: WarningMapFocus | null;
+  onSelectWarning?: (id: string) => void;
   kakaoMaps: KakaoMapsNamespace;
   baseMapType: KakaoBaseMapType;
   overlayMapTypes: KakaoOverlayMapType[];
@@ -47,6 +50,7 @@ export interface KakaoMapCanvasProps {
   navSubTab: 'route' | 'weather';
 
   // 3.1 꼬미의 바다수첩
+  hazardPoints?: readonly ReferenceMapPoint[];
   portNamePoints?: readonly ReferenceMapPoint[];
   features: DockingFeature[];
   selectedFeature: DockingFeature | null;
@@ -303,9 +307,9 @@ function attachDraggableToCustomOverlay(
 }
 
 interface ParsedKakaoLayerPrimitives {
-  polygons: { rings: KakaoLatLng[][]; label?: string; center?: KakaoLatLng; permitId?: string }[];
+  polygons: { rings: KakaoLatLng[][]; label?: string; center?: KakaoLatLng; permitId?: string; warningId?: string }[];
   polylines: { path: KakaoLatLng[]; label?: string; center?: KakaoLatLng }[];
-  points: { position: KakaoLatLng; label: string }[];
+  points: { position: KakaoLatLng; label: string; warningId?: string }[];
 }
 
 /**
@@ -317,6 +321,7 @@ function parseGeoJsonToKakaoPrimitives(
   geojson: any,
   labelField = 'name',
   permit = false,
+  warning = false,
 ): ParsedKakaoLayerPrimitives {
   const result: ParsedKakaoLayerPrimitives = {
     polygons: [],
@@ -357,6 +362,7 @@ function parseGeoJsonToKakaoPrimitives(
           label: labelStr,
           center: permit && props.labelPoint ? new kakaoMaps.LatLng(props.labelPoint.lat, props.labelPoint.lng) : computeCenter(rings[0]),
           permitId: permit ? props.permitId : undefined,
+          warningId: warning ? props.warningId : undefined,
         });
       }
     } else if (geom.type === 'MultiPolygon' && Array.isArray(geom.coordinates)) {
@@ -399,6 +405,7 @@ function parseGeoJsonToKakaoPrimitives(
       result.points.push({
         position: new kakaoMaps.LatLng(lat, lng),
         label: labelStr,
+        warningId: warning ? props.warningId : undefined,
       });
     } else if (geom.type === 'MultiPoint' && Array.isArray(geom.coordinates)) {
       for (const pt of geom.coordinates) {
@@ -418,12 +425,15 @@ function parseGeoJsonToKakaoPrimitives(
 export function KakaoMapCanvas({
   permitFocus,
   onSelectPermit,
+  warningFocus,
+  onSelectWarning,
   kakaoMaps,
   baseMapType,
   overlayMapTypes,
   activeMainTab,
   navSubTab,
   features,
+  hazardPoints = EMPTY_REFERENCE_POINTS,
   portNamePoints = EMPTY_REFERENCE_POINTS,
   selectedFeature,
   onSelectFeature,
@@ -706,6 +716,17 @@ export function KakaoMapCanvas({
     const height = containerRef.current?.clientHeight ?? 640;
     map.setBounds(bounds, Math.min(160, height * .2), 24, Math.min(260, height * .35), 24);
   }, [kakaoMaps, permitFocus, activeMainTab]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !warningFocus || activeMainTab !== 'notebook') return;
+    if (warningFocus.vertices.length === 1) {
+      const p = warningFocus.vertices[0]; map.setCenter(new kakaoMaps.LatLng(p.lat, p.lng)); map.setLevel(4); return;
+    }
+    const bounds = new kakaoMaps.LatLngBounds();
+    warningFocus.vertices.forEach(p => bounds.extend(new kakaoMaps.LatLng(p.lat, p.lng)));
+    const height = containerRef.current?.clientHeight ?? 640;
+    map.setBounds(bounds, Math.min(160, height * .2), 24, Math.min(260, height * .35), 24);
+  }, [kakaoMaps, warningFocus, activeMainTab]);
   const showSpatialLabels = currentLeafletZoom >= 11 && activeMainTab !== 'navigation';
   const showPortLabels = currentLeafletZoom >= 13;
 
@@ -722,6 +743,7 @@ export function KakaoMapCanvas({
         rawGeoJson,
         labelField,
         layer.id === PERMIT_LAYER_ID,
+        layer.id === 'hazard',
       );
     }
     return mapById;
@@ -772,16 +794,17 @@ export function KakaoMapCanvas({
         const polygon = new kakaoMaps.Polygon({
           map,
           path: polyItem.rings,
-          strokeWeight,
+          strokeWeight: strokeWeight + (polyItem.warningId && polyItem.warningId === warningFocus?.id ? 2 : 0),
           strokeColor,
           strokeOpacity,
           strokeStyle,
           fillColor,
-          fillOpacity,
+          fillOpacity: polyItem.warningId && polyItem.warningId === warningFocus?.id ? Math.min(1, fillOpacity + .08) : fillOpacity,
           zIndex,
         });
 
         const onPolyClick = (mouseEvent: KakaoMouseEvent) => {
+          if (polyItem.warningId && onSelectWarning && !clickContextRef.current.isPorpoiseAddMode && !clickContextRef.current.isReportPickMode) { onSelectWarning(polyItem.warningId); return; }
           if (polyItem.permitId && onSelectPermit && !clickContextRef.current.isPorpoiseAddMode && !clickContextRef.current.isReportPickMode) { onSelectPermit(polyItem.permitId); return; }
           if (!mouseEvent?.latLng) return;
           handleCoordinateClick(mouseEvent.latLng.getLat(), mouseEvent.latLng.getLng());
@@ -845,10 +868,13 @@ export function KakaoMapCanvas({
         const ptSpec = buildSpatialLayerPointSpec(
           fillColor,
           ptItem.label,
-          pointRadius,
+          pointRadius + (ptItem.warningId && ptItem.warningId === warningFocus?.id ? 2 : 0),
           showLabels,
         );
-        const ptEl = createOverlayElement(kakaoMaps, ptSpec);
+        const ptEl = createOverlayElement(kakaoMaps, ptSpec, ptItem.warningId ? () => {
+          if (clickContextRef.current.isPorpoiseAddMode || clickContextRef.current.isReportPickMode) handleCoordinateClick(ptItem.position.getLat(), ptItem.position.getLng());
+          else onSelectWarning?.(ptItem.warningId!);
+        } : undefined);
         createdOverlays.push(
           new kakaoMaps.CustomOverlay({
             map,
@@ -857,7 +883,7 @@ export function KakaoMapCanvas({
             xAnchor: ptSpec.xAnchorRatio,
             yAnchor: ptSpec.yAnchorRatio,
             zIndex: zIndex + 10,
-            clickable: false,
+            clickable: Boolean(ptItem.warningId),
           }),
         );
       }
@@ -887,21 +913,23 @@ export function KakaoMapCanvas({
     showSpatialLabels,
     handleCoordinateClick,
     onSelectPermit,
+    onSelectWarning,
+    warningFocus,
   ]);
 
-  const [selectedPortNameId, setSelectedPortNameId] = useState<string | null>(null);
+  const [selectedReference, setSelectedReference] = useState<string | null>(null);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || activeMainTab !== 'notebook') return;
     const labels = referenceLabelIds(portNamePoints, currentLeafletZoom);
-    const overlays = portNamePoints.map(point => {
-      const key = point.id;
-      const spec = buildPortNamePointSpec(point.name, labels.has(point.id) || selectedPortNameId === key);
-      const content = createOverlayElement(kakaoMaps, spec, () => setSelectedPortNameId(current => current === key ? null : key));
-      return new kakaoMaps.CustomOverlay({ map, position: new kakaoMaps.LatLng(point.lat, point.lng), content, xAnchor: spec.xAnchorRatio, yAnchor: spec.yAnchorRatio, zIndex: 140, clickable: true });
+    const overlays = [ ...portNamePoints.map(point => ({ point, hazard: false })), ...hazardPoints.map(point => ({ point, hazard: true })) ].map(({ point, hazard }) => {
+      const key = (hazard ? 'hazard:' : 'port:') + point.id;
+      const spec = buildReferencePointSpec(point.name, hazard || labels.has(point.id) || selectedReference === key, hazard);
+      const content = createOverlayElement(kakaoMaps, spec, () => setSelectedReference(current => current === key ? null : key));
+      return new kakaoMaps.CustomOverlay({ map, position: new kakaoMaps.LatLng(point.lat, point.lng), content, xAnchor: spec.xAnchorRatio, yAnchor: spec.yAnchorRatio, zIndex: hazard ? 380 : 140, clickable: true });
     });
     return () => overlays.forEach(overlay => overlay.setMap(null));
-  }, [kakaoMaps, activeMainTab, portNamePoints, currentLeafletZoom, selectedPortNameId]);
+  }, [kakaoMaps, activeMainTab, portNamePoints, hazardPoints, currentLeafletZoom, selectedReference]);
 
   // 6. [3.1 꼬미의 바다수첩] 55개 갯바위 접안 및 소규모 선착장 5색 마커
   useEffect(() => {

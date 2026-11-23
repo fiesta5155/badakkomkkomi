@@ -33,6 +33,8 @@
     --knps-bg-card: #f0f9ff;         /* Sky-50: 2차 정보 카드 서피스 */
     --knps-border-subtle: rgba(0, 167, 157, 0.38);
     --knps-border-strong: rgba(0, 132, 108, 0.62);
+    --bada-banner-border: #A5F3FC;
+    --bada-banner-border-width: 2px;
 
     /* modern-web-guidance: brand-consistent-forms (#FFFFFF 대비 4.8:1 AA 충족, Safari/Android 체크마크 역전 버그 예방) */
     accent-color: var(--npip-emerald);
@@ -72,6 +74,16 @@
   box-shadow:
     0 14px 32px rgba(0, 51, 96, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.bada-banner-border {
+  border-color: var(--bada-banner-border);
+  outline: var(--bada-banner-border-width) solid var(--bada-banner-border);
+  outline-offset: calc(0px - var(--bada-banner-border-width));
+}
+
+.bada-banner-border > .knps-tricolor-bar {
+  background: none;
 }
 
 /* modern-web-guidance: size-aware-styling & css-layout (하단 HUD 패널 인라인 컨테이너 쿼리 컨텍스트) */

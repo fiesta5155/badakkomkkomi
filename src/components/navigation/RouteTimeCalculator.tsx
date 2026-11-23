@@ -302,6 +302,21 @@ export function RouteTimeCalculator({
   }, [waypoints, calculation, speedKnots, timeFormatted, etaTimeKst, formatKstEtaFromOffsetMins]);
 
   if (freeDrawMode) {
+    if (waypoints.length === 0) {
+      return (
+        <section
+          aria-label="바닷길 직선거리 시간계산"
+          className="knps-hud-surface bada-hud-panel pointer-events-auto mx-auto w-full max-w-xl rounded-2xl border border-[#00a79d]/60 px-3 py-3 text-[#003360]"
+          style={{ boxShadow: '0 2px 8px rgba(0, 51, 96, 0.08)' }}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <p className="text-center text-xs leading-5 font-bold whitespace-nowrap sm:text-sm">
+            지도를 눌러 출발지를 선택하세요
+          </p>
+        </section>
+      );
+    }
     const freeDrawStage: RouteSheetStage = waypoints.length === 0
       ? 'summary' : sheetStage === 'full' ? 'full' : 'compact';
     const isExpanded = freeDrawStage === 'full';
@@ -311,7 +326,7 @@ export function RouteTimeCalculator({
     const speedPosition = Math.max(0, Math.min(100, ((speedKnots - 5) / 30) * 100));
     return (
       <section
-        className={`knps-hud-surface bada-hud-panel pointer-events-auto relative mx-auto flex max-h-[min(70dvh,calc(100dvh-10.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#00a79d]/60 bg-white/96 text-[#003360] shadow-2xl backdrop-blur-md ${freeDrawStage === 'summary' ? 'max-w-xl p-3' : 'max-w-[720px] p-3 sm:p-4'}`}
+        className={`knps-hud-surface bada-banner-border bada-hud-panel pointer-events-auto relative mx-auto flex max-h-[min(70dvh,calc(100dvh-10.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] w-full flex-col overflow-hidden rounded-2xl border-2 bg-white/96 text-[#003360] shadow-2xl backdrop-blur-md ${freeDrawStage === 'summary' ? 'max-w-xl p-3' : 'max-w-[720px] p-3 sm:p-4'}`}
         aria-label="바닷길 직선거리 시간계산"
         onPointerDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}

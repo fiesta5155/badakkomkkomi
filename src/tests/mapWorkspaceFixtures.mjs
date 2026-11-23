@@ -21,7 +21,8 @@ export const deletePermit=savePermit,addInvestigations=savePermit,updateInvestig
 export const mapView = `
 import React from '/node_modules/.vite/deps/react.js';
 import L from '/node_modules/.vite/deps/leaflet.js';
-
+const leafletStyles = document.createElement('link');
+leafletStyles.rel = 'stylesheet'; leafletStyles.href = '/node_modules/leaflet/dist/leaflet.css'; document.head.append(leafletStyles);
 import {LegacyLeafletCanvas} from '/src/components/map/LegacyLeafletCanvas.tsx';
 import {KakaoMapCanvas} from '/src/components/map/KakaoMapCanvas.tsx';
 const fit=L.Map.prototype.qaOriginalFitBounds??L.Map.prototype.fitBounds;L.Map.prototype.qaOriginalFitBounds=fit;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { DEFAULT_REPORT_RECIPIENT, loadReportRecipient, saveReportRecipient } from '../services/reportRecipientStorage';
 import type { AppConfig, MapLayerConfig } from '../types/config';
 import {
   buildDefaultLayerStyle,
@@ -26,10 +27,10 @@ const DEFAULT_LAYERS: MapLayerConfig[] = [
     name: '갯바위 접안 포인트',
     visible: true,
     color: '#38bdf8',
-    description: '5개 색상별 접안 안전도 및 현장 정보',
+    description: '현장 확인을 완료한 운영 접안정보 (현재 0건)',
     isSystemLayer: true,
     geometryTypes: ['Point'],
-    featureCount: 55,
+    featureCount: 0,
   },
   {
     id: 'national_park',
@@ -57,7 +58,7 @@ const DEFAULT_LAYERS: MapLayerConfig[] = [
 
 const DEFAULT_CONFIG: AppConfig = {
   admin: {
-    report_recipient_email: 'marine_admin@knps.or.kr',
+    report_recipient_email: DEFAULT_REPORT_RECIPIENT,
     report_cc_email: 'field_safety@knps.or.kr',
     department_name: '국립공원공단 해양조사팀',
   },
@@ -76,12 +77,11 @@ const DEFAULT_CONFIG: AppConfig = {
   layers: DEFAULT_LAYERS,
 };
 
-const STORAGE_KEY_ADMIN_EMAIL = 'bada_custom_admin_email';
-
 function enrichLayerWithDefaults(layer: MapLayerConfig): MapLayerConfig {
   const isDocking = layer.id === 'docking' || layer.isSystemLayer;
   return {
     ...layer,
+    ...(layer.id === 'docking' ? { featureCount: 0, description: '현장 확인을 완료한 운영 접안정보 (현재 0건)' } : {}),
     isSystemLayer: isDocking ? true : layer.isSystemLayer,
     style:
       layer.style ??
@@ -92,7 +92,10 @@ function enrichLayerWithDefaults(layer: MapLayerConfig): MapLayerConfig {
 export function useAppConfig() {
   const syncBootMeta = loadSyncOperationalMetaFromLocalStorage();
 
-  const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
+  const [config, setConfig] = useState<AppConfig>(() => ({
+    ...DEFAULT_CONFIG,
+    admin: { ...DEFAULT_CONFIG.admin, report_recipient_email: loadReportRecipient() },
+  }));
   const [layers, setLayers] = useState<MapLayerConfig[]>(() =>
     syncBootMeta?.layers
       ? syncBootMeta.layers.map(enrichLayerWithDefaults)
@@ -218,16 +221,10 @@ export function useAppConfig() {
         // 정적 파일 실패 시 기본 설정 사용
       }
 
-      const savedEmail = localStorage.getItem(STORAGE_KEY_ADMIN_EMAIL);
-      if (savedEmail) {
-        staticConfig = {
-          ...staticConfig,
-          admin: {
-            ...staticConfig.admin,
-            report_recipient_email: savedEmail,
-          },
-        };
-      }
+      staticConfig = {
+        ...staticConfig,
+        admin: { ...staticConfig.admin, report_recipient_email: loadReportRecipient() },
+      };
 
       if (!isMounted) return;
       setConfig(staticConfig);
@@ -273,8 +270,7 @@ export function useAppConfig() {
   // 운영자 이메일 로컬 수정
   const updateAdminEmail = useCallback((newEmail: string) => {
     const trimmed = newEmail.trim();
-    if (!trimmed) return;
-    localStorage.setItem(STORAGE_KEY_ADMIN_EMAIL, trimmed);
+    if (!saveReportRecipient(trimmed)) return false;
     setConfig((prev) => ({
       ...prev,
       admin: {
@@ -282,6 +278,7 @@ export function useAppConfig() {
         report_recipient_email: trimmed,
       },
     }));
+    return true;
   }, []);
 
   // 빠른 레이어 표시/숨김 토글 (StrictMode 이중 실행 방지를 위해 상태 업데이터 외부에서 영속 저장 수행)

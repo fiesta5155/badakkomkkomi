@@ -1,5 +1,6 @@
-import { buildPortNamePointSpec } from './mapMarkerTemplates';
-import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../../data/portNameMapPoints';
+import type { WarningMapFocus } from '../../services/navigationalWarningMap';
+import { buildReferencePointSpec } from './mapMarkerTemplates';
+import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../notebook/mapInformationData';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import {
@@ -33,12 +34,15 @@ import {
 export interface LegacyLeafletCanvasProps {
   permitFocus?: PermitMapFocus | null;
   onSelectPermit?: (id: string) => void;
+  warningFocus?: WarningMapFocus | null;
+  onSelectWarning?: (id: string) => void;
   baseMapType: KakaoBaseMapType;
   overlayMapTypes: KakaoOverlayMapType[];
   activeMainTab: 'notebook' | 'navigation';
   navSubTab: 'route' | 'weather';
 
   // 3.1 꼬미의 바다수첩
+  hazardPoints?: readonly ReferenceMapPoint[];
   portNamePoints?: readonly ReferenceMapPoint[];
   features: DockingFeature[];
   selectedFeature: DockingFeature | null;
@@ -359,7 +363,7 @@ function MapEventsAndCameraController({
   return null;
 }
 
-function PermitBoundsEffect({ target }: { target?: PermitMapFocus | null }) {
+function PermitBoundsEffect({ target }: { target?: PermitMapFocus | WarningMapFocus | null }) {
   const map = useMap();
   useEffect(() => {
     if (!target) return;
@@ -373,11 +377,14 @@ function PermitBoundsEffect({ target }: { target?: PermitMapFocus | null }) {
 export function LegacyLeafletCanvas({
   permitFocus,
   onSelectPermit,
+  warningFocus,
+  onSelectWarning,
   baseMapType,
   overlayMapTypes,
   activeMainTab,
   navSubTab,
   features,
+  hazardPoints = EMPTY_REFERENCE_POINTS,
   portNamePoints = EMPTY_REFERENCE_POINTS,
   selectedFeature,
   onSelectFeature,
@@ -417,7 +424,7 @@ export function LegacyLeafletCanvas({
   isMapFocused,
 }: LegacyLeafletCanvasProps) {
   const gpsPulseIcon = useMemo(() => getGpsPulseIcon(), []);
-  const [selectedPortNameId, setSelectedPortNameId] = useState<string | null>(null);
+  const [selectedReference, setSelectedReference] = useState<string | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(viewport.zoom || DEFAULT_ZOOM);
   const referenceLabels = useMemo(() => referenceLabelIds(portNamePoints, currentZoom), [portNamePoints, currentZoom]);
   const initialCenter = useMemo<[number, number]>(
@@ -505,6 +512,7 @@ export function LegacyLeafletCanvas({
       />
 
       <PermitBoundsEffect target={activeMainTab === 'notebook' ? permitFocus : null} />
+      <PermitBoundsEffect target={activeMainTab === 'notebook' ? warningFocus : null} />
       {/* 1. QGIS 공간정보 레이어 (Polygon, LineString, Point 및 동적 스타일/라벨) */}
       {layers.map((layer) => {
         const fc = geoJsonLayersData[layer.id];
@@ -537,19 +545,23 @@ export function LegacyLeafletCanvas({
 
         return (
           <GeoJSON
-            key={layer.id === PERMIT_LAYER_ID ? `${versionKey}:${JSON.stringify(fc)}` : versionKey}
+            key={layer.id === 'hazard' ? `${versionKey}:${JSON.stringify(fc)}:${warningFocus?.id ?? ''}` : layer.id === PERMIT_LAYER_ID ? `${versionKey}:${JSON.stringify(fc)}` : versionKey}
             data={fc}
-            style={() => ({
+            style={(feature) => ({
               color: strokeColor,
-              weight: strokeWidth,
+              weight: strokeWidth + (layer.id === 'hazard' && feature?.properties?.warningId === warningFocus?.id ? 2 : 0),
               opacity: strokeOpacity,
               fillColor,
-              fillOpacity,
-              dashArray,
+              fillOpacity: layer.id === 'hazard'
+                ? feature?.geometry.type === 'Polygon'
+                  ? Math.min(1, fillOpacity + (feature.properties?.warningId === warningFocus?.id ? .08 : 0))
+                  : .16 // Keep the existing warning point appearance.
+                : fillOpacity,
+              dashArray: layer.id === 'hazard' && feature?.geometry.type !== 'Polygon' ? undefined : dashArray,
             })}
-            pointToLayer={(_feature, latlng) =>
+            pointToLayer={(feature, latlng) =>
               L.circleMarker(latlng, {
-                radius: pointRadius,
+                radius: pointRadius + (layer.id === 'hazard' && feature.properties?.warningId === warningFocus?.id ? 2 : 0),
                 color: '#ffffff',
                 weight: 2,
                 fillColor,
@@ -558,6 +570,9 @@ export function LegacyLeafletCanvas({
             }
             onEachFeature={(feature, leafletLayer) => {
               const permit = layer.id === PERMIT_LAYER_ID;
+              if (layer.id === 'hazard') leafletLayer.on('click', (event: L.LeafletMouseEvent) => {
+                if (!isMapFocused && !isPorpoiseAddMode && !isReportPickMode) { L.DomEvent.stopPropagation(event.originalEvent); onSelectWarning?.(feature.properties?.warningId); }
+              });
               if (permit) leafletLayer.on('click', (event: L.LeafletMouseEvent) => {
                 if (!isMapFocused && !isPorpoiseAddMode && !isReportPickMode) { L.DomEvent.stopPropagation(event.originalEvent); onSelectPermit?.(feature.properties?.permitId); }
               });
@@ -580,11 +595,11 @@ export function LegacyLeafletCanvas({
         );
       })}
 
-      {activeMainTab === 'notebook' && portNamePoints.map(point => {
-        const key = point.id;
-        const spec = buildPortNamePointSpec(point.name, referenceLabels.has(point.id) || selectedPortNameId === key);
+      {activeMainTab === 'notebook' && [...portNamePoints.map(point => ({ point, hazard: false })), ...hazardPoints.map(point => ({ point, hazard: true }))].map(({ point, hazard }) => {
+        const key = (hazard ? 'hazard:' : 'port:') + point.id;
+        const spec = buildReferencePointSpec(point.name, hazard || referenceLabels.has(point.id) || selectedReference === key, hazard);
         return <Marker key={key} position={[point.lat, point.lng]} icon={L.divIcon({ className: 'reference-map-point', html: spec.html, iconSize: [spec.width, spec.height], iconAnchor: [spec.anchorX, spec.anchorY] })}
-          zIndexOffset={140} eventHandlers={{ click: event => { L.DomEvent.stopPropagation(event.originalEvent); setSelectedPortNameId(current => current === key ? null : key); } }} />;
+          zIndexOffset={hazard ? 380 : 140} eventHandlers={{ click: event => { L.DomEvent.stopPropagation(event.originalEvent); setSelectedReference(current => current === key ? null : key); } }} />;
       })}
 
       {/* 2. [3.1 꼬미의 바다수첩] 갯바위 접안 및 소규모 선착장 마커 */}

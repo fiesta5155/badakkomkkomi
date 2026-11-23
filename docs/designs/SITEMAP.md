@@ -36,10 +36,13 @@
 - [`src/components/map/mapMarkerTemplates.ts`](../../src/components/map/mapMarkerTemplates.ts): `buildDockingMarkerSpec()`, `buildNavPortPinSpec()`, `buildPorpoiseSpec()`, `buildRouteWaypointMarkerSpec()`, `buildRouteLegDurationBadgeSpec()`, `buildRouteDirectionArrowSpec()`, `buildWeatherTargetPinSpec()`
 - [`src/components/DockingDetailSheet.tsx`](../../src/components/DockingDetailSheet.tsx): `DockingDetailSheet(props)`
 - [`src/components/PhotoGallery.tsx`](../../src/components/PhotoGallery.tsx): `PhotoGallery(props)`
-- [`src/components/notebook/LayerControlModal.tsx`](../../src/components/notebook/LayerControlModal.tsx): `LayerControlModal(props)`
-- [`src/components/notebook/FieldReportModal.tsx`](../../src/components/notebook/FieldReportModal.tsx): `FieldReportModal(props)`
+- [`src/components/notebook/LayerControlModal.tsx`](../../src/components/notebook/LayerControlModal.tsx): `LayerControlModal(props)` — 기본 ‘지도 정보 관리’와 ‘상세 관리’를 분리. 파일 등록·레이어/스타일/속성 편집·저장·이력·원격 동기화는 상세 관리에 보존
+- [`src/components/notebook/MapInformationCards.tsx`](../../src/components/notebook/MapInformationCards.tsx): 접안 포인트·특별보호구역·항행경보·항·포구 명칭·행위허가·상괭이 관찰 기록의 압축형 표시 카드. 기존 hazard 저장 키 유지, 목록 아이콘으로 항행경보 열람
+- [`src/components/notebook/NavigationalWarningPanel.tsx`](../../src/components/notebook/NavigationalWarningPanel.tsx): 정적 경보 목록/상세를 전환하는 모바일 하단 dialog. 원문·구역 접기/펼치기·미수집/실패/오래됨 안내. 지도 이동/표시 없음
+- [`src/components/notebook/mapInformationOrder.ts`](../../src/components/notebook/mapInformationOrder.ts): 기본 카드 순서 검증·이동·읽기. `bada_map_information_ui_order_v1`은 목록 UI 전용 기기 설정이며 지도 레이어 배열·렌더링 우선순위·운영 스냅샷과 분리
+- [`src/components/notebook/FieldReportModal.tsx`](../../src/components/notebook/FieldReportModal.tsx): `FieldReportModal(props)` — 현장제보 좌표·메모·사진 최대 4장. 수신 주소 변경·기본값 복원, 메일 앱 최종 전송 안내. 실제 발송 성공 표시 없음
 - [`src/components/notebook/PorpoiseObservationModal.tsx`](../../src/components/notebook/PorpoiseObservationModal.tsx): `PorpoiseObservationModal(props)`
-- [`src/components/notebook/PorpoiseExportButton.tsx`](../../src/components/notebook/PorpoiseExportButton.tsx): 레이어 관리의 관찰기록 내보내기 버튼. 로그인 실명 확인 후 기기 전체 기록 공유·다운로드, 빈 기록·오류 안내 및 공유 취소 처리
+- [`src/components/notebook/PorpoiseExportButton.tsx`](../../src/components/notebook/PorpoiseExportButton.tsx): 레이어 관리의 관찰기록 내보내기 버튼(`compact` 아이콘 표시 지원). 로그인 실명 확인 후 기기 전체 기록 공유·다운로드, 빈 기록·오류 안내 및 공유 취소 처리
 - [`src/components/calendar/CalendarScreen.tsx`](../../src/components/calendar/CalendarScreen.tsx): `CalendarScreen(props)` — 인증된 사용자용 공유 달력, 날짜 상세·작성·권한별 수정/삭제, 기존 로컬 원본 JSON 백업. 물때/날씨/운항/메모 고정 2×2 배치 유지
 - [`src/components/navigation/RouteTimeCalculator.tsx`](../../src/components/navigation/RouteTimeCalculator.tsx): `RouteTimeCalculator(props)`
 - [`src/components/navigation/PortSelectModal.tsx`](../../src/components/navigation/PortSelectModal.tsx): `PortSelectModal(props)`
@@ -48,6 +51,8 @@
 
 ### Invariants
 - `HomeScreen.tsx`의 4대 포스터 카드는 동일한 아이콘 슬롯 높이를 유지하며, 카드 내부 다중 단축 버튼 바를 두지 않습니다(Memo 2).
+- `mapInformationData.ts`는 독립 위험정보 검증, [운영 지명 154곳](../../data/public-port-names.final-candidate.geojson)의 점 추출과 라벨 겹침 제어를 담당합니다. 사전과 경로 좌표는 별도로 보존합니다. 검수 및 GPS 반영은 [지명 좌표 유지보수](../PLACE_NAME_COORDINATES.md)를 따릅니다. `mapInformationVisibility.ts`는 별도 UI 표시 설정을 읽으며 기존 false·운영 저장소를 유지합니다. 운영 접안·위험정보는 각각 0건이며 기존 접안 55건은 상세 관리에서 내려받는 보존 원본입니다.
+- 지도 정보 관리의 카드 이동은 목록 순서만 바꾸며 `draftLayers`, 지도 `layers`, `style.zIndex`, GeoJSON 및 운영 저장·GitHub 동기화 내용에는 포함하지 않습니다. 국립공원 경계는 기본 카드에서만 숨기고 상세 관리·지도 데이터와 렌더링은 보존합니다.
 - `MapView.tsx`는 자체적으로 GeoJSON을 중복 fetch하지 않고 `useAppConfig.ts`가 공급하는 `layers` 및 `geoJsonLayersData` 단일 SSOT만 렌더링합니다.
 - `buildNavPortPinSpec()`의 136개 항구 마커와 `buildDockingMarkerSpec()`의 55개 접안지 마커는 모두 `.bada-marker-hit-target`(`52×52px`) 터치 영역을 보장합니다.
 - `KakaoMapCanvas.tsx`와 `LegacyLeafletCanvas.tsx`는 시간계산에서 지도 클릭의 원좌표를 `App.tsx`로 전달합니다. `straightRouteService.ts`는 클릭 순서대로 점을 추가하고, 지도는 **인접 지점 간 직선(`leg.pathPositions`)**과 **구간 중점 배지(`leg.midLat`, `leg.midLng`)**를 렌더링합니다. 마커 드래그 좌표도 보정하지 않습니다.
@@ -63,6 +68,8 @@
 
 ## 2. Core Domain Services (`src/services`)
 
+- [`src/services/reportRecipientStorage.ts`](../../src/services/reportRecipientStorage.ts): 수신 이메일 형식 검증·읽기·저장·기본값 복원. 기존 `bada_custom_admin_email` 키를 유지하며 제보자명 저장과 분리. 미저장·잘못된 값은 `marine_admin@knps.or.kr`로 대체
+
 - [`src/services/porpoiseLocationPicker.ts`](../../src/services/porpoiseLocationPicker.ts): `createPorpoiseLocationPicker()` — 첫 클릭 수동 선택, 활성 버튼 재클릭마다 캐시 없는 GPS 조회. 중복·실패·시간 초과·수동 선택·종료 후 늦은 응답을 제어하며 저장은 기존 관찰 모달에 위임
 - [`src/services/porpoiseExportService.ts`](../../src/services/porpoiseExportService.ts): `buildPorpoiseCsv()`, `createPorpoiseCsvFile()`, `sharePorpoiseCsv()`, `downloadPorpoiseCsv()` — 현지 관찰일시 보존·오름차순 정렬·14열 CSV·UTF-8 BOM, 현재 로그인 실명 적용. `bada_finless_porpoise_records_v1` 읽기·쓰기를 수행하지 않으며 전달받은 기록을 변경하지 않음
 - [`src/hooks/usePorpoiseLocationPicker.ts`](../../src/hooks/usePorpoiseLocationPicker.ts): 상괭이 선택 모드와 버튼 상태 구독. 화면 이탈·popstate·모드 종료·언마운트 시 요청 무효화. GPS 실패 알림 없음
@@ -75,6 +82,8 @@
 
 - [`src/services/khoaTideSchema.ts`](../../src/services/khoaTideSchema.ts): `validTideSnapshot()`, `tideFreshness()` — 통영·고현항 32일 묶음과 가변 고저조 사건 검증. 예측 시간대·기준면은 미확정이며 생성 시각은 UTC
 - [`src/services/khoaTideService.ts`](../../src/services/khoaTideService.ts): `fetchKhoaTides()` — BASE_URL 기준 정적 조석 JSON과 신선도 조회. 날짜 상세 카드에서 재사용하며 기존 물때 계산과 분리
+- [`src/services/navigationalWarningService.ts`](../../src/services/navigationalWarningService.ts): 정적 JSON 검증·문서 정렬·상태 구분, 60초 메모리 재사용/동시 요청 합침, 게시 쌍 해시 검증과 과거 응답 방지. 오래됨·갱신 지연 기본값은 `src/config/navigationalWarnings.ts`
+- [`src/services/navigationalWarningMap.ts`](../../src/services/navigationalWarningMap.ts): 일반 DMS 검증·수집 좌표 대조·경계/단일 위치 판별, 기존 hazard GeoJSON 생성. [지도 연결 검증](../NAVIGATIONAL_WARNING_MAP.md). WGS84 정책은 `src/config/navigationalWarningMap.ts`에 분리.
 
 - [`src/services/pwaInstallation.ts`](../../src/services/pwaInstallation.ts): `installationInstructions()` — 조타실에서 iPhone·iPad·Android·PC의 홈 화면 추가 방법 안내. 설치 가능 여부는 기존 `beforeinstallprompt` 이벤트를 사용하며 인증·사용자 저장소를 변경하지 않음
 
@@ -174,6 +183,7 @@ React 컴포넌트에 라우팅, 공간레이어 설정, 실시간 해상기상,
 
 ### Interface
 - [`scripts/verify-integrity.mjs`](../../scripts/verify-integrity.mjs): 버전 SSOT, 공간데이터 패리티, 레거시 더미 차단, SW 프리캐시 중복 차단, **EGM 계약·모듈 목록·마크다운 링크 무결성(Section 7)** 검증
+- [`scripts/prepare-navigational-warnings.mjs`](../../scripts/prepare-navigational-warnings.mjs): 수집 아티팩트/기존 Pages의 v1 JSON 검증·최신 정상 자료 보존·게시 준비 metadata 생성. API 호출 없음. [4단계 배포 계약](../NAVIGATIONAL_WARNING_DEPLOYMENT.md)
 - [`scripts/sync-qgis-protected-areas.mjs`](../../scripts/sync-qgis-protected-areas.mjs): 공단 QGIS 특별보호구역 Shapefile(`EPSG:5181`) → `protected_area.geojson`(`EPSG:4326`) 변환기
 - [`scripts/build-coastline-polygons.mjs`](../../scripts/build-coastline-polygons.mjs): OSM 해안선 폴리곤 추출·경량화 빌더
 - [`src/tests/coreServices.test.ts`](../../src/tests/coreServices.test.ts): 핵심 서비스·알고리즘·항구 선택 상태 머신·EGM 무드리프트 단위 테스트 스위트

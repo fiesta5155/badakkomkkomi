@@ -1,5 +1,5 @@
 // Local reference-label QA; real Leaflet, synthetic Kakao SDK, no external writes.
-// Start Vite and set PLAYWRIGHT_MODULE, CHROME_EXECUTABLE (local Chromium).
+// Start Vite and set PLAYWRIGHT_MODULE, CHROME_EXECUTABLE (same as mapInformation.browser.mjs).
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -78,11 +78,11 @@ try {
       assert.ok(Math.abs(geometry.symbolX - 26) < 0.1 && Math.abs(geometry.symbolY - 26) < 0.1, JSON.stringify(geometry));
     }
     assert.equal(await page.evaluate(() => JSON.stringify({ routes: window.qaMapProps.routeWaypoints, layers: window.qaMapProps.layers, data: window.qaMapProps.geoJsonLayersData })), unchanged);
-    await page.getByRole('button', { name: /^(공간 )?레이어$/ }).click();
-    const toggle = page.getByRole('switch', { name: /^항·포구 명칭/ });
-    assert.equal(await toggle.getAttribute('aria-checked'), 'true'); await toggle.click(); await page.waitForFunction(() => window.qaMapProps.portNamePoints.length === 0);
+    await page.getByRole('group', { name: '바다수첩 기능' }).getByRole('button').first().click();
+    const toggle = page.getByRole('checkbox', { name: '항·포구 명칭 표시', exact: true });
+    await toggle.uncheck(); await page.waitForFunction(() => window.qaMapProps.portNamePoints.length === 0);
     assert.deepEqual(await positions(), []);
-    assert.equal(await toggle.getAttribute('aria-checked'), 'false'); await toggle.click(); await page.waitForFunction(count => window.qaMapProps.portNamePoints.length === count, count);
+    await toggle.check(); await page.waitForFunction(count => window.qaMapProps.portNamePoints.length === count, count);
     await page.waitForFunction(({engine,count}) => engine === 'leaflet'
       ? (window.qaReferenceMarkers ?? []).filter(m => m._map).length === count
       : window.qaOverlays.filter(o => o.map && o.options.content?.matches?.('[data-reference-point="port_names"]')).length === count, {engine,count});

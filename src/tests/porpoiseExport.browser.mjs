@@ -62,7 +62,7 @@ try {
     await page.goto(origin, { waitUntil: 'domcontentloaded' });
     const button = page.getByRole('button', { name: '관찰기록 내보내기', exact: true });
     await button.waitFor();
-    const checkbox = page.getByRole('checkbox', { name: /개인 상괭이 관찰 표식/ });
+    const checkbox = page.getByRole('checkbox', { name: '상괭이 관찰 기록 표시', exact: true });
     assert.equal(await checkbox.isChecked(), true);
     await button.click();
     await page.waitForFunction(() => window.qaShares.length === 1);

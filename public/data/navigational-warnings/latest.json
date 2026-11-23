@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "source": "https://www.data.go.kr/data/15057792/openapi.do",
+  "apiBase": "https://apis.data.go.kr/1192136/NavigationalWarning/",
+  "lastSuccessfulAt": null,
+  "coverage": {
+    "queryDates": [],
+    "region": "nationwide-unfiltered",
+    "activeSetCompleteness": "unverified",
+    "dateSemantics": "unverified",
+    "datum": null
+  },
+  "documents": []
+}

@@ -1,12 +1,15 @@
+import { buildWarningMap, warningMapLayer, warningMapFeatures, type WarningMapFocus } from './services/navigationalWarningMap';
+import { fetchWarningData, type WarningData } from './services/navigationalWarningService';
+import { EMPTY_REFERENCE_POINTS, hazardPointsFromGeoJson, type ReferenceMapPoint } from './components/notebook/mapInformationData';
+import { portNamePointsFromGeoJson } from './data/portNameMapPoints';
 import operationalPortNamesGeoJson from '../data/public-port-names.final-candidate.geojson?raw';
-import { EMPTY_REFERENCE_POINTS, portNamePointsFromGeoJson } from './data/portNameMapPoints';
+import { DEFAULT_MAP_INFORMATION_VISIBILITY, loadMapInformationVisibility, MAP_INFORMATION_VISIBILITY_KEY, type MapInformationVisibility } from './components/notebook/mapInformationVisibility';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   AlertTriangle,
   ArrowLeftRight,
   Check,
-  ChevronDown,
   ChevronLeft,
   ClipboardList,
   Layers,
@@ -15,7 +18,6 @@ import {
   Navigation,
   Search,
   ShieldCheck,
-  SlidersHorizontal,
   Waves,
   X,
 } from 'lucide-react';
@@ -38,6 +40,7 @@ const LayerControlModal = lazy(() =>
     default: m.LayerControlModal,
   })),
 );
+const NavigationalWarningPanel = lazy(() => import('./components/notebook/NavigationalWarningPanel'));
 const FieldReportModal = lazy(() =>
   import('./components/notebook/FieldReportModal').then((m) => ({
     default: m.FieldReportModal,
@@ -127,16 +130,7 @@ interface UserGpsState {
   isSimulated?: boolean;
 }
 
-const portNamePoints = portNamePointsFromGeoJson(JSON.parse(operationalPortNamesGeoJson));
-const MAP_INFORMATION_VISIBILITY_KEY = 'bada_map_information_visibility_v1';
-
-function readPortNamesVisible(): boolean {
-  try {
-    return JSON.parse(window.localStorage.getItem(MAP_INFORMATION_VISIBILITY_KEY) ?? '{}')?.port_names !== false;
-  } catch {
-    return true;
-  }
-}
+const namePoints = portNamePointsFromGeoJson(JSON.parse(operationalPortNamesGeoJson));
 
 export function App() {
   const {
@@ -232,21 +226,47 @@ export function App() {
     () => initialWorkspaceDraft.lastReporterName ?? '',
   );
   const [dockingSearchQuery, setDockingSearchQuery] = useState<string>('');
-  const [portNamesVisible, setPortNamesVisible] = useState(readPortNamesVisible);
-  function togglePortNames() {
-    const visible = !portNamesVisible;
-    setPortNamesVisible(visible);
-    try {
-      const saved = JSON.parse(window.localStorage.getItem(MAP_INFORMATION_VISIBILITY_KEY) ?? '{}');
-      window.localStorage.setItem(MAP_INFORMATION_VISIBILITY_KEY, JSON.stringify({ ...saved, port_names: visible }));
-    } catch {
-      // The switch still works for this session if storage is unavailable.
-    }
-  }
-  const [showHazardInformation, setShowHazardInformation] = useState(true);
-  const [isHazardListExpanded, setIsHazardListExpanded] = useState(false);
+  const [mapVisibility, setMapVisibility] = useState(() => { try { return loadMapInformationVisibility(window.localStorage); } catch { return { ...DEFAULT_MAP_INFORMATION_VISIBILITY }; } });
+  const visibilityRef = useRef(mapVisibility);
+  const setMapInformationVisible = useCallback((key: keyof MapInformationVisibility, visible: boolean | ((previous: boolean) => boolean)) => {
+    const next = { ...visibilityRef.current, [key]: typeof visible === 'function' ? visible(visibilityRef.current[key]) : visible };
+    visibilityRef.current = next;
+    setMapVisibility(next);
+    try { window.localStorage.setItem(MAP_INFORMATION_VISIBILITY_KEY, JSON.stringify(next)); }
+    catch { /* Keep the current session usable when storage is unavailable. */ }
+  }, []);
+  const showHazardInformation = mapVisibility.hazard;
+  const setShowHazardInformation = useCallback((visible: boolean | ((previous: boolean) => boolean)) => setMapInformationVisible('hazard', visible), [setMapInformationVisible]);
+  const [independentHazards, setIndependentHazards] = useState<ReferenceMapPoint[]>([]);
+  const [hazardLoadError, setHazardLoadError] = useState<string | null>(null);
+  const [isNavigationalWarningOpen, setIsNavigationalWarningOpen] = useState(false);
+  const [warningData, setWarningData] = useState<WarningData | null>(null);
+  const [warningDocument, setWarningDocument] = useState<string | null>(null);
+  const [warningFocus, setWarningFocus] = useState<WarningMapFocus | null>(null);
+  const warningMap = useMemo(() => buildWarningMap(warningData?.snapshot ?? null), [warningData?.snapshot]);
+  const warningFeatures = useMemo(() => warningMapFeatures(warningMap.areas), [warningMap]);
+  useEffect(() => {
+    if (!showHazardInformation || route.screen !== 'notebook') { setWarningFocus(null); return; }
+    const controller = new AbortController();
+    const preview = import.meta.env.DEV && document.querySelector('meta[name="bada-nav-warning-preview"]')?.getAttribute('content') === '1';
+    const base = preview ? import.meta.env.BASE_URL + '__dev/' : import.meta.env.BASE_URL;
+    void fetchWarningData(base, controller.signal).then(data => { if (!controller.signal.aborted) setWarningData(data); });
+    return () => controller.abort();
+  }, [showHazardInformation, route.screen]);
+  useEffect(() => { if (route.screen !== 'notebook') { setIsNavigationalWarningOpen(false); setWarningDocument(null); } }, [route.screen]);
+  const handleSelectWarning = useCallback((id: string) => {
+    const area = warningMap.areas.find(item => item.id === id);
+    if (area) { setWarningDocument(area.docNum); setIsNavigationalWarningOpen(true); }
+  }, [warningMap]);
+  const handleFocusWarning = useCallback((id: string) => {
+    const area = warningMap.areas.find(item => item.id === id);
+    if (!area) return;
+    setShowHazardInformation(true);
+    setWarningFocus({ id, vertices: area.vertices, nonce: Date.now() });
+    setIsNavigationalWarningOpen(false);
+  }, [warningMap, setShowHazardInformation]);
   const [isColorFilterOpen, setIsColorFilterOpen] = useState<boolean>(false);
-  const colorFilterPopoverRef = useRef<HTMLDivElement | null>(null);
+  const colorFilterPopoverRef = useRef<HTMLLIElement | null>(null);
   const [selectedFeature, setSelectedFeature] = useState<DockingFeature | null>(null);
 
   // 3. 모달 및 지도 인터랙션 모드 상태
@@ -256,9 +276,11 @@ export function App() {
   const [customReportCoords, setCustomReportCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isReportPickMode, setIsReportPickMode] = useState(false);
 
-  const [showPorpoiseLayer, setShowPorpoiseLayer] = useState(true);
+  const showPorpoiseLayer = mapVisibility.porpoise;
+  const setShowPorpoiseLayer = useCallback((visible: boolean | ((previous: boolean) => boolean)) => setMapInformationVisible('porpoise', visible), [setMapInformationVisible]);
   const permitWorkspace = useActivityPermits();
-  const [permitVisible, setPermitVisible] = useState(true);
+  const permitVisible = mapVisibility.permits;
+  const setPermitVisible = useCallback((visible: boolean | ((previous: boolean) => boolean)) => setMapInformationVisible('permits', visible), [setMapInformationVisible]);
   const [permitPanel, setPermitPanel] = useState<'list' | 'detail' | null>(null);
   const [selectedPermit, setSelectedPermit] = useState<(PermitSnapshot & { id: string }) | null>(null);
   const [permitFocus, setPermitFocus] = useState<PermitMapFocus | null>(null);
@@ -268,8 +290,8 @@ export function App() {
     () => activePermitRecords(permitWorkspace.records, permitWorkspace.today),
     [permitWorkspace.records, permitWorkspace.today],
   );
-  const permitMapLayers = useMemo(() => [...layers, permitLayer(layers.find(l => l.id === 'protected_area'), permitVisible && route.screen === 'notebook')], [layers, permitVisible, route.screen]);
-  const permitMapData = useMemo(() => ({ ...geoJsonLayersData, [PERMIT_LAYER_ID]: permitFeatureCollection(permitMapRecords) }), [geoJsonLayersData, permitMapRecords]);
+  const permitMapLayers = useMemo(() => [...layers.filter(layer => layer.id !== 'hazard'), warningMapLayer(showHazardInformation && route.screen === 'notebook'), permitLayer(layers.find(l => l.id === 'protected_area'), permitVisible && route.screen === 'notebook')], [layers, permitVisible, showHazardInformation, route.screen]);
+  const permitMapData = useMemo(() => ({ ...geoJsonLayersData, hazard: warningFeatures, [PERMIT_LAYER_ID]: permitFeatureCollection(permitMapRecords) }), [geoJsonLayersData, permitMapRecords, warningFeatures]);
   const [porpoiseModalCoords, setPorpoiseModalCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPorpoise, setSelectedPorpoise] = useState<PorpoiseRecord | null>(null);
 
@@ -331,6 +353,7 @@ export function App() {
         setSelectedRegion('all');
         setDockingSearchQuery('');
       } else if (preset === 'layers') {
+        setIsColorFilterOpen(false);
         setIsLayerModalOpen(true);
       }
       navigateToScreen('notebook', 'route');
@@ -514,7 +537,7 @@ export function App() {
   useEffect(() => {
     const controller = new AbortController();
     const base = import.meta.env.BASE_URL;
-    const geoJsonUrl = `${base}data/docking_points.geojson`;
+    const geoJsonUrl = `${base}data/operational/docking_points.geojson`;
     const portsUrl = `${base}data/ports.json`;
 
     Promise.all([
@@ -559,6 +582,14 @@ export function App() {
     return () => controller.abort();
   }, []);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(import.meta.env.BASE_URL + 'data/operational/hazards.geojson', { signal: controller.signal, cache: 'no-cache' })
+      .then(response => { if (!response.ok) throw new Error('항행경보 준비 자료를 불러오지 못했습니다.'); return response.json(); })
+      .then(data => setIndependentHazards(hazardPointsFromGeoJson(data)))
+      .catch((error: unknown) => { if (!(error instanceof DOMException && error.name === 'AbortError')) setHazardLoadError(error instanceof Error ? error.message : '항행경보 준비 자료 오류'); });
+    return () => controller.abort();
+  }, []);
   // 접안지 등급별 건수 사전 집계
   const colorCounts = useMemo<Record<MarkerColor, number>>(() => {
     const counts: Record<MarkerColor, number> = {
@@ -619,25 +650,20 @@ export function App() {
       );
   }, [collection, selectedColors, selectedRegion, dockingSearchQuery]);
 
-  const { visibleFeatures: notebookVisibleFeatures, hazardFeatures: notebookHazardFeatures, hazardCount: notebookHazardCount } = useMemo(
-    () => getNotebookDisplay(filteredFeatures, showHazardInformation),
-    [filteredFeatures, showHazardInformation],
+  const { visibleFeatures: notebookVisibleFeatures, hazardFeatures: notebookHazardFeatures } = useMemo(
+    () => getNotebookDisplay(filteredFeatures, showHazardInformation, independentHazards),
+    [filteredFeatures, showHazardInformation, independentHazards],
   );
 
   const isRedOnly =
     selectedColors.length === 1 && selectedColors[0] === 'red';
   const isAllColorsSelected =
     selectedColors.length === ALL_MARKER_COLORS.length;
-  const extraSelectedCount = useMemo(
-    () =>
-      selectedColors.filter((c) => c !== 'red').length,
-    [selectedColors],
-  );
 
   // 등급 선택 팝오버 외부 클릭 및 Escape 닫기 가드
   useEffect(() => {
     if (!isColorFilterOpen) return;
-    const handlePointerDown = (e: PointerEvent) => {
+    const handleOutsideClick = (e: MouseEvent) => {
       if (
         colorFilterPopoverRef.current &&
         !colorFilterPopoverRef.current.contains(e.target as Node)
@@ -650,10 +676,11 @@ export function App() {
         setIsColorFilterOpen(false);
       }
     };
-    window.addEventListener('pointerdown', handlePointerDown);
+    // Collapse after the target's click, so cards do not move between pointerdown and click.
+    window.addEventListener('click', handleOutsideClick);
     window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('click', handleOutsideClick);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isColorFilterOpen]);
@@ -693,7 +720,7 @@ export function App() {
 
   const handleSelectAllColors = useCallback(() => {
     setSelectedColors([...ALL_MARKER_COLORS]);
-    showToast(`전체 ${totalDockingCount || 55}개소(5개 등급)가 모두 표시됩니다.`);
+    showToast(`운영 접안정보 ${totalDockingCount}곳을 표시합니다.`);
   }, [totalDockingCount, showToast]);
 
   const handleHazardPrimaryChipClick = useCallback(() => {
@@ -702,7 +729,7 @@ export function App() {
       if (selectedFeature && selectedFeature.properties.color !== 'red') {
         setSelectedFeature(null);
       }
-      showToast('위험주의(9개소) 단독 표시 모드로 전환되었습니다.');
+      showToast(`접안 주의등급 ${colorCounts.red}곳을 표시합니다.`);
       return;
     }
     // 이미 위험주의 단독 모드일 때 탭하면 통영·거제 전체 위험지점 시야로 리셋 안내
@@ -710,10 +737,6 @@ export function App() {
     showToast(`통영·거제 위험주의 ${colorCounts.red}개소 집중 표시 중 (레이어 메뉴에서 다른 등급도 선택할 수 있습니다.)`);
   }, [selectedColors, selectedFeature, showToast, colorCounts.red]);
 
-  const isDockingLayerVisible = useMemo(
-    () => layers.find((l) => l.id === 'docking')?.visible !== false,
-    [layers],
-  );
 
   // 지도에서 찍은 좌표를 순서대로 직선 연결한다.
   const routeCalculation = useMemo(() => {
@@ -773,7 +796,7 @@ export function App() {
     setSelectedPermit(p); setPermitVisible(true); setPermitPanel('detail');
     setPermitFocus({ vertices: p.vertices, nonce: Date.now() });
     setHasEnteredWorkspace(true); navigateToScreen('notebook', 'route');
-  }, [navigateToScreen, setIsPorpoiseAddMode]);
+  }, [navigateToScreen, setIsPorpoiseAddMode, setPermitVisible]);
   const handleSelectPermit = useCallback((id: string) => {
     const p = permitWorkspace.records.find(item => item.id === id) ?? (selectedPermit?.id === id ? selectedPermit : null);
     if (p) handleFocusPermit(p);
@@ -1265,9 +1288,10 @@ export function App() {
       }
       return '바닷길 콕콕 · 지도에서 첫 지점 선택 대기 중';
     }
+    if (totalDockingCount === 0) return '꼬미의 바다수첩 · 운영 접안정보 0곳';
     return isRedOnly
       ? `꼬미의 바다수첩 · 위험주의 ${filteredFeatures.length}개소 집중 표시 중`
-      : `꼬미의 바다수첩 · ${filteredFeatures.length}/${totalDockingCount || 55}개소 표시 중`;
+      : `꼬미의 바다수첩 · ${filteredFeatures.length}/${totalDockingCount}개소 표시 중`;
   }, [
     lastTriggeredCardId,
     routeWaypoints,
@@ -1306,8 +1330,8 @@ export function App() {
           onResumeWorkspace={() =>
             handleOpenWorkspaceFromHome(lastTriggeredCardId ?? 'notebook')
           }
-          hazardCount={colorCounts.red || 9}
-          totalDockingCount={totalDockingCount || 55}
+          hazardCount={independentHazards.length}
+          totalDockingCount={totalDockingCount}
           totalPortsCount={portsList.length || 136}
           isOnline={isOnline}
         />
@@ -1336,22 +1360,18 @@ export function App() {
             className="pointer-events-none fixed inset-x-0 top-0 z-[1000] flex flex-col gap-1 px-2 py-1 sm:gap-1.5 sm:p-3"
             style={{ paddingTop: 'calc(var(--safe-top) + 0.25rem)' }}
           >
-            <div className="knps-hud-surface pointer-events-auto relative mx-auto flex h-10 w-full max-w-3xl items-center justify-between gap-1.5 overflow-hidden rounded-2xl border-2 border-[#00a79d]/60 bg-white/96 px-2 text-[#003360] shadow-xl backdrop-blur-md sm:h-[52px] sm:gap-2 sm:px-3">
-              <div
-                aria-hidden="true"
-                className="knps-tricolor-bar pointer-events-none absolute inset-x-0 top-0 h-1 opacity-95"
-              />
-              <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
+            <div className="knps-hud-surface bada-banner-border pointer-events-auto relative mx-auto grid h-10 w-full max-w-3xl grid-cols-[6rem_minmax(0,1fr)_6rem] items-center gap-0.5 overflow-hidden rounded-2xl border bg-white/96 px-2 text-[#003360] shadow-xl backdrop-blur-md sm:h-[52px] sm:grid-cols-[8rem_minmax(0,1fr)_8rem] sm:gap-2 sm:px-3">
                 <button
                   type="button"
                   onClick={handleReturnToHome}
                   aria-label="인트로 홈 화면으로 돌아가기"
                   title="홈 화면으로 이동"
-                  className="flex h-8 shrink-0 items-center gap-0.5 rounded-xl border border-[#00846c] bg-emerald-50 px-2 text-xs font-black text-[#00846c] shadow-xs transition hover:bg-emerald-100 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#00846c] sm:h-9 sm:px-2.5"
+                  className="flex h-8 shrink-0 items-center justify-self-start gap-0.5 rounded-xl border border-[#00846c] bg-emerald-50 px-2 text-xs font-black text-[#00846c] shadow-xs transition hover:bg-emerald-100 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#00846c] sm:h-9 sm:px-2.5"
                 >
                   <ChevronLeft className="h-4 w-4 stroke-[2.6]" aria-hidden="true" />
                   <span>홈</span>
                 </button>
+              <div className="relative flex min-w-0 max-w-full items-center justify-self-center gap-1 sm:gap-2">
                 <img
                   src={`${import.meta.env.BASE_URL}images/brand/${
                     activeMainTab === 'notebook'
@@ -1360,16 +1380,16 @@ export function App() {
                   }`}
                   alt=""
                   aria-hidden="true"
-                  className="h-8 w-9 shrink-0 rounded-xl border border-sky-200 bg-sky-50 object-contain p-0.5 shadow-xs sm:h-9 sm:w-10"
+                  className="h-4 w-4 shrink-0 rounded-xl border border-sky-200 bg-sky-50 object-contain p-0.5 shadow-xs min-[360px]:h-8 min-[360px]:w-9 sm:h-9 sm:w-10"
                 />
                 <h1
                   ref={workspaceHeadingRef}
                   tabIndex={-1}
-                  className="min-w-0 truncate whitespace-nowrap text-[11px] leading-none font-black tracking-tight text-[#003360] outline-none min-[375px]:text-xs sm:text-base"
+                  className="min-w-0 whitespace-nowrap text-[10px] leading-none font-black tracking-tight text-[#003360] outline-none min-[360px]:text-[11px] min-[375px]:text-xs sm:text-base"
                 >
                   {activeMainTab === 'notebook' ? '꼬미의 바다수첩' : '바닷길 콕콕'}
                 </h1>
-                <div className="hidden h-9 w-9 shrink-0 items-center justify-center sm:flex">
+                <div className="absolute top-1/2 left-full ml-2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center sm:flex">
                   <img
                     src={`${import.meta.env.BASE_URL}images/brand/${
                       activeMainTab === 'notebook'
@@ -1383,7 +1403,7 @@ export function App() {
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center">
+              <div className="flex shrink-0 items-center justify-self-end">
                 {/* 교차 작업공간 원터치 스위치 버튼 (기존 2행 대메뉴 바를 대체하여 지도 시야 44px 확보) */}
                 <button
                   type="button"
@@ -1569,14 +1589,14 @@ export function App() {
           </div>
         )}
 
-        {errorMsg && (
+        {(errorMsg || hazardLoadError) && (
           <div
             role="alert"
             className="pointer-events-auto mx-auto w-full max-w-xl rounded-2xl border-2 border-[#b2415f] bg-rose-50/98 p-3 text-[#870b41] shadow-2xl"
           >
             <div className="flex items-start gap-2.5">
               <AlertCircle className="h-5 w-5 shrink-0 text-[#b2415f]" />
-              <p className="text-xs font-black text-[#870b41]">데이터 로드 오류: {errorMsg}</p>
+              <p className="text-xs font-black text-[#870b41]">데이터 로드 오류: {errorMsg || hazardLoadError}</p>
             </div>
           </div>
         )}
@@ -1591,16 +1611,19 @@ export function App() {
         }
       >
         <MapView
-          portNamePoints={activeMainTab === 'notebook' && portNamesVisible ? portNamePoints : EMPTY_REFERENCE_POINTS}
           isMapFocused={isMapFocused}
           onMapFocusChange={setIsMapFocused}
           activeMainTab={activeMainTab}
           navSubTab={navSubTab}
+          hazardPoints={activeMainTab === 'notebook' ? notebookHazardFeatures : EMPTY_REFERENCE_POINTS}
+          portNamePoints={activeMainTab === 'notebook' && mapVisibility.port_names ? namePoints : EMPTY_REFERENCE_POINTS}
           features={activeMainTab === 'notebook' ? notebookVisibleFeatures : filteredFeatures}
           selectedFeature={selectedFeature}
           onSelectFeature={handleSelectFeatureOnMap}
           layers={permitMapLayers}
           geoJsonLayersData={permitMapData}
+          warningFocus={showHazardInformation ? warningFocus : null}
+          onSelectWarning={handleSelectWarning}
           permitFocus={permitFocus}
           onSelectPermit={handleSelectPermit}
           layerLoadErrorIds={layerLoadErrorIds}
@@ -1642,67 +1665,6 @@ export function App() {
           onClearExternalRoadviewTarget={handleClearExternalRoadviewTarget}
         />
       </Suspense>
-
-      {/* 3.1 꼬미의 바다수첩: 하단 빠른 접안지 선택 바 (하단 Leaflet 출처 배지 위 16px 여유 확보) */}
-      {activeMainTab === 'notebook' && isDockingLayerVisible && showHazardInformation && (
-        <aside
-          aria-label="접안 포인트 빠른 선택 목록"
-          className="pointer-events-none fixed inset-x-2.5 bottom-4 z-[900] mx-auto max-w-2xl sm:inset-x-3"
-          style={{ paddingBottom: 'var(--safe-bottom)' }}
-        >
-          <button type="button" aria-expanded={isHazardListExpanded} aria-controls="notebook-hazard-list"
-            onClick={() => setIsHazardListExpanded((expanded) => !expanded)}
-            className="pointer-events-auto flex min-h-10 items-center gap-2 rounded-xl border border-[#b2415f]/50 bg-white/96 px-3 py-1.5 text-xs font-bold text-[#870b41] shadow-md">
-            <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span>위험정보 {notebookHazardCount}곳 · {isHazardListExpanded ? '목록 접기' : '목록 보기'}</span>
-            <ChevronDown className={`h-4 w-4 ${isHazardListExpanded ? 'rotate-180' : ''}`} aria-hidden="true" />
-          </button>
-          <div id="notebook-hazard-list" hidden={!isHazardListExpanded} className="mt-2">
-            {notebookHazardCount === 0 && <p className="pointer-events-auto rounded-xl bg-white/95 p-3 text-xs text-slate-600">현재 필터에 맞는 위험정보가 없습니다.</p>}
-          <div className="pointer-events-auto flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {notebookHazardFeatures.map((feature) => {
-              const meta = MARKER_COLOR_MAP[feature.properties.color] ?? MARKER_COLOR_MAP.blue;
-              const isSelected = selectedFeature?.properties.id === feature.properties.id;
-              const isHazardRed = feature.properties.color === 'red';
-              return (
-                <button
-                  key={feature.properties.id}
-                  type="button"
-                  onClick={() => handleSelectFeatureOnMap(feature)}
-                  className={`flex min-h-11 shrink-0 flex-col justify-center rounded-2xl border-2 px-3 py-1 text-left shadow-xl backdrop-blur-md transition active:scale-95 sm:min-h-12 sm:px-3.5 sm:py-1.5 ${
-                    isSelected
-                      ? 'border-[#00846c] bg-emerald-50/98 text-[#003360]'
-                      : isHazardRed
-                        ? 'border-[#b2415f] bg-rose-50/96 text-[#870b41]'
-                        : 'border-[#00a79d]/60 bg-white/96 text-[#003360]'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className="h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: meta.hex }}
-                    />
-                    <span className="font-mono text-[11px] font-black text-sky-800">
-                      {feature.properties.id}
-                    </span>
-                    <span
-                      className={`text-[11px] font-bold ${
-                        isHazardRed ? 'text-[#870b41]' : 'text-[#484843]'
-                      }`}
-                    >
-                      · {isHazardRed ? '⚠️ 위험주의' : meta.shortLabel}
-                    </span>
-                  </div>
-                  <span className="mt-0.5 max-w-[175px] truncate text-xs font-extrabold text-[#003360]">
-                    {feature.properties.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          </div>
-        </aside>
-      )}
 
       {/* 3.2 바닷길 콕콕: 하단 전체폭 패널 (상단 HUD·우측 컨트롤·하단 Leaflet 출처와 충돌 제로) */}
       {activeMainTab === 'navigation' && (
@@ -1779,7 +1741,7 @@ export function App() {
       )}
 
       {/* 모달 1: 접안 상세 시트 (선택된 포인트가 있을 때만 지연 로드) */}
-      {!isMapFocused && selectedFeature && (activeMainTab !== 'notebook' || showHazardInformation || selectedFeature.properties.color !== 'red') && (
+      {!isMapFocused && selectedFeature && (
         <Suspense fallback={null}>
           <DockingDetailSheet
             key={selectedFeature.properties.id}
@@ -1807,88 +1769,41 @@ export function App() {
       )}
 
       {/* 모달 2: 공간정보 레이어 관리 (열릴 때만 SHP/GeoJSON 파서 번들과 함께 지연 로드) */}
+      {!isMapFocused && !isHomeScreen && !isCalendarScreen && activeMainTab === 'notebook' && isNavigationalWarningOpen && (
+        <Suspense fallback={null}>
+          <NavigationalWarningPanel mapAreas={warningMap.areas} initialData={warningData} initialDocument={warningDocument} onData={setWarningData} onViewArea={handleFocusWarning} onClose={() => setIsNavigationalWarningOpen(false)} />
+        </Suspense>
+      )}
       {!isMapFocused && isLayerModalOpen && (
         <Suspense fallback={null}>
           <LayerControlModal
             permitVisible={permitVisible}
+            permitCount={permitMapRecords.length}
             onTogglePermits={() => setPermitVisible(v => !v)}
             key="layer-modal-open"
             isOpen={isLayerModalOpen}
             onClose={() => setIsLayerModalOpen(false)}
             layers={layers}
             geoJsonLayersData={geoJsonLayersData}
-            portNamesVisible={portNamesVisible}
-            portNamesCount={portNamePoints.length}
-            onTogglePortNames={togglePortNames}
             showHazardInformation={showHazardInformation}
             onToggleHazardInformation={() => setShowHazardInformation((visible) => !visible)}
+            onOpenNavigationalWarnings={() => { setWarningDocument(null); setIsNavigationalWarningOpen(true); }}
             dockingCount={totalDockingCount}
-            hazardCount={colorCounts.red}
+            hazardCount={independentHazards.length}
+            portNamesCount={namePoints.length}
+            portNamesVisible={mapVisibility.port_names}
+            onTogglePortNames={() => setMapInformationVisible('port_names', !mapVisibility.port_names)}
             onFitProtectedAreas={() => {
               handleFlyToPoint(34.78, 128.44, 11);
               setIsLayerModalOpen(false);
             }}
-            notebookDisplayControls={<div ref={colorFilterPopoverRef} className="space-y-3">
-              {/* 우측: 위험주의 빠른 필터와 등급 선택 */}
-              <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-                <button
-                  type="button"
-                  onClick={handleHazardPrimaryChipClick}
-                  title="위험·암초 주의 접안지 최우선 표시 (탭하면 위험주의 단독 모드로 즉시 전환)"
-                  className={`flex h-8 shrink-0 items-center gap-1 rounded-xl border-2 px-2 text-[11px] font-black tabular-nums shadow-md transition active:scale-95 sm:h-9 sm:gap-1.5 sm:px-3 sm:text-xs ${
-                    selectedColors.includes('red')
-                      ? 'border-[#b2415f] bg-[#870b41] text-white shadow-[0_4px_14px_rgba(135,11,65,0.35)]'
-                      : 'border-[#b2415f]/60 bg-white/96 text-[#870b41] hover:bg-rose-50'
-                  }`}
-                >
-                  <span className="relative flex h-2 w-2 shrink-0 sm:h-2.5 sm:w-2.5">
-                    {selectedColors.includes('red') && (
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-300 opacity-75" />
-                    )}
-                    <span
-                      className="relative inline-flex h-2 w-2 rounded-full border border-white/90 sm:h-2.5 sm:w-2.5"
-                      style={{ backgroundColor: MARKER_COLOR_MAP.red.hex }}
-                    />
-                  </span>
-                  <span>{MARKER_COLOR_MAP.red.shortLabel}</span>
-                </button>
-
-                <button
-                  type="button"
-                  aria-expanded={isColorFilterOpen}
-                  aria-controls="docking-color-filter-popover"
-                  onClick={() => setIsColorFilterOpen((open) => !open)}
-                  className={`flex h-8 shrink-0 items-center gap-1 rounded-xl border-2 px-2 text-[11px] font-black tabular-nums shadow-md transition active:scale-95 sm:h-9 sm:px-3 sm:text-xs ${
-                    isColorFilterOpen
-                      ? 'border-[#003360] bg-[#003360] text-white'
-                      : isAllColorsSelected || selectedRegion !== 'all' || dockingSearchQuery
-                        ? 'border-[#00846c] bg-emerald-50 text-[#00846c]'
-                        : extraSelectedCount > 0
-                          ? 'border-amber-500 bg-amber-50 text-amber-900'
-                          : 'border-sky-400 bg-white/96 text-[#003360] hover:bg-sky-50'
-                  }`}
-                >
-                  <SlidersHorizontal className="hidden h-3.5 w-3.5 shrink-0 sm:inline" />
-                  <span className="sm:hidden">
-                    {isAllColorsSelected
-                      ? `전체(${notebookVisibleFeatures.length})`
-                      : extraSelectedCount > 0
-                        ? `+${extraSelectedCount}등급`
-                        : '+등급'}
-                  </span>
-                  <span className="hidden sm:inline">
-                    {isAllColorsSelected
-                      ? `전체 (${notebookVisibleFeatures.length})`
-                      : extraSelectedCount > 0
-                        ? `+${extraSelectedCount}등급·권역`
-                        : '+등급·권역'}
-                  </span>
-                  <ChevronDown
-                    className={`h-3 w-3 shrink-0 transition-transform sm:h-3.5 sm:w-3.5 ${
-                      isColorFilterOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
+            dockingFiltersOpen={isColorFilterOpen}
+            onToggleDockingFilters={() => setIsColorFilterOpen(open => !open)}
+            dockingCardRef={colorFilterPopoverRef}
+            notebookDisplayControls={<div className="min-w-0 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <button type="button" onClick={handleHazardPrimaryChipClick}
+                  className="min-h-11 touch-manipulation rounded-xl border border-[#b2415f]/60 bg-rose-50 px-3 text-xs font-bold text-[#870b41] active:bg-rose-100">위험주의</button>
               </div>
 
             {/* 온디맨드 다중 등급 + 권역·검색 통합 팝오버 (필요한 사용자만 열어서 조석주의·안전접안·전용부두·비상거점·권역 선택) */}
@@ -1899,7 +1814,7 @@ export function App() {
                 className="knps-modal-surface w-full rounded-2xl border-2 border-[#00a79d]/60 bg-white/98 p-3 text-[#003360] shadow-2xl backdrop-blur-xl"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-200 pb-2">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <AlertTriangle className="h-4 w-4 shrink-0 text-[#b2415f]" />
                     <span className="text-xs font-black text-[#003360] sm:text-sm">
                       접안지 등급 · 권역 필터
@@ -1909,7 +1824,7 @@ export function App() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => {
@@ -1917,7 +1832,7 @@ export function App() {
                         setDockingSearchQuery('');
                         handleResetToHazardOnly();
                       }}
-                      className={`rounded-lg border px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+                      className={`min-h-11 rounded-lg border px-2 py-1 text-[11px] font-black transition active:scale-95 ${
                         isRedOnly && selectedRegion === 'all' && !dockingSearchQuery
                           ? 'border-[#b2415f] bg-rose-100 text-[#870b41]'
                           : 'border-slate-300 bg-white text-[#003360] hover:border-[#b2415f]'
@@ -1932,7 +1847,7 @@ export function App() {
                         setDockingSearchQuery('');
                         handleSelectAllColors();
                       }}
-                      className={`rounded-lg border px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+                      className={`min-h-11 rounded-lg border px-2 py-1 text-[11px] font-black transition active:scale-95 ${
                         isAllColorsSelected && selectedRegion === 'all' && !dockingSearchQuery
                           ? 'border-[#00846c] bg-[#00846c] text-white'
                           : 'border-slate-300 bg-white text-[#003360] hover:border-[#00846c]'
@@ -1944,7 +1859,7 @@ export function App() {
                       type="button"
                       onClick={() => setIsColorFilterOpen(false)}
                       aria-label="등급 선택 창 닫기"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -1980,7 +1895,7 @@ export function App() {
                               handleResetBounds();
                             }
                           }}
-                          className={`rounded-xl border px-2 py-1 text-[11px] font-black transition active:scale-95 ${
+                          className={`min-h-11 rounded-xl border px-2 py-1 text-[11px] font-black transition active:scale-95 ${
                             active
                               ? 'border-[#003360] bg-[#003360] text-white'
                               : 'border-slate-300 bg-white text-[#003360] hover:bg-sky-50'
@@ -2000,7 +1915,7 @@ export function App() {
                       onChange={(e) => setDockingSearchQuery(e.target.value)}
                       placeholder="접안지명·코드·위험요소 검색"
                       aria-label="접안지명 또는 코드 검색"
-                      className="w-full rounded-xl border-2 border-slate-400 bg-white py-1 pr-2.5 pl-8 text-xs font-bold text-[#003360] placeholder-slate-500 focus:border-[#00846c] focus:outline-none"
+                      className="min-h-11 w-full rounded-xl border-2 border-slate-400 bg-white py-1 pr-2.5 pl-8 text-base font-bold text-[#003360] placeholder-slate-500 focus:border-[#00846c] focus:outline-none"
                     />
                   </div>
                 </div>
@@ -2010,7 +1925,8 @@ export function App() {
                   <button
                     type="button"
                     onClick={() => handleToggleColor('red')}
-                    className={`flex w-full items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition active:scale-[0.99] ${
+                    aria-pressed={selectedColors.includes('red')}
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition active:scale-[0.99] ${
                       selectedColors.includes('red')
                         ? 'border-[#b2415f] bg-rose-50 text-[#870b41] shadow-xs'
                         : 'border-slate-300 bg-slate-50 text-slate-600 opacity-85 hover:border-[#b2415f]'
@@ -2065,7 +1981,8 @@ export function App() {
                         key={colorKey}
                         type="button"
                         onClick={() => handleToggleColor(colorKey)}
-                        className={`flex items-start justify-between gap-2 rounded-xl border-2 p-2.5 text-left transition active:scale-[0.98] ${
+                        aria-pressed={isChecked}
+                        className={`flex min-h-11 items-start justify-between gap-2 rounded-xl border-2 p-2.5 text-left transition active:scale-[0.98] ${
                           isChecked
                             ? 'border-[#00846c] bg-emerald-50/90 text-[#003360] shadow-xs'
                             : 'border-slate-300 bg-white text-[#484843] hover:border-sky-400'
@@ -2104,7 +2021,7 @@ export function App() {
                   })}
                 </div>
 
-                <div className="mt-2.5 flex items-center justify-between border-t border-sky-200 pt-2">
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-sky-200 pt-2">
                   <span className="text-[11px] font-bold text-[#484843]">
                     선택된 등급:{' '}
                     <strong className="font-black text-[#003360]">
@@ -2114,7 +2031,7 @@ export function App() {
                   <button
                     type="button"
                     onClick={() => setIsColorFilterOpen(false)}
-                    className="rounded-xl border border-[#00846c] bg-[#00846c] px-3 py-1 text-xs font-black text-white shadow-xs active:scale-95"
+                    className="min-h-11 rounded-xl border border-[#00846c] bg-[#00846c] px-3 py-1 text-xs font-black text-white shadow-xs active:scale-95"
                   >
                     확인 · 닫기
                   </button>
