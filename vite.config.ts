@@ -40,6 +40,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
+            if (id.includes('@firebase/storage') || id.includes('/firebase/storage')) return 'vendor-firebase-storage';
             if (id.includes('@firebase') || id.includes('/firebase/')) {
               return 'vendor-firebase';
             }
@@ -131,6 +132,11 @@ export default defineConfig({
         navigateFallback: `${base}index.html`,
         navigateFallbackDenylist: [/\/data\//, /\/images\//, /\/config\//],
         runtimeCaching: [
+          {
+            // Authenticated user photos must never persist in the PWA cache.
+            urlPattern: ({ url }) => url.hostname === 'firebasestorage.googleapis.com' || url.hostname === 'storage.googleapis.com',
+            handler: 'NetworkOnly',
+          },
           {
             // Warning pairs carry a generation hash; never pin old JSON in SW caches.
             urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/data\/navigational-warnings\/(latest|status)\.json$/.test(url.pathname),

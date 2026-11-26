@@ -1,3 +1,6 @@
+import { ROCK_DOCKING_MIN_ZOOM } from '../../config/rockDocking';
+import { buildRockDockingMarkerSpec } from './mapMarkerTemplates';
+import { EMPTY_ROCK_POINTS, type RockMapPoint } from '../../services/rockDockingModel';
 import type { WarningMapFocus } from '../../services/navigationalWarningMap';
 import { buildReferencePointSpec } from './mapMarkerTemplates';
 import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../notebook/mapInformationData';
@@ -34,6 +37,8 @@ import {
 export interface LegacyLeafletCanvasProps {
   permitFocus?: PermitMapFocus | null;
   onSelectPermit?: (id: string) => void;
+  rockPoints?: readonly RockMapPoint[];
+  onSelectRock?: (id: string) => void;
   warningFocus?: WarningMapFocus | null;
   onSelectWarning?: (id: string) => void;
   baseMapType: KakaoBaseMapType;
@@ -377,6 +382,8 @@ function PermitBoundsEffect({ target }: { target?: PermitMapFocus | WarningMapFo
 export function LegacyLeafletCanvas({
   permitFocus,
   onSelectPermit,
+  rockPoints = EMPTY_ROCK_POINTS,
+  onSelectRock,
   warningFocus,
   onSelectWarning,
   baseMapType,
@@ -593,6 +600,12 @@ export function LegacyLeafletCanvas({
             }}
           />
         );
+      })}
+
+      {activeMainTab === 'notebook' && currentZoom >= ROCK_DOCKING_MIN_ZOOM && !isReportPickMode && !isPorpoiseAddMode && rockPoints.map(point => {
+        const spec = buildRockDockingMarkerSpec(point);
+        return <Marker key={'rock:' + point.id} position={[point.lat, point.lng]} icon={L.divIcon({ className: 'rock-docking-marker', html: spec.html, iconSize: [44,44], iconAnchor: [22,22] })} zIndexOffset={230}
+          eventHandlers={{ click: event => { L.DomEvent.stopPropagation(event.originalEvent); onSelectRock?.(point.id); } }} />;
       })}
 
       {activeMainTab === 'notebook' && [...portNamePoints.map(point => ({ point, hazard: false })), ...hazardPoints.map(point => ({ point, hazard: true }))].map(({ point, hazard }) => {

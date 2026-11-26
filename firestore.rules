@@ -211,6 +211,101 @@ service cloud.firestore {
         && (request.resource.data.permitSnapshot == resource.data.permitSnapshot || currentPermitSnapshot(request.resource.data));
       allow delete: if calendarUser() && (resource.data.authorUid == request.auth.uid || calendarAdmin());
     }
+    // Shared rock docking data: isolated from calendar and permit collections.
+    function rockRange(r) {
+      return r == null || (r is map && r.keys().hasAll(['min','max']) && r.keys().hasOnly(['min','max'])
+        && r.min is number && r.max is number && r.min >= -2000 && r.max <= 2000 && r.min <= r.max);
+    }
+    function rockPhoto(index, id, owner) {
+      let p = request.resource.data.photos[index];
+      return p is map && p.keys().hasOnly(['id','path','role','size','width','height'])
+        && p.id is string && p.id.matches('^[0-9a-f-]{36}$') && p.path == 'rockDocking/' + id + '/' + owner + '/' + p.id + '.webp'
+        && p.role in ['wide','close','extra'] && p.size is int && p.size > 0 && p.size <= 512000
+        && p.width is int && p.width > 0 && p.width <= 1600 && p.height is int && p.height > 0 && p.height <= 1600;
+    }
+    function rockPhotos(id, owner) {
+      let p = request.resource.data.photos;
+      let n = p.size();
+      let ids = [n > 0 ? p[0].id : '', n > 1 ? p[1].id : '', n > 2 ? p[2].id : '', n > 3 ? p[3].id : ''];
+      let roles = [n > 0 ? p[0].role : '', n > 1 ? p[1].role : '', n > 2 ? p[2].role : '', n > 3 ? p[3].role : ''];
+      let primary = roles.removeAll(['extra','']);
+      return p is list && n <= 4
+        && ids.toSet().size() == n + (n < 4 ? 1 : 0)
+        && primary.toSet().size() == primary.size() && roles.removeAll(['wide','close','']).size() <= 2
+        && (n < 1 || rockPhoto(0, id, owner)) && (n < 2 || rockPhoto(1, id, owner))
+        && (n < 3 || rockPhoto(2, id, owner)) && (n < 4 || rockPhoto(3, id, owner));
+    }
+    function rockPoint(id) {
+      let d = request.resource.data;
+      return d.keys().hasAll(['schemaVersion','islandId','name','lat','lng','stationCode','datum','ranges','confirmedOn','photos','authorUid','authorName','updatedBy','createdAt','updatedAt','revision','deleted'])
+        && d.keys().hasOnly(['schemaVersion','islandId','name','lat','lng','stationCode','datum','ranges','confirmedOn','photos','authorUid','authorName','updatedBy','createdAt','updatedAt','revision','deleted'])
+        && d.schemaVersion == 1 && d.islandId is string && exists(/databases/$(database)/documents/rockDockingIslands/$(d.islandId))
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 80 && d.name.matches('[\\s\\S]*[^\\s\\p{Z}][\\s\\S]*')
+        && d.lat is number && d.lat >= -90 && d.lat <= 90 && d.lng is number && d.lng >= -180 && d.lng <= 180
+        && d.stationCode in ['DT_0014','SO_0552'] && d.datum in ['DL','unverified'] && validCalendarDate(d.confirmedOn)
+        && d.ranges is map && d.ranges.keys().hasAll(['101','103']) && d.ranges.keys().hasOnly(['101','103']) && rockRange(d.ranges['101']) && rockRange(d.ranges['103'])
+        && d.authorUid is string && d.authorName is string && d.authorName.matches('^[가-힣]{2}$')
+        && d.updatedBy == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+        && d.createdAt is timestamp && d.updatedAt == request.time && d.revision is int && d.revision >= 1 && d.deleted is bool
+        && rockPhotos(id,d.authorUid);
+    }
+    // Existing immutable fields were validated on create; revalidate changed input only.
+    // Four photos must fit Firestore's 1,000-expression budget without weakening fields.
+    function rockEdits(id) {
+      let d = request.resource.data;
+      let c = d.diff(resource.data).affectedKeys();
+      return (!c.hasAny(['islandId']) || (d.islandId is string && exists(/databases/$(database)/documents/rockDockingIslands/$(d.islandId))))
+        && (!c.hasAny(['name']) || (d.name is string && d.name.size() > 0 && d.name.size() <= 80 && d.name.matches('[\\s\\S]*[^\\s\\p{Z}][\\s\\S]*')))
+        && (!c.hasAny(['lat']) || (d.lat is number && d.lat >= -90 && d.lat <= 90))
+        && (!c.hasAny(['lng']) || (d.lng is number && d.lng >= -180 && d.lng <= 180))
+        && (!c.hasAny(['stationCode']) || d.stationCode in ['DT_0014','SO_0552'])
+        && (!c.hasAny(['datum']) || d.datum in ['DL','unverified'])
+        && (!c.hasAny(['confirmedOn']) || validCalendarDate(d.confirmedOn))
+        && (!c.hasAny(['ranges']) || (d.ranges is map && d.ranges.keys().hasAll(['101','103']) && d.ranges.keys().hasOnly(['101','103']) && rockRange(d.ranges['101']) && rockRange(d.ranges['103'])))
+        && (!c.hasAny(['photos']) || rockPhotos(id,resource.data.authorUid));
+    }
+    match /rockDockingIslands/{id} {
+      allow read: if calendarUser();
+      allow create: if calendarUser() && request.resource.data.keys().hasAll(['name','createdBy','createdAt'])
+        && request.resource.data.keys().hasOnly(['name','createdBy','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.matches('^[가-힣A-Za-z0-9·()_-]{1,40}$')
+        && id == request.resource.data.name.lower() && request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /rockDockingPoints/{id} {
+      allow list: if calendarUser() && resource.data.deleted == false;
+      allow get: if calendarUser() && (!exists(/databases/$(database)/documents/rockDockingPoints/$(id)) || resource.data.deleted == false || resource.data.authorUid == request.auth.uid || calendarAdmin());
+      allow create: if calendarUser() && request.resource.data.photos.size() == 0 && rockPoint(id) && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+        && request.resource.data.createdAt == request.time && request.resource.data.revision == 1 && request.resource.data.deleted == false;
+      allow update: if calendarUser() && resource.data.deleted == false
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.updatedBy == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+        && request.resource.data.revision == resource.data.revision + 1
+        && ((resource.data.authorUid == request.auth.uid && request.resource.data.deleted == false && rockEdits(id)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['islandId','name','lat','lng','stationCode','datum','ranges','confirmedOn','photos','updatedBy','updatedAt','revision']))
+          || ((resource.data.authorUid == request.auth.uid || calendarAdmin()) && request.resource.data.deleted == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted','updatedBy','updatedAt','revision'])));
+      allow delete: if false;
+      match /notes/{noteId} {
+        function parentLive() { return get(/databases/$(database)/documents/rockDockingPoints/$(id)).data.deleted == false; }
+        function validNote() {
+          let d = request.resource.data;
+          return d.keys().hasAll(['text','pinned','authorUid','authorName','createdAt','updatedAt','revision']) && d.keys().hasOnly(['text','pinned','authorUid','authorName','createdAt','updatedAt','revision'])
+            && d.text is string && d.text.size() > 0 && d.text.size() <= 4000 && d.text.matches('[\\s\\S]*[^\\s\\p{Z}][\\s\\S]*') && d.pinned is bool
+            && d.authorUid is string && d.authorName is string && d.authorName.matches('^[가-힣]{2}$') && d.createdAt is timestamp
+            && d.updatedAt == request.time && d.revision is int && d.revision >= 1;
+        }
+        allow read: if calendarUser() && parentLive();
+        allow create: if calendarUser() && getAfter(/databases/$(database)/documents/rockDockingPoints/$(id)).data.deleted == false && validNote()
+          && request.resource.data.authorUid == request.auth.uid && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.realName
+          && request.resource.data.createdAt == request.time && request.resource.data.revision == 1;
+        allow update: if calendarUser() && parentLive() && resource.data.authorUid == request.auth.uid && validNote()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text','pinned','updatedAt','revision']) && request.resource.data.revision == resource.data.revision + 1;
+        allow delete: if calendarUser() && parentLive() && (resource.data.authorUid == request.auth.uid || calendarAdmin());
+      }
+    }
+
     // 명시적으로 허용하지 않은 경로는 기본 거부한다.
     match /{document=**} {
       allow read, write: if false;

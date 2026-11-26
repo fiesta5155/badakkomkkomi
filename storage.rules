@@ -1,0 +1,55 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function member() {
+      return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.uid == request.auth.uid
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.realName.matches('^[가-힣]{2}$');
+    }
+    function admin() {
+      return firestore.get(/databases/(default)/documents/calendarAdmins/$(request.auth.uid)).data.enabled == true;
+    }
+    match /rockDocking/{pointId}/{ownerUid}/{fileName} {
+      function point() { return firestore.get(/databases/(default)/documents/rockDockingPoints/$(pointId)).data; }
+      // photo-1..photo-4 use UUID-compatible fixed IDs so deployed Firestore rules stay unchanged.
+      function fixedSlot() {
+        return fileName in [
+          '00000000-0000-4000-8000-000000000001.webp',
+          '00000000-0000-4000-8000-000000000002.webp',
+          '00000000-0000-4000-8000-000000000003.webp',
+          '00000000-0000-4000-8000-000000000004.webp'
+        ];
+      }
+      function linked(p) {
+        let path = 'rockDocking/' + pointId + '/' + ownerUid + '/' + fileName;
+        return (p.photos.size() > 0 && p.photos[0].path == path)
+          || (p.photos.size() > 1 && p.photos[1].path == path)
+          || (p.photos.size() > 2 && p.photos[2].path == path)
+          || (p.photos.size() > 3 && p.photos[3].path == path);
+      }
+      function readable() {
+        let p = point();
+        return p.authorUid == ownerUid && p.deleted == false && (request.auth.uid == ownerUid || linked(p));
+      }
+      function writable() {
+        let p = point();
+        return request.auth.uid == ownerUid && p.authorUid == ownerUid && p.deleted == false;
+      }
+      function validFile() {
+        return fixedSlot() && request.resource.size > 0 && request.resource.size <= 512000
+          && request.resource.contentType == 'image/webp'
+          && request.resource.metadata.keys().hasOnly(['pointId','ownerUid','photoId'])
+          && request.resource.metadata.pointId == pointId && request.resource.metadata.ownerUid == ownerUid
+          && fileName == request.resource.metadata.photoId + '.webp';
+      }
+      // At most two Firestore documents per evaluation: profile + point, or profile + admin.
+      allow get: if member() && fileName.matches('^[0-9a-f-]{36}\\.webp$') && readable();
+      allow list: if false;
+      allow create, update: if member() && writable() && validFile();
+      // Legacy UUID names may be read/cleaned up, but never uploaded again.
+      // Cleanup remains possible after unlinking metadata or tombstoning the point.
+      allow delete: if member() && fileName.matches('^[0-9a-f-]{36}\\.webp$') && (request.auth.uid == ownerUid || admin());
+    }
+    match /{path=**} { allow read, write: if false; }
+  }
+}

@@ -202,3 +202,15 @@ React 컴포넌트에 라우팅, 공간레이어 설정, 실시간 해상기상,
 [`src/hooks/useCalendarWeather.ts`](../../src/hooks/useCalendarWeather.ts)는 캐시 우선 날씨 표시와 갱신 상태를 제공하며, 진입·지역 전환·포커스·온라인 복귀·한국 날짜 변경·3시간 경과를 검사합니다. 컴포넌트 이탈 시 타이머·이벤트·구독은 정리하고 이미 시작한 지역별 공유 요청은 완료 후 캐시에 저장합니다.
 
 [`src/hooks/useAnnouncements.ts`](../../src/hooks/useAnnouncements.ts)는 현재 UID의 서버 확인된 공지 관리 권한과 공지를 실시간 구독하고 계정·권한·화면 변경 시 정리합니다. [`HomeNotices.tsx`](../../src/components/home/HomeNotices.tsx)는 메인 메뉴 아래 공지 바·전체 내용·모바일 관리 창을 제공하며, 빈 게시 목록에는 바를 숨깁니다. 설정·규칙 백업·적용 절차는 [인수인계](../../HANDOVER.md)에 기록합니다.
+
+
+### 갯바위 접안정보
+
+- [src/services/rockDockingModel.ts](../../src/services/rockDockingModel.ts): 섬 이름·사진·선박 범위 검증과 조위 보간
+- [src/services/rockDockingService.ts](../../src/services/rockDockingService.ts): 공동 지점·메모 및 작성자 리비전 트랜잭션
+- [src/services/rockDockingPhotos.ts](../../src/services/rockDockingPhotos.ts): WebP 압축과 인증된 Storage 지연 로딩
+- [src/services/rockDockingPhotoPlan.ts](../../src/services/rockDockingPhotoPlan.ts): 고정 4슬롯 배정·메타데이터 커밋·사진 복구 흐름
+- [src/services/rockDockingPhotoStorage.ts](../../src/services/rockDockingPhotoStorage.ts): 인증된 SDK 파일 백업·업로드·교체·삭제 어댑터
+- [src/hooks/useRockDocking.ts](../../src/hooks/useRockDocking.ts): 로그인 UID 범위 지점·공통 섬 구독
+
+[운영 준비 사항](../ROCK_DOCKING.md)

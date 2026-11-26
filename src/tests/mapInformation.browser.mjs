@@ -70,15 +70,15 @@ try {
     assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), '항행경보 목록');
     assert.equal(await mapState(), initialMap, 'reading warnings must not change map layers or geometry');
     const initialMetadata = await page.evaluate(() => localStorage.getItem('bada_operational_layers_meta_v2'));
-    await page.getByRole('button', { name: '갯바위 접안 포인트 아래로', exact: true }).focus();
+    await page.getByRole('button', { name: '갯바위 접안정보 아래로', exact: true }).focus();
     await page.keyboard.press('Enter');
     assert.deepEqual(await order(), ['protected_area', 'docking', 'hazard', 'port_names', 'permits', 'porpoise']);
-    assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), '갯바위 접안 포인트 아래로');
+    assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), '갯바위 접안정보 아래로');
     assert.equal(await mapState(), initialMap, 'UI order must preserve layer data, array order, styles and z-index');
     assert.equal(await page.evaluate(() => localStorage.getItem('bada_operational_layers_meta_v2')), initialMetadata);
     await page.getByRole('button', { name: '레이어 창 닫기' }).click(); await open();
     assert.deepEqual(await order(), ['protected_area', 'docking', 'hazard', 'port_names', 'permits', 'porpoise']);
-    await page.getByRole('button', { name: '갯바위 접안 포인트 위로', exact: true }).click();
+    await page.getByRole('button', { name: '갯바위 접안정보 위로', exact: true }).click();
     assert.deepEqual(await order(), defaultOrder);
 
     const layout = await page.locator('[data-map-information]').evaluateAll(cards => cards.map(card => {
@@ -95,7 +95,7 @@ try {
     if (width === 390) assert.ok(layout.at(-1).bottom <= 844, 'six compact rows fit in the mobile viewport');
     if (process.env.QA_SCREENSHOT_DIR) { await page.getByRole('heading', { name: '지도 정보 관리', exact: true }).focus(); await page.screenshot({ path: `${process.env.QA_SCREENSHOT_DIR}/map-information-${width}.png` }); }
 
-    for (const [name, id] of [['갯바위 접안 포인트 표시', 'docking'], ['특별보호구역 표시', 'protected_area']]) {
+    for (const [name, id] of [['갯바위 접안정보 표시', 'docking'], ['특별보호구역 표시', 'protected_area']]) {
       const checkbox = page.getByRole('checkbox', { name, exact: true });
       await checkbox.uncheck();
       await page.waitForFunction(id => window.qaMapProps.layers.find(layer => layer.id === id).visible === false, id);
@@ -203,7 +203,7 @@ try {
       await page.reload();
       await page.waitForFunction(() => window.qaMapProps?.hazardPoints?.length === 1);
       await open();
-      await page.getByRole('checkbox', { name: '갯바위 접안 포인트 표시', exact: true }).uncheck();
+      await page.getByRole('checkbox', { name: '갯바위 접안정보 표시', exact: true }).uncheck();
       assert.equal(await page.evaluate(() => window.qaMapProps.hazardPoints.length), 1);
       assert.equal(await countReferences('hazard'), 1);
       await page.getByRole('checkbox', { name: '항행경보 표시', exact: true }).uncheck();

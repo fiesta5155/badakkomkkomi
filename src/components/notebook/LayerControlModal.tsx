@@ -69,6 +69,8 @@ interface LayerControlModalProps {
   showHazardInformation: boolean;
   onToggleHazardInformation: () => void;
   onOpenNavigationalWarnings?: () => void;
+  onOpenRockDocking?: () => void;
+  rockDockingCount?: number;
   portNamesVisible?: boolean;
   portNamesCount?: number;
   onTogglePortNames?: () => void;
@@ -177,6 +179,8 @@ export function LayerControlModal({
   showHazardInformation,
   onToggleHazardInformation,
   onOpenNavigationalWarnings,
+  onOpenRockDocking,
+  rockDockingCount,
   portNamesVisible,
   portNamesCount,
   onTogglePortNames,
@@ -1018,6 +1022,7 @@ export function LayerControlModal({
             layers={draftLayers} onToggleLayer={handleToggleMapInformation}
             showHazardInformation={showHazardInformation} onToggleHazardInformation={onToggleHazardInformation}
             onOpenNavigationalWarnings={onOpenNavigationalWarnings}
+            onOpenRockDocking={onOpenRockDocking} rockDockingCount={rockDockingCount}
             portNamesVisible={portNamesVisible} portNamesCount={portNamesCount} onTogglePortNames={onTogglePortNames}
             permitVisible={permitVisible} permitCount={permitCount} onTogglePermits={onTogglePermits}
             showPorpoiseLayer={showPorpoiseLayer} onTogglePorpoiseLayer={onTogglePorpoiseLayer}

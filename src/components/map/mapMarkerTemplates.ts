@@ -2,6 +2,7 @@ import type { MarkerColor } from '../../types/docking';
 import { MARKER_COLOR_MAP } from '../../types/docking.ts';
 import type { MarinePort } from '../../types/port';
 import { getRouteLegLabelParts } from '../../services/routeLegLabelService.ts';
+import { ROCK_STATES, type RockMapPoint } from '../../services/rockDockingModel.ts';
 
 export interface MarkerTemplateSpec {
   html: string;
@@ -25,6 +26,12 @@ export function escapeHtml(raw: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+export function buildRockDockingMarkerSpec(point: RockMapPoint): MarkerTemplateSpec {
+  const state = ROCK_STATES[point.state];
+  return { width: 44, height: 44, anchorX: 22, anchorY: 22, xAnchorRatio: .5, yAnchorRatio: .5,
+    html: `<button type="button" data-rock-docking="${escapeHtml(point.id)}" data-rock-state="${point.state}" aria-label="${escapeHtml(point.name)} · ${state.label}" title="${escapeHtml(point.name)} · ${state.label}" style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:44px;height:44px;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation"><span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:16px;height:16px;font:900 10px sans-serif;color:white;border:2px solid white;border-radius:50%;background:${state.color};box-shadow:0 1px 3px #0005">${({inside:"✓",boundary:"!",outside:"×",unknown:"?"})[point.state]}</span></button>` };
 }
 
 /** The name tip and symbol center share the geographic anchor. */

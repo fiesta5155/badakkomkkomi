@@ -1,3 +1,4 @@
+import { EMPTY_ROCK_POINTS, type RockMapPoint } from '../services/rockDockingModel';
 import type { WarningMapFocus } from '../services/navigationalWarningMap';
 import { EMPTY_REFERENCE_POINTS, type ReferenceMapPoint } from './notebook/mapInformationData';
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -75,8 +76,11 @@ interface UserGpsLocation {
 export interface MapViewProps {
   permitFocus?: import('../services/activityPermitModel').PermitMapFocus | null;
   onSelectPermit?: (id: string) => void;
+  rockPoints?: readonly RockMapPoint[];
+  onSelectRock?: (id: string) => void;
   warningFocus?: WarningMapFocus | null;
   onSelectWarning?: (id: string) => void;
+  onViewportObserved?: (view: { lat: number; lng: number; zoom: number }) => void;
   isMapFocused: boolean;
   onMapFocusChange: (focused: boolean) => void;
   activeMainTab: 'notebook' | 'navigation';
@@ -136,8 +140,11 @@ export interface MapViewProps {
 export function MapView({
   permitFocus,
   onSelectPermit,
+  rockPoints = EMPTY_ROCK_POINTS,
+  onSelectRock,
   warningFocus,
   onSelectWarning,
+  onViewportObserved,
   isMapFocused,
   onMapFocusChange,
   activeMainTab,
@@ -316,6 +323,7 @@ export function MapView({
     }
   }, [onRetryGeoJsonLayers]);
 
+  useEffect(() => { onViewportObserved?.(viewport); }, [viewport, onViewportObserved]);
   const handleViewportChange = useCallback((lat: number, lng: number, zoom: number) => {
     setViewport({ lat, lng, zoom });
   }, []);
@@ -378,6 +386,8 @@ export function MapView({
       {/* 1. 메인 지도 캔버스 (Kakao Map Primary vs Legacy Leaflet Fallback) */}
       {activeEngine === 'kakao' && kakaoNamespace ? (
         <KakaoMapCanvas
+          rockPoints={rockPoints}
+          onSelectRock={isMapFocused ? undefined : onSelectRock}
           warningFocus={warningFocus}
           onSelectWarning={isMapFocused ? undefined : onSelectWarning}
           permitFocus={permitFocus}
@@ -438,7 +448,9 @@ export function MapView({
           }
         >
           <LegacyLeafletCanvas
-            warningFocus={warningFocus}
+            rockPoints={rockPoints}
+          onSelectRock={isMapFocused ? undefined : onSelectRock}
+          warningFocus={warningFocus}
             onSelectWarning={isMapFocused ? undefined : onSelectWarning}
             permitFocus={permitFocus}
             onSelectPermit={isMapFocused ? undefined : onSelectPermit}

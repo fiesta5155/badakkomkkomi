@@ -230,3 +230,15 @@ npm run verify
 # 로컬 개발 서버 실행
 npm run dev
 ```
+
+
+### 갯바위 접안정보
+
+- [src/services/rockDockingModel.ts](src/services/rockDockingModel.ts): 섬 이름·사진·선박 범위 검증과 조위 보간
+- [src/services/rockDockingService.ts](src/services/rockDockingService.ts): 공동 지점·메모 및 작성자 리비전 트랜잭션
+- [src/services/rockDockingPhotos.ts](src/services/rockDockingPhotos.ts): WebP 압축과 인증된 Storage 지연 로딩
+- [src/services/rockDockingPhotoPlan.ts](src/services/rockDockingPhotoPlan.ts): 고정 4슬롯 배정·메타데이터 커밋·사진 복구 흐름
+- [src/services/rockDockingPhotoStorage.ts](src/services/rockDockingPhotoStorage.ts): 인증된 SDK 파일 백업·업로드·교체·삭제 어댑터
+- [src/hooks/useRockDocking.ts](src/hooks/useRockDocking.ts): 로그인 UID 범위 지점·공통 섬 구독
+
+[운영 준비 사항](docs/ROCK_DOCKING.md)

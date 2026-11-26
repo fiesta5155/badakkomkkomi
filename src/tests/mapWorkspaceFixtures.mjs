@@ -1,5 +1,5 @@
 // Synthetic Firebase and Kakao fixtures; Leaflet and application components remain real.
-export const fixture = `
+export let fixture = `
 import React from '/node_modules/.vite/deps/react.js';
 import ReactDOM from '/node_modules/.vite/deps/react-dom_client.js';
 import '/src/index.css';
@@ -44,10 +44,17 @@ export function MapView(props){window.qaMapProps=props;const Canvas=window.qaEng
 `;
 
 export async function loadMapViewFixture(origin) {
+  const [appSource,mainSource] = await Promise.all(['/src/App.tsx','/src/main.tsx'].map(async path => (await fetch(origin+path)).text()));
+  const reactModule = appSource.match(/["']([^"']*\/react\.js[^"']*)["']/)?.[1];
+  const domModule = mainSource.match(/["']([^"']*\/react-dom_client\.js[^"']*)["']/)?.[1];
+  if (!reactModule || !domModule) throw Error('Vite React module URL not found');
+  // Use exactly the application's optimized instances, including its cache directory/query.
+  // Separate Vite servers/cache generations otherwise create an invalid-hook-call in QA.
+  fixture = fixture.replace('/node_modules/.vite/deps/react.js',reactModule).replace('/node_modules/.vite/deps/react-dom_client.js',domModule);
   const response = await fetch(origin + '/src/components/map/LegacyLeafletCanvas.tsx');
   const canvas = await response.text();
-  const leafletModule = canvas.match(/["'](\/node_modules\/\.vite\/deps\/leaflet\.js[^"']*)["']/)?.[1];
+  const leafletModule = canvas.match(/["']([^"']*\/leaflet\.js[^"']*)["']/)?.[1];
   if (!leafletModule) throw Error('Vite Leaflet module URL not found');
   // Instrument the same optimized module instance as the real canvas, including Vite's query.
-  return mapView.replace('/node_modules/.vite/deps/leaflet.js', leafletModule);
+  return mapView.replace('/node_modules/.vite/deps/leaflet.js',leafletModule).replace('/node_modules/.vite/deps/react.js',reactModule);
 }

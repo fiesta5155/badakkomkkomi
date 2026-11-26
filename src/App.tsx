@@ -1,3 +1,8 @@
+import { useRockDocking } from './hooks/useRockDocking';
+import { estimateRockTide, rockComparison, type RockVessel, type RockMapPoint } from './services/rockDockingModel';
+import { fetchKhoaTides } from './services/khoaTideService';
+import type { TideSnapshot } from './services/khoaTideSchema';
+import type { RockPanelMode } from './components/notebook/RockDockingPanel';
 import { buildWarningMap, warningMapLayer, warningMapFeatures, type WarningMapFocus } from './services/navigationalWarningMap';
 import { fetchWarningData, type WarningData } from './services/navigationalWarningService';
 import { EMPTY_REFERENCE_POINTS, hazardPointsFromGeoJson, type ReferenceMapPoint } from './components/notebook/mapInformationData';
@@ -14,6 +19,7 @@ import {
   ClipboardList,
   Layers,
   LoaderCircle,
+  LifeBuoy,
   Mail,
   Navigation,
   Search,
@@ -40,6 +46,7 @@ const LayerControlModal = lazy(() =>
     default: m.LayerControlModal,
   })),
 );
+const RockDockingPanel = lazy(() => import('./components/notebook/RockDockingPanel'));
 const NavigationalWarningPanel = lazy(() => import('./components/notebook/NavigationalWarningPanel'));
 const FieldReportModal = lazy(() =>
   import('./components/notebook/FieldReportModal').then((m) => ({
@@ -275,6 +282,32 @@ export function App() {
   const [reportTargetFeature, setReportTargetFeature] = useState<DockingFeature | null>(null);
   const [customReportCoords, setCustomReportCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isReportPickMode, setIsReportPickMode] = useState(false);
+  const [rockMode, setRockMode] = useState<RockPanelMode | null>(null);
+  const [rockSelectedId, setRockSelectedId] = useState<string | null>(null);
+  const [rockPicking, setRockPicking] = useState(false);
+  const [rockPicked, setRockPicked] = useState<{lat: number; lng: number; nonce: number} | null>(null);
+  const [rockVessel, setRockVessel] = useState<RockVessel>('101');
+  const [rockTime, setRockTime] = useState(() => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date()).replace(' ', 'T'));
+  const [rockTides, setRockTides] = useState<TideSnapshot | null>(null);
+  const rockVisible = layers.find(layer => layer.id === 'docking')?.visible !== false;
+  const rockWorkspace = useRockDocking(route.screen === 'notebook' && (rockVisible || rockMode !== null));
+  const rockViewport = useRef({ lat: 34.8195, lng: 128.552, zoom: 11 });
+  const rockReturnViewport = useRef(rockViewport.current);
+  const observeRockViewport = useCallback((view: {lat: number; lng: number; zoom: number}) => { rockViewport.current = view; }, []);
+  const hasRockPoints = rockWorkspace.points.length > 0;
+  const rockTidesWanted = route.screen === 'notebook' && hasRockPoints && (rockVisible || rockMode !== null);
+  useEffect(() => {
+    if (!rockTidesWanted) return;
+    const controller = new AbortController();
+    void fetchKhoaTides(import.meta.env.BASE_URL, controller.signal).then(result => setRockTides(result.snapshot)).catch(() => { if (!controller.signal.aborted) setRockTides(null); });
+    return () => controller.abort();
+  }, [rockTidesWanted]);
+  useEffect(() => { if (route.screen !== 'notebook') { setRockMode(null); setRockSelectedId(null); setRockPicking(false); } }, [route.screen]);
+  const rockMarkers = useMemo<readonly RockMapPoint[]>(() => rockVisible && route.screen === 'notebook' && rockWorkspace.ready
+    ? rockWorkspace.points.map(p => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, state: rockComparison(estimateRockTide(rockTides, p, rockTime), p.ranges[rockVessel]) })) : [], [rockVisible, route.screen, rockWorkspace.ready, rockWorkspace.points, rockTides, rockTime, rockVessel]);
+  const rockSelected = rockWorkspace.points.find(p => p.id === rockSelectedId);
+  const rockHeight = rockSelected ? estimateRockTide(rockTides, rockSelected, rockTime) : null;
+
 
   const showPorpoiseLayer = mapVisibility.porpoise;
   const setShowPorpoiseLayer = useCallback((visible: boolean | ((previous: boolean) => boolean)) => setMapInformationVisible('porpoise', visible), [setMapInformationVisible]);
@@ -789,6 +822,18 @@ export function App() {
   const handleFlyToPoint = useCallback((lat: number, lng: number, zoom = 14) => {
     setFlyTarget({ lat, lng, zoom, nonce: Date.now() });
   }, []);
+  const closeRock = useCallback(() => { setRockMode(null); setRockSelectedId(null); setRockPicking(false); }, []);
+  const focusRock = useCallback((id: string) => {
+    const p = rockWorkspace.points.find(item => item.id === id); if (!p) return;
+    setRockPicked(null); setRockSelectedId(id); setRockMode('brief'); setIsLayerModalOpen(false); setIsPorpoiseAddMode(false); setIsReportPickMode(false); setSelectedFeature(null);
+    if (!rockVisible) toggleLayer('docking');
+    handleFlyToPoint(p.lat, p.lng, 15);
+  }, [rockWorkspace.points, rockVisible, toggleLayer, handleFlyToPoint, setIsPorpoiseAddMode]);
+  const selectRock = useCallback((id: string) => { setRockPicked(null); setRockSelectedId(id); setRockMode('brief'); setSelectedFeature(null); }, []);
+  const pickRock = useCallback(() => {
+    rockReturnViewport.current = rockViewport.current; setIsLayerModalOpen(false); setIsPorpoiseAddMode(false); setIsReportPickMode(false); setRockPicking(true);
+  }, [setIsPorpoiseAddMode]);
+  const cancelRockPick = useCallback(() => { setRockPicking(false); const v = rockReturnViewport.current; handleFlyToPoint(v.lat, v.lng, v.zoom); }, [handleFlyToPoint]);
   const handleFocusPermit = useCallback((p: PermitSnapshot & { id: string }) => {
     setIsPorpoiseAddMode(false); setIsReportPickMode(false); setSelectedFeature(null);
     // An explicit selection turns the layer ON for all live, valid permits.
@@ -1250,11 +1295,12 @@ export function App() {
   }, [setIsPorpoiseAddMode]);
 
   const handleMapClickForReport = useCallback((lat: number, lng: number) => {
+    if (rockPicking) { setRockPicked({ lat, lng, nonce: Date.now() }); cancelRockPick(); return; }
     setCustomReportCoords({ lat, lng });
     setReportTargetFeature(null);
     setIsReportPickMode(false);
     setIsReportModalOpen(true);
-  }, []);
+  }, [rockPicking, cancelRockPick, ]);
 
   const handleClearExternalRoadviewTarget = useCallback(() => {
     setExternalRoadviewTarget(null);
@@ -1501,6 +1547,7 @@ export function App() {
                     {isPorpoiseAddMode ? '위치 탭 대기중' : '상괭이 관찰'}
                   </span>
                 </button>
+                <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setPermitPanel('list')}
@@ -1509,6 +1556,15 @@ export function App() {
                   <ClipboardList className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span>행위허가</span>
                 </button>
+                <button
+                  type="button"
+                  aria-disabled="true"
+                  className="flex min-h-11 shrink-0 items-center gap-1 rounded-xl border-2 border-[var(--npip-rose)] bg-white/96 px-2 text-[11px] font-black text-[var(--npip-rose)] shadow-md sm:min-h-11 sm:px-3 sm:text-xs"
+                >
+                  <LifeBuoy className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>수색지원</span>
+                </button>
+                </div>
               </div>
 
             </div>
@@ -1615,6 +1671,9 @@ export function App() {
           onMapFocusChange={setIsMapFocused}
           activeMainTab={activeMainTab}
           navSubTab={navSubTab}
+          rockPoints={rockMarkers}
+          onSelectRock={selectRock}
+          onViewportObserved={observeRockViewport}
           hazardPoints={activeMainTab === 'notebook' ? notebookHazardFeatures : EMPTY_REFERENCE_POINTS}
           portNamePoints={activeMainTab === 'notebook' && mapVisibility.port_names ? namePoints : EMPTY_REFERENCE_POINTS}
           features={activeMainTab === 'notebook' ? notebookVisibleFeatures : filteredFeatures}
@@ -1630,7 +1689,7 @@ export function App() {
           onRetryGeoJsonLayers={retryFailedGeoJsonLayers}
           showPorpoiseLayer={showPorpoiseLayer}
           isPorpoiseAddMode={isPorpoiseAddMode}
-          isReportPickMode={isReportPickMode}
+          isReportPickMode={isReportPickMode || rockPicking}
           porpoiseRecords={porpoiseRecords}
           onSelectPorpoise={handleSelectPorpoiseOnMap}
           onMapClickForPorpoise={handleMapClickForPorpoise}
@@ -1768,6 +1827,14 @@ export function App() {
         </Suspense>
       )}
 
+      {rockPicking && route.screen === 'notebook' && <aside aria-label="접안 위치 선택" className="fixed inset-x-3 top-28 z-[1100] mx-auto flex max-w-xl items-center justify-between gap-2 rounded-xl border border-sky-200 bg-white p-3 text-sm text-[#003360] shadow-sm"><span>지도를 눌러 접안 위치를 선택하세요</span><button type="button" className="min-h-11 rounded-xl border border-sky-200 px-3" onClick={cancelRockPick}>위치 선택 취소</button></aside>}
+      {rockMode && !isHomeScreen && !isCalendarScreen && activeMainTab === 'notebook' && <Suspense fallback={null}>
+        <RockDockingPanel workspace={rockWorkspace} mode={rockMode} pointId={rockSelectedId} hidden={rockPicking || isMapFocused} picked={rockPicked} onPick={pickRock}
+          onMode={setRockMode} onNew={() => { setRockSelectedId(null); setRockPicked(null); setRockMode('form'); }} onFocus={focusRock}
+          onSaved={id => { setRockSelectedId(id); setRockMode('detail'); }} onClose={closeRock}
+          vessel={rockVessel} onVessel={setRockVessel} time={rockTime} onTime={setRockTime} height={rockHeight} state={rockComparison(rockHeight, rockSelected?.ranges[rockVessel] ?? null)} />
+      </Suspense>}
+
       {/* 모달 2: 공간정보 레이어 관리 (열릴 때만 SHP/GeoJSON 파서 번들과 함께 지연 로드) */}
       {!isMapFocused && !isHomeScreen && !isCalendarScreen && activeMainTab === 'notebook' && isNavigationalWarningOpen && (
         <Suspense fallback={null}>
@@ -1788,6 +1855,8 @@ export function App() {
             showHazardInformation={showHazardInformation}
             onToggleHazardInformation={() => setShowHazardInformation((visible) => !visible)}
             onOpenNavigationalWarnings={() => { setWarningDocument(null); setIsNavigationalWarningOpen(true); }}
+            onOpenRockDocking={() => { setIsLayerModalOpen(false); setRockSelectedId(null); setRockMode('list'); }}
+            rockDockingCount={rockWorkspace.points.length}
             dockingCount={totalDockingCount}
             hazardCount={independentHazards.length}
             portNamesCount={namePoints.length}

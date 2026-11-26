@@ -11,6 +11,8 @@ interface Props {
   showHazardInformation: boolean;
   onToggleHazardInformation: () => void;
   onOpenNavigationalWarnings?: () => void;
+  onOpenRockDocking?: () => void;
+  rockDockingCount?: number;
   portNamesVisible?: boolean;
   portNamesCount?: number;
   onTogglePortNames?: () => void;
@@ -38,7 +40,7 @@ export function MapInformationCards(props: Props) {
   const [message, setMessage] = useState('');
   const items: Record<MapInformationId, { name: string; count: string; checked: boolean; toggle: () => void; disabled?: boolean }> = {
     docking: {
-      name: '갯바위 접안 포인트', count: `${props.dockingCount}곳`,
+      name: props.onOpenRockDocking ? '갯바위 접안정보' : '갯바위 접안 포인트', count: `${props.rockDockingCount ?? props.dockingCount}곳`,
       checked: props.layers.find(layer => layer.id === 'docking')?.visible ?? false,
       toggle: () => props.onToggleLayer('docking'), disabled: !props.layers.some(layer => layer.id === 'docking'),
     },
@@ -64,7 +66,7 @@ export function MapInformationCards(props: Props) {
     <ol aria-label="지도 정보 목록" className="space-y-2">
       {order.map((id, index) => {
         const item = items[id];
-        const hasAction = (id === 'docking' && props.dockingCount > 0) || id === 'porpoise' || id === 'hazard';
+        const hasAction = (id === 'docking' && (props.dockingCount > 0 || !!props.onOpenRockDocking)) || id === 'porpoise' || id === 'hazard';
         return <li key={id} ref={id === 'docking' ? props.dockingCardRef : undefined} data-map-information={id}
           onKeyDown={event => {
             if (id === 'docking' && props.dockingFiltersOpen && event.key === 'Escape') {
@@ -83,10 +85,11 @@ export function MapInformationCards(props: Props) {
                 <span className="block break-keep text-[11px] leading-4 font-semibold text-[#484843]">{item.count}</span>
               </span>
             </label>
-            {id === 'docking' && props.dockingCount > 0 && <button type="button" id="docking-filter-toggle" aria-label="등급·권역 필터" title="등급·권역 필터"
+            {id === 'docking' && <div className="col-start-2 row-start-1 flex gap-1">{props.dockingCount > 0 && <button type="button" id="docking-filter-toggle" aria-label="등급·권역 필터" title="등급·권역 필터"
               aria-expanded={props.dockingFiltersOpen} aria-controls={props.dockingFiltersOpen ? 'docking-color-filter-popover' : undefined}
               disabled={!props.onToggleDockingFilters} onClick={props.onToggleDockingFilters}
               className={`${iconButton} col-start-2 row-start-1`}><Settings className="h-4 w-4" aria-hidden="true" /></button>}
+            {props.onOpenRockDocking && <button type="button" onClick={props.onOpenRockDocking} aria-label="갯바위 접안정보 목록" title="갯바위 접안정보 목록" className={iconButton + ' col-start-2 row-start-1'}><List aria-hidden="true" className="h-4 w-4" /></button>}</div>}
             {id === 'porpoise' && <PorpoiseExportButton records={props.porpoiseRecords} compact />}
             {id === 'hazard' && <button type="button" onClick={props.onOpenNavigationalWarnings} disabled={!props.onOpenNavigationalWarnings}
               aria-label="항행경보 목록" title="항행경보 목록" className={`${iconButton} col-start-2 row-start-1`}><List aria-hidden="true" className="h-4 w-4" /></button>}

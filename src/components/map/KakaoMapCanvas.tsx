@@ -1,3 +1,6 @@
+import { ROCK_DOCKING_MIN_ZOOM } from '../../config/rockDocking';
+import { buildRockDockingMarkerSpec } from './mapMarkerTemplates';
+import { EMPTY_ROCK_POINTS, type RockMapPoint } from '../../services/rockDockingModel';
 import type { WarningMapFocus } from '../../services/navigationalWarningMap';
 import { buildReferencePointSpec } from './mapMarkerTemplates';
 import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../notebook/mapInformationData';
@@ -41,6 +44,8 @@ import {
 export interface KakaoMapCanvasProps {
   permitFocus?: PermitMapFocus | null;
   onSelectPermit?: (id: string) => void;
+  rockPoints?: readonly RockMapPoint[];
+  onSelectRock?: (id: string) => void;
   warningFocus?: WarningMapFocus | null;
   onSelectWarning?: (id: string) => void;
   kakaoMaps: KakaoMapsNamespace;
@@ -425,6 +430,8 @@ function parseGeoJsonToKakaoPrimitives(
 export function KakaoMapCanvas({
   permitFocus,
   onSelectPermit,
+  rockPoints = EMPTY_ROCK_POINTS,
+  onSelectRock,
   warningFocus,
   onSelectWarning,
   kakaoMaps,
@@ -916,6 +923,16 @@ export function KakaoMapCanvas({
     onSelectWarning,
     warningFocus,
   ]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || activeMainTab !== 'notebook' || currentLeafletZoom < ROCK_DOCKING_MIN_ZOOM || isReportPickMode || isPorpoiseAddMode) return;
+    const overlays = rockPoints.map(point => {
+      const spec = buildRockDockingMarkerSpec(point), content = createOverlayElement(kakaoMaps, spec, () => onSelectRock?.(point.id));
+      return new kakaoMaps.CustomOverlay({ map, position: new kakaoMaps.LatLng(point.lat, point.lng), content, xAnchor: spec.xAnchorRatio, yAnchor: spec.yAnchorRatio, zIndex: 230, clickable: true });
+    });
+    return () => overlays.forEach(item => item.setMap(null));
+  }, [kakaoMaps, activeMainTab, rockPoints, currentLeafletZoom, isReportPickMode, isPorpoiseAddMode, onSelectRock]);
 
   const [selectedReference, setSelectedReference] = useState<string | null>(null);
   useEffect(() => {
