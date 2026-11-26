@@ -1,12 +1,20 @@
 # KHOA 날짜별 조위 시계열
 
-기존 고·저조 수집과 달력을 유지하면서, 향후 접안 조위 비교에서 명시적으로 요청할 수 있는 정적 자료만 준비한다. 현재 App/갯바위 UI에는 시계열 서비스를 연결하지 않는다. ROCK_DOCKING_TIDE_REFERENCE는 null을 유지한다.
+기존 고·저조 수집과 달력을 유지한다. 갯바위 레이어에는 아래의 시험 운영용 경험 범위 비교만 연결하며, 검증 완료 경로의 ROCK_DOCKING_TIDE_REFERENCE는 null을 유지한다.
+
+## 갯바위 시험 운영용 참고 비교
+
+[시험 비교](../src/services/rockDockingTrialTides.ts)는 원문 시각을 KST로 해석하는 시험 운영 경로다. API 시간대·기준면을 공식 검증했다는 뜻이 아니며 원본 검증값 false와 기존 estimateRockTide의 검증 조건을 변경하지 않는다. 지점에 등록된 참조 코드의 예보 조위와 직원이 입력한 경험 범위를 비교하며 현지 수위나 접안 안전을 보장하지 않는다. 등록 범위와 기준면을 다시 쓰지 않는다.
+
+[전용 훅](../src/hooks/useRockTrialTides.ts)은 자료가 준비된 갯바위 레이어를 사용하거나 지점 정보를 볼 때만 현재 날짜 파일을 요청한다. 홈/일반 바다수첩 진입, 지도 이동·확대에는 요청하지 않는다. 두 지점은 한 파일과 기존 요청 공유/메모리/PWA 캐시를 재사용한다. 현재 시각은 매분 및 화면 복귀 시 갱신하고, 네트워크 재확인은 활성화·날짜 변경·화면 복귀·온라인 복귀 때만 수행한다. 분 갱신 자체는 네트워크 폴링이 아니다.
+
+현재 시각 양옆 5분 표본을 선형 보간하며 23:55 이후에는 내장 nextMidnightCm을 사용한다. 계산값의 음수·소수를 보존하고 UI 표시만 소수 첫째 자리로 정리한다. 파일 날짜·스키마·참조 코드·36시간 신선도 검사 실패 시 미확인이다. 101호·103호는 독립 비교하며 기존 10cm 경계와 색상을 사용한다. 마커 배열은 실제 위치/이름/색상이 바뀔 때만 교체하여 매분 지도 도형 재생성을 방지한다.
 
 ## 파일과 기준
 
 public/data/tide-series/YYYY-MM-DD.json은 한 날짜의 통영 DT_0014·고현항 SO_0552 자료를 함께 담는다. schemaVersion, date, generatedAt(UTC ISO), unit=cm, intervalMinutes=5, reference, stations를 사용한다. 각 station은 code, heightsCm(288개), nextMidnightCm만 가진다. 배열의 0은 응답 원문의 00:00, 287은 23:55이며 경계값은 다음 날짜 00:00이다. 음수/소수를 반올림·보정하지 않는다.
 
-reference.verticalDatumVerified와 reference.timeZoneVerified는 모두 false다. 요청 날짜와 수집 예약을 KST로 정하는 것과 API 응답 시간대/수직기준면을 공식 확인하는 것은 다르다. 자동 비교나 안전 판정에 연결하지 않는다. tideSeriesBracket은 원문 표본 두 개만 반환하며 조위 보간/색상 판정을 실행하지 않는다.
+reference.verticalDatumVerified와 reference.timeZoneVerified는 모두 false다. 요청 날짜와 수집 예약을 KST로 정하는 것과 API 응답 시간대/수직기준면을 공식 확인하는 것은 다르다. 검증 완료 자동 비교나 안전 판정에 연결하지 않으며 위 시험 참고 비교와 구분한다. tideSeriesBracket은 원문 표본 두 개만 반환하며 조위 보간/색상 판정을 실행하지 않는다.
 
 ## 수집과 묶음 교체
 
@@ -50,7 +58,7 @@ reference.verticalDatumVerified와 reference.timeZoneVerified는 모두 false다
 - 자료는 Git 제외 public/data/tide-series에 생성된다. 원문 응답이나 인증키를 소스/정적 JSON에 기록하지 않는다.
 - node --test src/tests/khoaTideSeries.test.ts 및 기존 npm test/lint/build/verify를 실행한다.
 
-기준면/시간대 확인, 선박 등록 범위와의 기준 일치, 색상 판정 활성화는 별도 후속 작업이다. Firebase 규칙/IAM/CORS/운영 문서는 변경하지 않는다.
+공식 기준면/시간대 확인과 검증 완료 경로 활성화는 별도 후속 작업이다. Firebase 규칙/IAM/CORS/운영 문서는 변경하지 않는다.
 
 ## 이번 로컬 실측 결과 (2026-11-26)
 

@@ -17,11 +17,20 @@ try {
   for (const engine of (process.env.QA_ENGINES ?? 'leaflet,kakao').split(',')) for (const width of (process.env.QA_WIDTHS ?? '320,390,1280').split(',').map(Number)) {
     const context = await browser.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block' });
     const page = await context.newPage(), errors = [];
+    await page.clock.install({time:new Date('2026-11-26T03:02:30Z')});
+    let seriesRequests=0,seriesMode='good';
+    await page.route('**/data/tide-series/*.json',route=>{
+      seriesRequests++;
+      if(seriesMode==='error')return route.fulfill({status:503,body:'unavailable'});
+      if(seriesMode==='corrupt')return route.fulfill({contentType:'application/json',body:'{}'});
+      if(seriesMode==='stale')return route.fulfill({contentType:'application/json',body:JSON.stringify({schemaVersion:1,date:'2026-11-26',generatedAt:'2026-11-24T01:00:00.000Z',unit:'cm',intervalMinutes:5,reference:{verticalDatumVerified:false,timeZoneVerified:false},stations:[{code:'DT_0014',heightsCm:Array(288).fill(130),nextMidnightCm:130},{code:'SO_0552',heightsCm:Array(288).fill(0),nextMidnightCm:0}]})});
+      return route.fulfill({contentType:'application/json',body:JSON.stringify({schemaVersion:1,date:'2026-11-26',generatedAt:'2026-11-26T01:00:00.000Z',unit:'cm',intervalMinutes:5,reference:{verticalDatumVerified:false,timeZoneVerified:false},stations:[{code:'DT_0014',heightsCm:Array(288).fill(130),nextMidnightCm:130},{code:'SO_0552',heightsCm:Array(288).fill(-5.25),nextMidnightCm:-5.25}]})});
+    });
     page.setDefaultTimeout(45000);
     page.on('pageerror', e => { errors.push(e.message); console.error(e.message); });
     await page.addInitScript(value => { window.qaEngine = value; }, engine);
 
-    await page.route('**/*', route => new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    await page.route('**/*', route => new URL(route.request().url()).origin === origin ? route.fallback() : route.abort());
     await page.route('**/src/main.tsx*', route => route.fulfill({ contentType: 'application/javascript', body: fixture }));
     await page.route('**/src/components/MapView.tsx*', route => route.fulfill({ contentType: 'application/javascript', body: mapView }));
     await page.route('**/src/services/activityPermitService.ts*', route => route.fulfill({ contentType: 'application/javascript', body: service }));
@@ -43,6 +52,7 @@ export function rockPhotoStore(unchanged){window.qaPhotoBlobs??=new Map();return
 `;
       await route.fulfill({contentType:'application/javascript',body:source});
     });
+    await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:90000});await page.waitForTimeout(500);assert.equal(seriesRequests,0,'home must not load tide series');
     await page.goto(origin+'/?screen=notebook',{waitUntil:'commit',timeout:90000});
     console.log('QA loaded');
     await page.waitForFunction(()=>window.qaMapProps);
@@ -50,16 +60,31 @@ export function rockPhotoStore(unchanged){window.qaPhotoBlobs??=new Map();return
     await layers();await page.getByRole('checkbox',{name:'갯바위 접안정보 표시',exact:true}).check();
     await page.waitForFunction(()=>window.qaMapProps?.rockPoints.length===1).catch(async e=>{console.log(await page.evaluate(()=>({ready:!!window.qaMapProps,points:window.qaMapProps?.rockPoints,body:document.body.innerText.slice(0,2000)})));throw e;});
     console.log('QA points ready');
+    await page.waitForFunction(()=>window.qaMapProps.rockPoints[0]?.state==='inside',null,{timeout:10000});
+    assert.equal(seriesRequests,1,'one shared date request for all markers');
+    await page.evaluate(()=>{window.qaPriorRockMarkers=window.qaMapProps.rockPoints;});
+    await page.clock.fastForward(61000);
+    assert.equal(await page.evaluate(()=>window.qaPriorRockMarkers===window.qaMapProps.rockPoints),true,'same color retains marker identity across clock updates');
+    assert.equal(seriesRequests,1,'clock updates do not poll');
     assert.equal(await page.locator('[data-rock-docking]').count(),0,'hidden below zoom threshold');
     await page.getByRole('button',{name:'갯바위 접안정보 목록',exact:true}).click();
     await page.getByText('소매물도',{exact:true}).click();
     await page.screenshot({path:'.dev/docs/rock-docking/list-'+engine+'-'+width+'.png'});
     await page.getByRole('button',{name:'남측 테스트 지점',exact:true}).click();
     await page.getByRole('complementary',{name:'갯바위 접안 간략정보'}).waitFor();
-    if(engine==='leaflet'){await page.locator('[data-rock-docking]').waitFor();assert.equal(await page.locator('[data-rock-state="unknown"]').count(),1);}
+    await page.getByText('현재 예보 조위 130cm · 통영 기준',{exact:true}).waitFor();
+    const brief=page.getByRole('complementary',{name:'갯바위 접안 간략정보'});
+    assert.match(await brief.innerText(),/101호: 범위 내/);assert.match(await brief.innerText(),/103호: 미확인/);
+    if(engine==='leaflet'){await page.locator('[data-rock-docking]').waitFor();assert.equal(await page.locator('[data-rock-state="inside"]').count(),1);}
     else await page.waitForFunction(()=>window.qaOverlays.some(o=>o.map&&(o.options.content.matches('[data-rock-docking]')||o.options.content.querySelector('[data-rock-docking]'))));
+    if(engine==='leaflet'){await page.evaluate(()=>{window.qaRockElement=document.querySelector('[data-rock-docking]');});await page.clock.fastForward(61000);assert.equal(await page.evaluate(()=>window.qaRockElement===document.querySelector('[data-rock-docking]')),true,'unchanged marker icon DOM is retained');}
     await page.getByRole('button',{name:'상세 보기',exact:true}).click();
     await page.getByRole('heading',{name:'남측 테스트 지점'}).waitFor();
+    await page.getByRole('combobox',{name:/선박/}).selectOption('103');
+    await page.waitForFunction(()=>window.qaMapProps.rockPoints[0]?.state==='unknown');
+    await page.getByRole('combobox',{name:/선박/}).selectOption('101');
+    await page.waitForFunction(()=>window.qaMapProps.rockPoints[0]?.state==='inside');
+    assert.equal(seriesRequests,1,'vessel changes reuse the same date');
     if(engine==='leaflet' && width===390){
       const compressed=await page.evaluate(async()=>{const {compressRockPhoto}=await import('/src/services/rockDockingPhotos.ts');const c=document.createElement('canvas');c.width=2000;c.height=1000;c.getContext('2d').fillRect(0,0,2000,1000);const blob=await new Promise(r=>c.toBlob(r,'image/png'));const result=await compressRockPhoto(new File([blob],'test.png',{type:'image/png'}));return{type:result.blob.type,size:result.blob.size,width:result.width,height:result.height};});
       assert.equal(compressed.type,'image/webp');assert.equal(compressed.width,1600);assert.equal(compressed.height,800);assert.ok(compressed.size<=512000);
@@ -91,6 +116,8 @@ export function rockPhotoStore(unchanged){window.qaPhotoBlobs??=new Map();return
     await page.getByRole('button',{name:'+ 접안 지점 등록'}).click();
     assert.equal(await page.getByLabel('원경',{exact:false}).count(),1);assert.equal(await page.getByLabel('근경',{exact:false}).count(),1);
     assert.equal(await page.evaluate(()=>document.querySelector('dialog[open] section').scrollWidth<=document.querySelector('dialog[open] section').clientWidth),true);
-    assert.deepEqual(errors,[]);console.log(JSON.stringify({engine,width,list:true,marker:true,toggle:true,detail:true,pickerPreservesDraft:true,noOverflow:true}));await context.close();
+    assert.equal(seriesRequests,1,'layer toggle and camera changes reuse date cache');
+    if(engine==='leaflet'&&width===390){for(const mode of ['stale','corrupt','error']){seriesMode=mode;const count=seriesRequests;await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.qaMapProps?.rockPoints.length===1);await page.waitForTimeout(300);assert.equal(seriesRequests,count+1);assert.equal(await page.evaluate(()=>window.qaMapProps.rockPoints[0].state),'unknown',mode+' remains unknown');}console.log('stale/corrupt/error gray marker checks passed');}
+    assert.deepEqual(errors,[]);console.log(JSON.stringify({engine,width,list:true,marker:true,toggle:true,detail:true,pickerPreservesDraft:true,noOverflow:true,trialTide:true,seriesRequests,stableMarkers:true}));await context.close();
   }
 }finally{await browser.close();}

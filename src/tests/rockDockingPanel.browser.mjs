@@ -9,7 +9,7 @@ const fixture=`
 import React from '/node_modules/.vite/deps/react.js';import {createRoot} from '/node_modules/.vite/deps/react-dom_client.js';import '/src/index.css';import Panel from '/src/components/notebook/RockDockingPanel.tsx';
 const c=document.createElement('canvas');c.width=1200;c.height=800;c.getContext('2d').fillRect(0,0,1200,800);window.qaBlob=await new Promise(r=>c.toBlob(r,'image/webp'));window.qaReads=0;window.qaClosed=0;window.qaFocus=0;
 const photos=Array.from({length:4},(_,i)=>({id:'photo'+i,path:'test/'+i,role:i===0?'wide':i===1?'close':'extra',size:100,width:1200,height:800}));
-const base={id:'p',name:'소매물도 남측 접안지점 긴 이름 모바일 확인',islandId:'island',photos:[],ranges:{101:{min:50,max:150},103:{min:80,max:180}},confirmedOn:'2026-11-26',authorUid:'owner',authorName:'범진',updatedBy:'범진',updatedAt:{seconds:1795660000},revision:1};
+const base={id:'p',name:'소매물도 남측 접안지점 긴 이름 모바일 확인',islandId:'island',stationCode:'DT_0014',photos:[],ranges:{101:{min:50,max:150},103:{min:120,max:180}},confirmedOn:'2026-11-26',authorUid:'owner',authorName:'범진',updatedBy:'범진',updatedAt:{seconds:1795660000},revision:1};
 function Fixture(){const[count,setCount]=React.useState(0),[mode,setMode]=React.useState('brief'),[open,setOpen]=React.useState(true);window.qaCount=n=>{setCount(n);setMode('brief');setOpen(true);};return open?React.createElement(Panel,{workspace:{profile:{uid:'owner'},points:[{...base,photos:photos.slice(0,count),revision:count+1}],islands:[],ready:true},mode,pointId:'p',hidden:false,picked:null,onPick:()=>{},onNew:()=>{},onFocus:()=>{window.qaFocus++;},onSaved:()=>{},onClose:()=>{window.qaClosed++;setOpen(false);},onMode:setMode,vessel:'101',onVessel:()=>{},time:'2026-11-26T12:00',onTime:()=>{},height:100,state:'inside'}):null;}
 createRoot(document.getElementById('root')).render(React.createElement(Fixture));`;
 if(process.env.QA_STATIC==='1'){
@@ -33,8 +33,8 @@ try{for(const width of [320,390,1280]){
  for(const count of [0,1,2,4]){
   await page.evaluate(n=>window.qaCount(n),count);await page.waitForFunction(n=>document.querySelectorAll('aside figure').length===n,count);
   if(count)await page.waitForFunction(n=>[...document.querySelectorAll('aside figure img')].filter(i=>i.complete&&i.naturalWidth).length===n,count);
-  assert.equal(await panel.locator('figure').count(),count);await panel.getByText('현장 메모 3건',{exact:true}).waitFor();
-  const box=await panel.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+.5);assert.ok(box.height<=844*.58+1);if(count)assert.ok(box.height>=844*.55);else assert.ok(box.height<300);
+  assert.equal(await panel.locator('figure').count(),count);await panel.getByText('현장 메모 3건',{exact:true}).waitFor();assert.match(await panel.innerText(),/101호: 범위 내/);assert.match(await panel.innerText(),/103호: 범위 밖/);await panel.getByText('현재 예보 조위 100cm · 통영 기준',{exact:true}).waitFor();
+  const box=await panel.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+.5);assert.ok(box.height<=844*.58+1);if(count)assert.ok(box.height>=844*.55);else assert.ok(box.height<360);
   assert.equal(await panel.evaluate(e=>e.scrollWidth<=e.clientWidth),true);
   if(count){const reads=await page.evaluate(()=>window.qaReads);assert.ok(await panel.locator('figure img').first().evaluate(e=>e.naturalWidth<=480));
    await panel.getByRole('button',{name:'원경 사진 1 확대'}).click();const viewer=page.getByRole('dialog',{name:'접안지 사진 확대'});await viewer.waitFor();await viewer.locator('img').waitFor();assert.equal(await viewer.locator('img').evaluate(e=>e.naturalWidth),1200);

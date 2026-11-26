@@ -3,7 +3,8 @@ import { ArrowLeft, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { RockWorkspace } from '../../hooks/useRockDocking';
 import { getFirebaseClient } from '../../services/firebaseClient';
 import { deleteRockNote, deleteRockPoint, ensureRockIsland, getRockPoint, saveRockNote, saveRockPoint, subscribeRockNotes } from '../../services/rockDockingService';
-import { ROCK_STATES, rockIslandId, validateRock, type RockInput, type RockNote, type RockPhoto, type RockPoint, type RockVessel, type RockState } from '../../services/rockDockingModel';
+import { ROCK_STATES, rockComparison, rockIslandId, validateRock, type RockInput, type RockNote, type RockPhoto, type RockPoint, type RockVessel, type RockState } from '../../services/rockDockingModel';
+import { ROCK_TRIAL_NOTICE } from '../../services/rockDockingTrialTides';
 import { compressRockPhoto, loadRockPhoto, removeRockPhoto, rockStorageReady, rockPhotoStore } from '../../services/rockDockingPhotos';
 import { applyRockPhotoPlan, planRockPhotos, sameRockPhotos, RockPhotoCommitUncertain, RockPhotoSaveError, rockSaveStep, rockSaveDiagnostic } from '../../services/rockDockingPhotoPlan';
 import { koreaToday } from '../../services/sharedCalendarModel';
@@ -104,18 +105,26 @@ function RockBrief({ point,props,rangeText,estimate }: { point: RockPoint; props
   },[point.id]);
   return <aside aria-label="갯바위 접안 간략정보" style={point.photos.length ? {height:'58dvh'} : undefined} className="pointer-events-auto fixed inset-x-2.5 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[950] mx-auto flex max-h-[58dvh] max-w-xl flex-col overflow-hidden rounded-2xl border-2 border-[#A5F3FC] bg-white text-[#003360] shadow-md">
     <header className="flex shrink-0 items-start justify-between gap-2 border-b border-sky-100 px-3 py-2">
-      <div className="min-w-0"><h2 className="break-words text-sm font-black">{point.name}</h2><p className="mt-1 text-xs">{props.vessel}호 · 예상 조위 {estimate} · <strong style={{color:ROCK_STATES[props.state].color}}>{ROCK_STATES[props.state].label}</strong></p></div>
+      <div className="min-w-0"><h2 className="break-words text-sm font-black">{point.name}</h2><p className="mt-1 text-xs">{props.vessel}호 · <strong style={{color:ROCK_STATES[props.state].color}}>{ROCK_STATES[props.state].label}</strong> · 시험 운영</p><p className="mt-1 text-xs">현재 예보 조위 {estimate} · {point.stationCode === 'DT_0014' ? '통영' : '고현항'} 기준</p></div>
       <button type="button" className="flex min-h-11 min-w-11 items-center justify-center" aria-label="접안정보 닫기" onClick={props.onClose}><X className="h-5 w-5" /></button>
     </header>
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 [overflow-wrap:anywhere]">
       {point.photos.length>0 && <Gallery key={point.id+':'+point.revision} photos={point.photos} />}
-      <dl className={'grid grid-cols-2 gap-2 text-sm'+(point.photos.length?' mt-3':'')}>{(['101','103'] as const).map(v => <div key={v}><dt className="text-xs text-slate-600">{v}호 등록 조위</dt><dd className="font-bold">{rangeText(v)}</dd></div>)}</dl>
+      <TrialRanges point={point} height={props.height} rangeText={rangeText} />
+      <p className="mt-2 text-xs text-slate-600">{ROCK_TRIAL_NOTICE}</p>
     </div>
     <footer className="flex shrink-0 items-center justify-between gap-2 border-t border-sky-100 px-3 py-2">
       <div className="min-w-0 text-xs text-slate-600"><p>{noteError?'현장 메모 확인 실패':'현장 메모 '+(notes===null?'확인 중':notes+'건')}</p><p className="mt-1">최종 확인 {point.confirmedOn}</p></div>
       <button type="button" className={button+' shrink-0'} onClick={() => props.onMode('detail')}>상세 보기</button>
     </footer>
   </aside>;
+}
+
+function TrialRanges({ point, height, rangeText }: { point: RockPoint; height: number | null; rangeText: (v: RockVessel) => string }) {
+  return <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">{(['101','103'] as const).map(v => {
+    const state = ROCK_STATES[rockComparison(height, point.ranges[v])];
+    return <div key={v}><dt>{v}호: <strong style={{color:state.color}}>{state.label}</strong></dt><dd className="mt-1 text-xs text-slate-600">{rangeText(v)}</dd></div>;
+  })}</dl>;
 }
 
 type PhotoSlot = { role: RockPhoto['role']; photo?: RockPhoto; data?: Awaited<ReturnType<typeof compressRockPhoto>>; preview?: string };
@@ -245,16 +254,15 @@ interface Props {
   workspace: RockWorkspace; mode: RockPanelMode; pointId: string | null; hidden: boolean;
   picked: { lat: number; lng: number; nonce: number } | null; onPick: () => void;
   onMode: (mode: RockPanelMode) => void; onNew: () => void; onFocus: (id: string) => void; onSaved: (id: string) => void; onClose: () => void;
-  vessel: RockVessel; onVessel: (v: RockVessel) => void; time: string; onTime: (value: string) => void; height: number | null; state: RockState;
+  vessel: RockVessel; onVessel: (v: RockVessel) => void; height: number | null; state: RockState;
 }
 export default function RockDockingPanel(props: Props) {
   const { workspace, mode, pointId } = props, point = workspace.points.find(p => p.id === pointId) ?? null;
   const [error, setError] = useState(''), [busy, setBusy] = useState(false);
   const rangeText = (v: RockVessel) => point?.ranges[v] ? `${point.ranges[v]!.min} ~ ${point.ranges[v]!.max} cm` : '미확인';
-  const estimate = props.height === null ? '미확인' : `약 ${props.height} cm`;
+  const estimate = props.height === null ? '미확인' : `${props.height.toLocaleString('ko-KR', {maximumFractionDigits:1})}cm`;
   const controls = <div className="mb-3 flex flex-wrap items-end gap-2">
     <label className="text-xs font-bold">선박<select className={input} value={props.vessel} onChange={e => props.onVessel(e.target.value as RockVessel)}><option value="101">101호</option><option value="103">103호</option></select></label>
-    <label className="min-w-0 basis-full flex-1 text-xs font-bold sm:basis-0">날짜·시간 (KST)<input className={input} type="datetime-local" value={props.time} onChange={e => props.onTime(e.target.value)} /></label>
   </div>;
   const remove = async () => {
     const db = getFirebaseClient()?.db; if (!point || !db || !workspace.profile || !window.confirm('이 접안 지점을 삭제할까요?')) return;
@@ -272,10 +280,11 @@ export default function RockDockingPanel(props: Props) {
         {workspace.islands.filter(i => workspace.points.some(p => p.islandId === i.id)).map(island => <details key={island.id} className="rounded-xl border border-sky-200 px-3"><summary className="min-h-11 cursor-pointer py-3 text-sm font-bold">{island.name}</summary><ul>{workspace.points.filter(p => p.islandId === island.id).map(p => <li key={p.id}><button type="button" className="min-h-11 w-full py-2 text-left text-sm" onClick={() => props.onFocus(p.id)}>{p.name}</button></li>)}</ul></details>)}
       </div> : point ? <article className="space-y-3">
         <h3 className="text-base font-black">{point.name}</h3>
-        <p className="text-sm">{props.vessel}호 · 예상 조위 {estimate} · <strong style={{ color: ROCK_STATES[props.state].color }}>{ROCK_STATES[props.state].label}</strong></p>
-        <p className="text-xs text-slate-600">{point.stationCode === 'DT_0014' ? '통영' : '고현항'} · 조위 참고</p>
+        <p className="text-sm">현재 예보 조위 {estimate} · {point.stationCode === 'DT_0014' ? '통영' : '고현항'} 기준</p>
+        <p className="text-xs text-slate-600">{props.vessel}호 · 시험 운영</p>
         {point.photos.length > 0 && <Gallery key={point.id + ":" + point.revision} photos={point.photos} />}
-        <dl className="grid grid-cols-2 gap-2 text-sm">{(['101','103'] as const).map(v => <div key={v}><dt className="text-xs text-slate-600">{v}호 등록 조위</dt><dd>{rangeText(v)}</dd></div>)}</dl>
+        <TrialRanges point={point} height={props.height} rangeText={rangeText} />
+        <p className="text-xs text-slate-600">{ROCK_TRIAL_NOTICE}</p>
         <p className="text-xs text-slate-600">최종 확인 {point.confirmedOn}<br />작성 {point.authorName} · 수정 {point.updatedBy} {new Date(point.updatedAt.seconds * 1000).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })}</p>
         <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={() => props.onFocus(point.id)}>지도에서 보기</button>
           {point.authorUid === workspace.profile.uid && <button type="button" className={button} onClick={() => props.onMode('form')}>지점 수정</button>}

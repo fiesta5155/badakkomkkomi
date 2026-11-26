@@ -249,3 +249,7 @@ npm run dev
 - [src/services/khoaTideSeriesService.ts](src/services/khoaTideSeriesService.ts): 명시적 날짜 요청만 수행하는 중복 방지·LRU 메모리 캐시 접근 서비스
 
 [시계열 수집·캐시 운영](docs/KHOA_TIDE_SERIES.md)
+
+- [src/services/rockDockingTrialTides.ts](src/services/rockDockingTrialTides.ts): 미검증 메타데이터를 유지하는 시험 운영용 5분 보간·참조 지점 비교
+- [src/hooks/useRockTrialTides.ts](src/hooks/useRockTrialTides.ts): 갯바위 사용 시에만 날짜 자료를 공유하고 현재 시각을 갱신
+- [src/tests/rockDockingTrialTides.test.ts](src/tests/rockDockingTrialTides.test.ts): 시험 보간·날짜 경계·선박별 범위·실패 안전 검증

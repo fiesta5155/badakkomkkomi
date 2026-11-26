@@ -93,9 +93,8 @@ test('serialized SW validates before caching and permits only validated offline/
   assert.equal(await plugin.cacheKeyWillBeUsed({request}),'https://example.test/app/data/tide-series/'+day.date+'.json');
  }finally{Object.defineProperty(globalThis,'caches',{configurable:true,value:original});}
 });
-test('automatic comparison stays disabled, consumers remain unconnected, SW has separate bounded cache and schedule stays unchanged',()=>{
+test('verified comparison stays disabled, SW has separate bounded cache and schedule stays unchanged',()=>{
  assert.equal(ROCK_DOCKING_TIDE_REFERENCE,null);
- const app=readFileSync('src/App.tsx','utf8');assert.ok(!app.includes('khoaTideSeriesService'));
  const vite=readFileSync('vite.config.ts','utf8');assert.ok(vite.includes('**/data/tide-series/**'));assert.ok(vite.includes('maxEntries:35,maxAgeSeconds:72*3600'));
  const workflow=readFileSync('.github/workflows/deploy-pages.yml','utf8');assert.ok(workflow.includes("cron: '17 19 * * *'"));assert.ok(workflow.includes("github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'"));assert.ok(workflow.includes("steps.series-recovery.outputs.today != 'true'"));
 });

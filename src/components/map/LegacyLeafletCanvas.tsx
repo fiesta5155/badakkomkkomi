@@ -4,7 +4,7 @@ import { EMPTY_ROCK_POINTS, type RockMapPoint } from '../../services/rockDocking
 import type { WarningMapFocus } from '../../services/navigationalWarningMap';
 import { buildReferencePointSpec } from './mapMarkerTemplates';
 import { EMPTY_REFERENCE_POINTS, referenceLabelIds, type ReferenceMapPoint } from '../notebook/mapInformationData';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import {
   Circle,
@@ -379,6 +379,14 @@ function PermitBoundsEffect({ target }: { target?: PermitMapFocus | WarningMapFo
   }, [target, map]);
   return null;
 }
+// Keep Leaflet's existing marker/icon instance when only the reference clock or
+// selected panel height changes. Styling, click handling and touch area stay shared.
+const RockDockingMarker = memo(function RockDockingMarker({ point, onSelect }: { point: RockMapPoint; onSelect?: (id: string) => void }) {
+  const spec = buildRockDockingMarkerSpec(point);
+  return <Marker position={[point.lat, point.lng]} icon={L.divIcon({ className: 'rock-docking-marker', html: spec.html, iconSize: [44,44], iconAnchor: [22,22] })} zIndexOffset={230}
+    eventHandlers={{ click: event => { L.DomEvent.stopPropagation(event.originalEvent); onSelect?.(point.id); } }} />;
+});
+
 export function LegacyLeafletCanvas({
   permitFocus,
   onSelectPermit,
@@ -602,11 +610,7 @@ export function LegacyLeafletCanvas({
         );
       })}
 
-      {activeMainTab === 'notebook' && currentZoom >= ROCK_DOCKING_MIN_ZOOM && !isReportPickMode && !isPorpoiseAddMode && rockPoints.map(point => {
-        const spec = buildRockDockingMarkerSpec(point);
-        return <Marker key={'rock:' + point.id} position={[point.lat, point.lng]} icon={L.divIcon({ className: 'rock-docking-marker', html: spec.html, iconSize: [44,44], iconAnchor: [22,22] })} zIndexOffset={230}
-          eventHandlers={{ click: event => { L.DomEvent.stopPropagation(event.originalEvent); onSelectRock?.(point.id); } }} />;
-      })}
+      {activeMainTab === 'notebook' && currentZoom >= ROCK_DOCKING_MIN_ZOOM && !isReportPickMode && !isPorpoiseAddMode && rockPoints.map(point => <RockDockingMarker key={'rock:' + point.id} point={point} onSelect={onSelectRock} />)}
 
       {activeMainTab === 'notebook' && [...portNamePoints.map(point => ({ point, hazard: false })), ...hazardPoints.map(point => ({ point, hazard: true }))].map(({ point, hazard }) => {
         const key = (hazard ? 'hazard:' : 'port:') + point.id;

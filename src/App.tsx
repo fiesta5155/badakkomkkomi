@@ -1,7 +1,7 @@
 import { useRockDocking } from './hooks/useRockDocking';
-import { estimateRockTide, rockComparison, type RockVessel, type RockMapPoint } from './services/rockDockingModel';
-import { fetchKhoaTides } from './services/khoaTideService';
-import type { TideSnapshot } from './services/khoaTideSchema';
+import { rockComparison, type RockVessel, type RockMapPoint } from './services/rockDockingModel';
+import { useRockTrialTides } from './hooks/useRockTrialTides';
+import { trialRockHeight } from './services/rockDockingTrialTides';
 import type { RockPanelMode } from './components/notebook/RockDockingPanel';
 import { buildWarningMap, warningMapLayer, warningMapFeatures, type WarningMapFocus } from './services/navigationalWarningMap';
 import { fetchWarningData, type WarningData } from './services/navigationalWarningService';
@@ -287,26 +287,22 @@ export function App() {
   const [rockPicking, setRockPicking] = useState(false);
   const [rockPicked, setRockPicked] = useState<{lat: number; lng: number; nonce: number} | null>(null);
   const [rockVessel, setRockVessel] = useState<RockVessel>('101');
-  const [rockTime, setRockTime] = useState(() => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date()).replace(' ', 'T'));
-  const [rockTides, setRockTides] = useState<TideSnapshot | null>(null);
   const rockVisible = layers.find(layer => layer.id === 'docking')?.visible !== false;
   const rockWorkspace = useRockDocking(route.screen === 'notebook' && (rockVisible || rockMode !== null));
   const rockViewport = useRef({ lat: 34.8195, lng: 128.552, zoom: 11 });
   const rockReturnViewport = useRef(rockViewport.current);
   const observeRockViewport = useCallback((view: {lat: number; lng: number; zoom: number}) => { rockViewport.current = view; }, []);
   const hasRockPoints = rockWorkspace.points.length > 0;
-  const rockTidesWanted = route.screen === 'notebook' && hasRockPoints && (rockVisible || rockMode !== null);
-  useEffect(() => {
-    if (!rockTidesWanted) return;
-    const controller = new AbortController();
-    void fetchKhoaTides(import.meta.env.BASE_URL, controller.signal).then(result => setRockTides(result.snapshot)).catch(() => { if (!controller.signal.aborted) setRockTides(null); });
-    return () => controller.abort();
-  }, [rockTidesWanted]);
+  const rockTidesWanted = route.screen === 'notebook' && rockWorkspace.ready && hasRockPoints && (rockVisible || rockMode === 'brief' || rockMode === 'detail');
+  const rockTrialHeights = useRockTrialTides(rockTidesWanted);
   useEffect(() => { if (route.screen !== 'notebook') { setRockMode(null); setRockSelectedId(null); setRockPicking(false); } }, [route.screen]);
-  const rockMarkers = useMemo<readonly RockMapPoint[]>(() => rockVisible && route.screen === 'notebook' && rockWorkspace.ready
-    ? rockWorkspace.points.map(p => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, state: rockComparison(estimateRockTide(rockTides, p, rockTime), p.ranges[rockVessel]) })) : [], [rockVisible, route.screen, rockWorkspace.ready, rockWorkspace.points, rockTides, rockTime, rockVessel]);
+  // Stable identity until a marker's visible data/color actually changes; clock
+  // updates must not recreate either engine's map overlays every minute.
+  const rockMarkerKey = JSON.stringify(rockVisible && route.screen === 'notebook' && rockWorkspace.ready
+    ? rockWorkspace.points.map(p => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, state: rockComparison(trialRockHeight(rockTrialHeights, p), p.ranges[rockVessel]) })) : []);
+  const rockMarkers = useMemo<readonly RockMapPoint[]>(() => JSON.parse(rockMarkerKey), [rockMarkerKey]);
   const rockSelected = rockWorkspace.points.find(p => p.id === rockSelectedId);
-  const rockHeight = rockSelected ? estimateRockTide(rockTides, rockSelected, rockTime) : null;
+  const rockHeight = rockSelected ? trialRockHeight(rockTrialHeights, rockSelected) : null;
 
 
   const showPorpoiseLayer = mapVisibility.porpoise;
@@ -1832,7 +1828,7 @@ export function App() {
         <RockDockingPanel workspace={rockWorkspace} mode={rockMode} pointId={rockSelectedId} hidden={rockPicking || isMapFocused} picked={rockPicked} onPick={pickRock}
           onMode={setRockMode} onNew={() => { setRockSelectedId(null); setRockPicked(null); setRockMode('form'); }} onFocus={focusRock}
           onSaved={id => { setRockSelectedId(id); setRockMode('detail'); }} onClose={closeRock}
-          vessel={rockVessel} onVessel={setRockVessel} time={rockTime} onTime={setRockTime} height={rockHeight} state={rockComparison(rockHeight, rockSelected?.ranges[rockVessel] ?? null)} />
+          vessel={rockVessel} onVessel={setRockVessel} height={rockHeight} state={rockComparison(rockHeight, rockSelected?.ranges[rockVessel] ?? null)} />
       </Suspense>}
 
       {/* 모달 2: 공간정보 레이어 관리 (열릴 때만 SHP/GeoJSON 파서 번들과 함께 지연 로드) */}
