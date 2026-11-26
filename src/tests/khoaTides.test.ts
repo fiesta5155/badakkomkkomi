@@ -229,7 +229,10 @@ test('workflow guards bootstrap, push inheritance, successful backup provenance 
   assert.match(yaml, /cron: '17 19 \* \* \*'/);
   assert.match(yaml, /cancel-in-progress: false/);
   assert.doesNotMatch(yaml, /contents: write|git push|git commit/);
-  assert.equal((yaml.match(/secrets\.KHOA_SERVICE_KEY/g) ?? []).length, 1);
+  const credentialSteps = yaml.split(/\r?\n      - name:/).filter(step => step.includes('secrets.KHOA_SERVICE_KEY'));
+  assert.equal(credentialSteps.length, 2);
+  assert.ok(credentialSteps.some(step => step.includes('node scripts/update-khoa-tides.mjs')));
+  assert.ok(credentialSteps.some(step => step.includes('node scripts/collect-khoa-tide-series.mjs')));
   assert.match(yaml, /github\.event_name != 'push' \|\| steps\.recovery\.outputs\.restored != 'true'/);
   assert.match(yaml, /run\.conclusion !== 'success'/);
   assert.match(yaml, /data\.commit\.sha !== process\.env\.CHECKED_OUT_SHA/);

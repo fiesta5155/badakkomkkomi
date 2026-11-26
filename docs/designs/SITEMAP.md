@@ -214,3 +214,10 @@ React 컴포넌트에 라우팅, 공간레이어 설정, 실시간 해상기상,
 - [src/hooks/useRockDocking.ts](../../src/hooks/useRockDocking.ts): 로그인 UID 범위 지점·공통 섬 구독
 
 [운영 준비 사항](../ROCK_DOCKING.md)
+
+### KHOA 날짜별 조위 시계열
+
+- [src/services/khoaTideSeriesSchema.ts](../../src/services/khoaTideSeriesSchema.ts): 날짜별 288개 × 2지점·다음 자정·공식 검증 미확인 상태 및 신선도
+- [src/services/khoaTideSeriesService.ts](../../src/services/khoaTideSeriesService.ts): 명시적 날짜 요청만 수행하는 중복 방지·LRU 메모리 캐시 접근 서비스
+
+[시계열 수집·캐시 운영](../../docs/KHOA_TIDE_SERIES.md)

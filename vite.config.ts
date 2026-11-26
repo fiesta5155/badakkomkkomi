@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { createTideCachePlugin } from './scripts/khoa-tide-cache.ts';
+import { createTideSeriesCachePlugin } from './scripts/khoa-tide-series-cache.ts';
 import { navigationalWarningPreviewPlugin } from './scripts/navigational-warning-preview.ts';
 
 function resolveViteBasePath(env: NodeJS.ProcessEnv): string {
@@ -124,7 +125,7 @@ export default defineConfig({
       workbox: {
         cacheId: 'bada-kkomkkomi-v2.4',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json,geojson}'],
-        globIgnores: ['**/dev/**', '**/data/tides/**', '**/data/navigational-warnings/**'],
+        globIgnores: ['**/dev/**', '**/data/tides/**', '**/data/tide-series/**', '**/data/navigational-warnings/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
@@ -152,6 +153,22 @@ export default defineConfig({
               fetchOptions: { cache: 'no-store' },
               plugins: [createTideCachePlugin()],
             },
+          },
+          {
+            urlPattern: ({url,sameOrigin}) => sameOrigin && /\/data\/tide-series\/\d{4}-\d{2}-\d{2}\.json$/.test(url.pathname),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'bada-khoa-tide-series-v1', networkTimeoutSeconds: 3,
+              fetchOptions: {cache:'no-store'},
+              expiration: {maxEntries:35,maxAgeSeconds:72*3600},
+              plugins: [createTideSeriesCachePlugin()],
+            },
+          },
+          {
+            // Publication manifest is not needed by the browser's date reader.
+            urlPattern: ({url,sameOrigin}) => sameOrigin && /\/data\/tide-series\//.test(url.pathname),
+            handler: 'NetworkOnly',
+            options: {fetchOptions:{cache:'no-store'}},
           },
           {
             // 1. GeoJSON 및 JSON 설정 파일: 온라인 시 3초 내 최신 파일 우선 조회(비개발자 Git Push 즉시 반영),

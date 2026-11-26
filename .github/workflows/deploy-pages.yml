@@ -112,6 +112,69 @@ jobs:
       - name: Require validated tide data before any deployment
         run: node --input-type=module -e "import {readSnapshot,OUTPUT} from './scripts/update-khoa-tides.mjs'; if (!await readSnapshot(OUTPUT)) { console.error('Missing verified tide snapshot. Deployment blocked.'); process.exit(1); }"
 
+      - name: Find successfully deployed tide series backup
+        id: series-backup
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            for (let page = 1; page <= 3; page++) {
+              const {data} = await github.rest.actions.listArtifactsForRepo({...context.repo, per_page:100, page});
+              for (const a of data.artifacts) {
+                const match = /^khoa-tide-series-(\d+)-(\d+)$/.exec(a.name);
+                if (a.expired || !match || a.workflow_run?.head_branch !== 'main' || a.workflow_run.id !== Number(match[1])) continue;
+                const {data:run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id:a.workflow_run.id});
+                if (run.path !== '.github/workflows/deploy-pages.yml' || run.conclusion !== 'success' || run.run_attempt !== Number(match[2]) || run.event === 'pull_request') continue;
+                core.setOutput('id',String(a.id)); core.setOutput('run',String(run.id)); return;
+              }
+              if (data.artifacts.length < 100) break;
+            }
+
+      - name: Download tide series backup
+        if: steps.series-backup.outputs.id != ''
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.series-backup.outputs.id }}
+          run-id: ${{ steps.series-backup.outputs.run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/tide-series-recovery
+          merge-multiple: true
+
+      - name: Recover complete tide series baseline
+        id: series-recovery
+        env:
+          TIDE_SERIES_ARTIFACT_DIR: ${{ runner.temp }}/tide-series-recovery
+          TIDE_SERIES_PAGES_URL: ${{ steps.pages.outputs.base_url }}/
+          TIDE_SERIES_BASELINE_DIR: ${{ runner.temp }}/tide-series-baseline
+        run: node scripts/prepare-khoa-tide-series.mjs
+
+      - name: Collect daily five-minute tide series
+        id: series-collection
+        # Once per KST date, only scheduled/manual runs. Push/hourly warning runs reuse data.
+        if: >-
+          (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+          steps.series-recovery.outputs.today != 'true'
+        continue-on-error: true
+        env:
+          KHOA_SERVICE_KEY: ${{ secrets.KHOA_SERVICE_KEY }}
+        run: node scripts/collect-khoa-tide-series.mjs
+
+      - name: Verify or restore complete tide series generation
+        id: series-final
+        env:
+          TIDE_SERIES_BASELINE_DIR: ${{ runner.temp }}/tide-series-baseline
+        run: |
+          node scripts/prepare-khoa-tide-series.mjs --finalize
+          if [ '${{ steps.series-collection.outcome }}' = 'failure' ]; then
+            echo '::warning::Tide series collection failed. Only a verified previous generation may be published; no partial batch.'
+          fi
+
+      - name: Report tide series collection separately from publication
+        run: |
+          echo 'Tide series API collection: ${{ steps.series-collection.outcome }}' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Verified generation available: ${{ steps.series-final.outputs.available }}; generatedAt: ${{ steps.series-final.outputs.generatedAt }}; starts today: ${{ steps.series-final.outputs.today }}' >> "$GITHUB_STEP_SUMMARY"
+
       - name: Find trusted navigational warning artifact
         id: navigation
         uses: actions/github-script@v7
@@ -235,5 +298,14 @@ jobs:
         with:
           name: khoa-tides-${{ github.run_id }}-${{ github.run_attempt }}
           path: public/data/tides/latest.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Preserve successfully deployed tide series generation
+        if: steps.series-final.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: khoa-tide-series-${{ github.run_id }}-${{ github.run_attempt }}
+          path: public/data/tide-series/
           if-no-files-found: error
           retention-days: 90

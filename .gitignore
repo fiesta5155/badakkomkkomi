@@ -18,6 +18,7 @@ node_modules
 dist
 dist-ssr
 public/data/tides/
+public/data/tide-series/
 dev-dist
 .env
 .env.*
